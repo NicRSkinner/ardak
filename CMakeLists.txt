@@ -20,13 +20,22 @@ find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclpy REQUIRED)
+find_package(bfr_base REQUIRED)
 
-include_directories(include)
+include_directories(
+  include
+  ${bfr_base_INCLUDE_DIRS}
+)
 
-ament_python_install_package(${PROJECT_NAME})
+add_executable(main src/main.cpp)
+ament_target_dependencies(main bfr_base rclcpp std_msgs)
 
 install(PROGRAMS
-  scripts/temp.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(TARGETS
+  main
   DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -38,7 +47,7 @@ if(BUILD_TESTING)
   # the following line skips cpplint (only works in a git repo)
   # uncomment the line when this package is not in a git repo
   #set(ament_cmake_cpplint_FOUND TRUE)
-  ament_lint_auto_find_test_dependencies()
+  #ament_lint_auto_find_test_dependencies()
 endif()
 
 ament_package()
