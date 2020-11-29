@@ -22,17 +22,10 @@ find_package(rclcpp REQUIRED)
 find_package(rclpy REQUIRED)
 find_package(bfr_base REQUIRED)
 
-include_directories(
-  include
-  ${bfr_base_INCLUDE_DIRS}
-)
+ament_export_dependencies(rclcpp bfr_base)
 
 add_executable(main src/main.cpp)
 ament_target_dependencies(main bfr_base rclcpp std_msgs)
-
-install(PROGRAMS
-  DESTINATION lib/${PROJECT_NAME}
-)
 
 install(TARGETS
   main
