@@ -19,14 +19,33 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclcpp_components REQUIRED)
 find_package(rclpy REQUIRED)
 find_package(bfr_base REQUIRED)
 find_package(std_msgs REQUIRED)
 
-ament_export_dependencies(rclcpp bfr_base)
+ament_export_dependencies(rclcpp rclcpp_components bfr_base)
 set(SOURCES
   src/input_calibration_node.cpp
+  src/ardak_node.cpp
 )
+
+# add components
+add_library(ardak_component SHARED
+  src/ardak_node.cpp)
+
+add_library(input_calibration_component SHARED
+  src/input_calibration_node.cpp)
+  
+ament_target_dependencies(ardak_component
+    "rclcpp"
+    "rclcpp_components")
+ament_target_dependencies(input_calibration_component
+  "rclcpp"
+  "rclcpp_components")
+
+rclcpp_components_register_nodes(ardak_component "bfr::ArdakNode")
+rclcpp_components_register_nodes(input_calibration_component "bfr::InputCalibrationNode")
 
 
 include_directories(
@@ -40,7 +59,7 @@ install(
 )
 
 add_executable(main src/main.cpp ${SOURCES})
-ament_target_dependencies(main bfr_base rclcpp std_msgs)
+ament_target_dependencies(main bfr_base rclcpp rclcpp_components std_msgs)
 
 install(TARGETS
   main
@@ -48,7 +67,7 @@ install(TARGETS
 )
 
 if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
+  #find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
   # uncomment the line when a copyright and license is not present in all source files
   #set(ament_cmake_copyright_FOUND TRUE)

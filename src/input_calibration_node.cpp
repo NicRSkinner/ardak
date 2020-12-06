@@ -15,11 +15,11 @@ namespace bfr
 
     void InputCalibrationNode::drive_encoder_callback(const std_msgs::msg::Int32::SharedPtr msg)
     {
-        this->steeringEncoderPosition += msg->data;
+        this->steeringEncoderPosition = msg->data;
     }
 
     void InputCalibrationNode::steering_encoder_callback(const std_msgs::msg::Int32::SharedPtr msg)
     {
-        this->driveEncoderPosition += msg->data;
+        this->driveEncoderPosition = msg->data;
     }
 } // namespace bfr
