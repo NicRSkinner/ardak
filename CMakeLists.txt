@@ -30,36 +30,54 @@ set(SOURCES
   src/ardak_node.cpp
 )
 
-# add components
-add_library(ardak_component SHARED
-  src/ardak_node.cpp)
-
-add_library(input_calibration_component SHARED
-  src/input_calibration_node.cpp)
-  
-ament_target_dependencies(ardak_component
-    "rclcpp"
-    "rclcpp_components")
-ament_target_dependencies(input_calibration_component
-  "rclcpp"
-  "rclcpp_components")
-
-rclcpp_components_register_nodes(ardak_component "bfr::ArdakNode")
-rclcpp_components_register_nodes(input_calibration_component "bfr::InputCalibrationNode")
-
-
 include_directories(
   include
   ${colcon_INCLUDE_DIRS}
 )
 
-install(
-  DIRECTORY include/
-  DESTINATION include
-)
 
-add_executable(main src/main.cpp ${SOURCES})
-ament_target_dependencies(main bfr_base rclcpp rclcpp_components std_msgs)
+set(node_plugins "")
+
+# add components
+add_library(ardak_component SHARED
+  src/ardak_node.cpp)
+target_compile_definitions(ardak_component
+  PRIVATE "ARDAK_DLL")
+ament_target_dependencies(ardak_component
+  "rclcpp"
+  "rclcpp_components")
+rclcpp_components_register_nodes(ardak_component "bfr::ArdakNode")
+set(node_plugins "${node_plugins}bfr::ArdakNode;$<TARGET_FILE:ardak_component>\n")
+
+add_library(input_calibration_component SHARED
+  src/input_calibration_node.cpp)
+target_compile_definitions(input_calibration_component
+  PRIVATE "ARDAK_DLL")
+ament_target_dependencies(input_calibration_component
+  "rclcpp"
+  "rclcpp_components")
+rclcpp_components_register_nodes(input_calibration_component "bfr::InputCalibrationNode")
+set(node_plugins "${node_plugins}bfr::InputCalibrationNode;$<TARGET_FILE:input_calibration_component>\n")
+
+if(NOT WIN32)
+  ament_environment_hooks(
+    "${ament_cmake_package_templates_ENVIRONMENT_HOOK_LIBRARY_PATH}")
+endif()
+
+add_executable(main src/main.cpp)
+
+target_link_libraries(main
+  ardak_component
+  input_calibration_component)
+
+ament_target_dependencies(main rclcpp)
+
+install(TARGETS
+  ardak_component
+  input_calibration_component
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
 
 install(TARGETS
   main
