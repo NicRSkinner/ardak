@@ -21,10 +21,25 @@ find_package(ament_cmake_python REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclpy REQUIRED)
 find_package(bfr_base REQUIRED)
+find_package(std_msgs REQUIRED)
 
 ament_export_dependencies(rclcpp bfr_base)
+set(SOURCES
+  src/input_calibration_node.cpp
+)
 
-add_executable(main src/main.cpp)
+
+include_directories(
+  include
+  ${colcon_INCLUDE_DIRS}
+)
+
+install(
+  DIRECTORY include/
+  DESTINATION include
+)
+
+add_executable(main src/main.cpp ${SOURCES})
 ament_target_dependencies(main bfr_base rclcpp std_msgs)
 
 install(TARGETS
