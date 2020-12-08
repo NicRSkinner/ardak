@@ -25,16 +25,11 @@ find_package(bfr_base REQUIRED)
 find_package(std_msgs REQUIRED)
 
 ament_export_dependencies(rclcpp rclcpp_components bfr_base)
-set(SOURCES
-  src/input_calibration_node.cpp
-  src/ardak_node.cpp
-)
 
 include_directories(
   include
   ${colcon_INCLUDE_DIRS}
 )
-
 
 set(node_plugins "")
 
@@ -43,6 +38,7 @@ add_library(ardak_component SHARED
   src/ardak_node.cpp)
 target_compile_definitions(ardak_component
   PRIVATE "ARDAK_DLL")
+target_link_libraries(ardak_component bfr_base::bfr_base)
 ament_target_dependencies(ardak_component
   "rclcpp"
   "rclcpp_components")
@@ -53,6 +49,7 @@ add_library(input_calibration_component SHARED
   src/input_calibration_node.cpp)
 target_compile_definitions(input_calibration_component
   PRIVATE "ARDAK_DLL")
+target_link_libraries(input_calibration_component bfr_base::bfr_base)
 ament_target_dependencies(input_calibration_component
   "rclcpp"
   "rclcpp_components")

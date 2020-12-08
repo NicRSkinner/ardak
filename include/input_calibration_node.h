@@ -3,6 +3,8 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/int32.hpp"
+#include "encoder.h"
+
 namespace bfr
 {
     class InputCalibrationNode : public rclcpp::Node
@@ -17,11 +19,15 @@ namespace bfr
         void drive_encoder_callback(const std_msgs::msg::Int32::SharedPtr msg);
         void steering_encoder_callback(const std_msgs::msg::Int32::SharedPtr msg);
 
+        void loop();
+
         rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr steering_encoder_subscription;
         rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr drive_encoder_subscription;
         
         int32_t steeringEncoderPosition;
         int32_t driveEncoderPosition;
+
+        rclcpp::TimerBase::SharedPtr timer;
     };
 } // namespace bfr
 
