@@ -9,7 +9,7 @@ namespace bfr
 {
     ArdakNode::ArdakNode(const rclcpp::NodeOptions &options) : Node("ardak", options)
     {
-        this->timer = this->create_wall_timer(50ms, std::bind(&ArdakNode::loop, this));
+        this->loopTimer = this->create_wall_timer(50ms, std::bind(&ArdakNode::loop, this));
     }
 
     void ArdakNode::loop()

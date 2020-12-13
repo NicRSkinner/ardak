@@ -8,19 +8,27 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
+    cout << "Initializing ROS" << endl;
     rclcpp::init(argc, argv);
 
     rclcpp::executors::MultiThreadedExecutor exec;
     rclcpp::NodeOptions options;
     options.use_intra_process_comms(true);
 
+    cout << "Initializing ROS nodes" << endl;
     auto input_cal_node = std::make_shared<bfr::InputCalibrationNode>(options);
     auto ardak_node = std::make_shared<bfr::ArdakNode>(options);
+
+    cout << "Adding Input Calibration node" << endl;
     exec.add_node(input_cal_node);
+
+    cout << "Adding Ardak main node" << endl;
     exec.add_node(ardak_node);
 
+    cout << "Performing ROS node tasks..." << endl;
     exec.spin();
 
+    cout << "Shutting down ROS environment" << endl;
     rclcpp::shutdown();
 
     return 0;

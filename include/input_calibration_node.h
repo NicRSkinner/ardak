@@ -3,7 +3,10 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/int32.hpp"
+#include "unittypes.h"
 #include "encoder.h"
+
+using namespace bfr_base::literals;
 
 namespace bfr
 {
@@ -27,7 +30,9 @@ namespace bfr
         int32_t steeringEncoderPosition;
         int32_t driveEncoderPosition;
 
-        rclcpp::TimerBase::SharedPtr timer;
+        rclcpp::TimerBase::SharedPtr loopTimer;
+        bfr_base::Encoder steeringEncoder;
+        bfr_base::Encoder driveEncoder;
     };
 } // namespace bfr
 

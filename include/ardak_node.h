@@ -14,7 +14,7 @@ namespace bfr
     private:
         void loop();
 
-        rclcpp::TimerBase::SharedPtr timer;
+        rclcpp::TimerBase::SharedPtr loopTimer;
     };
 } // namespace bfr
 
