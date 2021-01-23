@@ -11,21 +11,21 @@ namespace bfr
         this->steeringEncoder = bfr_base::Encoder(1024, 1, 1_cm);
         this->driveEncoder = bfr_base::Encoder(1024, 1, 79.756_cm);
 
-        this->steering_encoder_subscription = this->create_subscription<std_msgs::msg::Int32>(
-            "hardware/inputs/steering_encoder", 10, std::bind(&InputCalibrationNode::drive_encoder_callback, this, _1));
+        this->steering_encoder_raw_subscription = this->create_subscription<std_msgs::msg::Int32>(
+            "hal/inputs/steering_encoder_raw", 10, std::bind(&InputCalibrationNode::drive_encoder_raw_callback, this, _1));
 
-        this->drive_encoder_subscription = this->create_subscription<std_msgs::msg::Int32>(
-            "hardware/inputs/drive_encoder", 10, std::bind(&InputCalibrationNode::drive_encoder_callback, this, _1));
+        this->drive_encoder_raw_subscription = this->create_subscription<std_msgs::msg::Int32>(
+            "hal/inputs/drive_encoder_raw", 10, std::bind(&InputCalibrationNode::drive_encoder_raw_callback, this, _1));
 
         this->loopTimer = this->create_wall_timer(50ms, std::bind(&InputCalibrationNode::loop, this));
     }
 
-    void InputCalibrationNode::drive_encoder_callback(const std_msgs::msg::Int32::SharedPtr msg)
+    void InputCalibrationNode::steering_encoder_raw_callback(const std_msgs::msg::Int32::SharedPtr msg)
     {
         this->steeringEncoderPosition = msg->data;
     }
 
-    void InputCalibrationNode::steering_encoder_callback(const std_msgs::msg::Int32::SharedPtr msg)
+    void InputCalibrationNode::drive_encoder_raw_callback(const std_msgs::msg::Int32::SharedPtr msg)
     {
         this->driveEncoderPosition = msg->data;
     }

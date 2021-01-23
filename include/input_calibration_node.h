@@ -19,13 +19,13 @@ namespace bfr
         int getDriveEncoderPosition();
 
     private:
-        void drive_encoder_callback(const std_msgs::msg::Int32::SharedPtr msg);
-        void steering_encoder_callback(const std_msgs::msg::Int32::SharedPtr msg);
+        void drive_encoder_raw_callback(const std_msgs::msg::Int32::SharedPtr msg);
+        void steering_encoder_raw_callback(const std_msgs::msg::Int32::SharedPtr msg);
 
         void loop();
 
-        rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr steering_encoder_subscription;
-        rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr drive_encoder_subscription;
+        rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr steering_encoder_raw_subscription;
+        rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr drive_encoder_raw_subscription;
         
         int32_t steeringEncoderPosition;
         int32_t driveEncoderPosition;
