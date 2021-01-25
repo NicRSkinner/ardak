@@ -24,6 +24,7 @@ find_package(rclpy REQUIRED)
 find_package(bfr_base REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(bfr_msgs REQUIRED)
 
 ament_export_dependencies(rclcpp rclcpp_components bfr_base)
 
@@ -56,6 +57,18 @@ ament_target_dependencies(input_calibration_component
   "rclcpp_components")
 rclcpp_components_register_nodes(input_calibration_component "bfr::InputCalibrationNode")
 set(node_plugins "${node_plugins}bfr::InputCalibrationNode;$<TARGET_FILE:input_calibration_component>\n")
+
+add_library(drive_controller_component SHARED
+  src/drive_controller_node.cpp)
+target_compile_definitions(drive_controller_component
+  PRIVATE "ARDAK_DLL")
+target_link_libraries(drive_controller_component bfr_base::bfr_base)
+ament_target_dependencies(drive_controller_component
+  "rclcpp"
+  "rclcpp_components"
+  "bfr_msgs")
+rclcpp_components_register_nodes(drive_controller_component "bfr::DriveControllerNode")
+set(node_plugins "${node_plugins}bfr::DriveControllerNode;$<TARGET_FILE:drive_controller_component>\n")
 
 if(NOT WIN32)
   ament_environment_hooks(
