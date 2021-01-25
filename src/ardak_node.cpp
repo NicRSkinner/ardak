@@ -1,4 +1,4 @@
-#include "ardak_node.h"
+#include "ardak_node.hpp"
 
 #include <chrono>
 #include <iostream>

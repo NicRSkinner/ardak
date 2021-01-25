@@ -1,4 +1,4 @@
-#include "input_calibration_node.h"
+#include "input_calibration_node.hpp"
 #include <iostream>
 
 using std::placeholders::_1;

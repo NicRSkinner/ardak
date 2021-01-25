@@ -23,6 +23,7 @@ find_package(rclcpp_components REQUIRED)
 find_package(rclpy REQUIRED)
 find_package(bfr_base REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 
 ament_export_dependencies(rclcpp rclcpp_components bfr_base)
 
