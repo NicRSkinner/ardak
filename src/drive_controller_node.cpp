@@ -13,7 +13,7 @@ namespace bfr
         this->declare_parameter("gamepadEquipped", false);
         this->get_parameter("gamepadEquipped", this->gamepadEquipped);
 
-        this->set_on_parameters_set_callback(
+        (void)! this->add_on_set_parameters_callback(
             std::bind(&DriveControllerNode::parametersCallback, this, std::placeholders::_1));
 
         if (this->gamepadEquipped)
@@ -41,11 +41,13 @@ namespace bfr
                 this->gamepadEquipped = parameter.as_bool();
             }
         }
+
+        return result;
     }
 
     void DriveControllerNode::gamepad_callback(const bfr_msgs::msg::Gamepad::SharedPtr msg) const
     {
-
+        
     }
 
     void DriveControllerNode::loop()
