@@ -3,8 +3,9 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "rcl_interfaces/msg/set_parameters_result.hpp"
-#include "std_msgs/msg/string.hpp"
+#include "std_msgs/msg/int8.hpp"
 #include "bfr_msgs/msg/gamepad.hpp"
+#include "gamepad_definitions.hpp"
 
 namespace bfr
 {
@@ -26,6 +27,7 @@ namespace bfr
         rclcpp::TimerBase::SharedPtr loopTimer;
         rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr callbackHandle;
         rclcpp::Subscription<bfr_msgs::msg::Gamepad>::SharedPtr gamepadSubscription;
+        rclcpp::Publisher<std_msgs::msg::Int8>::SharedPtr drivePublisher;
     };
 } // namespace bfr
 
