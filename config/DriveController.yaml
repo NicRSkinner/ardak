@@ -1,0 +1,3 @@
+DriveControllerNode:
+  ros_parameters:
+    gamepadEquipped: true

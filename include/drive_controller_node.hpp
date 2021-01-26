@@ -24,6 +24,7 @@ namespace bfr
 
         bfr_msgs::msg::Gamepad lastReceivedMessage;
         rclcpp::TimerBase::SharedPtr loopTimer;
+        rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr callbackHandle;
         rclcpp::Subscription<bfr_msgs::msg::Gamepad>::SharedPtr gamepadSubscription;
     };
 } // namespace bfr

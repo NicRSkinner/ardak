@@ -13,7 +13,7 @@ namespace bfr
         this->declare_parameter("gamepadEquipped", false);
         this->get_parameter("gamepadEquipped", this->gamepadEquipped);
 
-        (void)! this->add_on_set_parameters_callback(
+        this->callbackHandle = this->add_on_set_parameters_callback(
             std::bind(&DriveControllerNode::parametersCallback, this, std::placeholders::_1));
 
         if (this->gamepadEquipped)
@@ -30,15 +30,30 @@ namespace bfr
         const std::vector<rclcpp::Parameter> &parameters)
     {
         rcl_interfaces::msg::SetParametersResult result;
-        result.successful = true;
-        result.reason = "NA";
+        result.successful = false;
+        result.reason = "Parameter not found/set.";
 
         for (const auto &parameter : parameters)
         {
             if (parameter.get_name() == "gamepadEquipped" &&
                 parameter.get_type() == rclcpp::ParameterType::PARAMETER_BOOL)
             {
+                result.successful = true;
+                result.reason = "NA";
+
                 this->gamepadEquipped = parameter.as_bool();
+
+                if (this->gamepadEquipped == false)
+                {
+                    // This should stop the callback from being served.
+                    this->gamepadSubscription.reset();
+                }
+                else
+                {
+                    this->gamepadSubscription = this->create_subscription<bfr_msgs::msg::Gamepad>(
+                        "hal/inputs/gamepad", 10, std::bind(&DriveControllerNode::gamepad_callback, this, _1)
+                    );
+                }
             }
         }
 
