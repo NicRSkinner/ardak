@@ -66,6 +66,7 @@ target_link_libraries(drive_controller_component bfr_base::bfr_base)
 ament_target_dependencies(drive_controller_component
   "rclcpp"
   "rclcpp_components"
+  "std_msgs"
   "bfr_msgs")
 rclcpp_components_register_nodes(drive_controller_component "bfr::DriveControllerNode")
 set(node_plugins "${node_plugins}bfr::DriveControllerNode;$<TARGET_FILE:drive_controller_component>\n")
@@ -86,6 +87,7 @@ ament_target_dependencies(main rclcpp)
 install(TARGETS
   ardak_component
   input_calibration_component
+  drive_controller_component
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
@@ -105,5 +107,10 @@ if(BUILD_TESTING)
   #set(ament_cmake_cpplint_FOUND TRUE)
   #ament_lint_auto_find_test_dependencies()
 endif()
+
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}
+)
 
 ament_package()
