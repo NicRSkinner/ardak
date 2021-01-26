@@ -62,7 +62,7 @@ namespace bfr
 
     void DriveControllerNode::gamepad_callback(const bfr_msgs::msg::Gamepad::SharedPtr msg) const
     {
-        if (msg->action == GamepadAction::LEFT_TRIGGER)
+        if (msg->action == GamepadAction::RIGHT_TRIGGER)
         {
             std_msgs::msg::Int8 message;
             message.data = msg->value;
