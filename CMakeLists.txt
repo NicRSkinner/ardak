@@ -54,9 +54,24 @@ target_compile_definitions(input_calibration_component
 target_link_libraries(input_calibration_component bfr_base::bfr_base)
 ament_target_dependencies(input_calibration_component
   "rclcpp"
-  "rclcpp_components")
+  "rclcpp_components"
+  "std_msgs"
+  "bfr_msgs")
 rclcpp_components_register_nodes(input_calibration_component "bfr::InputCalibrationNode")
 set(node_plugins "${node_plugins}bfr::InputCalibrationNode;$<TARGET_FILE:input_calibration_component>\n")
+
+add_library(output_calibration_component SHARED
+  src/output_calibration_node.cpp)
+target_compile_definitions(output_calibration_component
+  PRIVATE "ARDAK_DLL")
+target_link_libraries(output_calibration_component bfr_base::bfr_base)
+ament_target_dependencies(output_calibration_component
+  "rclcpp"
+  "rclcpp_components"
+  "std_msgs"
+  "bfr_msgs")
+rclcpp_components_register_nodes(output_calibration_component "bfr::OutputCalibrationNode")
+set(node_plugins "${node_plugins}bfr::OutputCalibrationNode;$<TARGET_FILE:output_calibration_component>\n")
 
 add_library(drive_controller_component SHARED
   src/drive_controller_node.cpp)
@@ -87,6 +102,7 @@ ament_target_dependencies(main rclcpp)
 install(TARGETS
   ardak_component
   input_calibration_component
+  output_calibration_component
   drive_controller_component
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib

@@ -13,6 +13,7 @@ namespace bfr
         this->callbackHandle = this->add_on_set_parameters_callback(
             std::bind(&DriveControllerNode::parametersCallback, this, std::placeholders::_1));
 
+        // TODO: Make all get parameters one call, for efficiency with the callback.
         this->declare_parameter("gamepadEquipped", false);
         this->get_parameter("gamepadEquipped", this->gamepadEquipped);
 
@@ -62,13 +63,22 @@ namespace bfr
 
     void DriveControllerNode::gamepad_callback(const bfr_msgs::msg::Gamepad::SharedPtr msg) const
     {
+        std_msgs::msg::Int8 output;
+
         if (msg->action == GamepadAction::RIGHT_TRIGGER)
         {
-            std_msgs::msg::Int8 message;
-            message.data = msg->value;
-
-            this->drivePublisher->publish(message);
+            output.data = msg->value;
         }
+        else if (msg->action == GamepadAction::LEFT_TRIGGER)
+        {
+            output.data = msg->value * -1;
+        }
+        else if (msg->action == 127)
+        {
+            output.data = 0;
+        }
+
+        this->drivePublisher->publish(output);
     }
 
     void DriveControllerNode::loop()
