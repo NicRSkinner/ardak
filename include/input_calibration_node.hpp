@@ -27,8 +27,8 @@ namespace bfr
         rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr steering_encoder_raw_subscription;
         rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr drive_encoder_raw_subscription;
         
-        int32_t steeringEncoderPosition;
-        int32_t driveEncoderPosition;
+        int32_t steeringEncoderPosition = 0;
+        int32_t driveEncoderPosition = 0;
 
         rclcpp::TimerBase::SharedPtr loopTimer;
         bfr_base::Encoder steeringEncoder;
