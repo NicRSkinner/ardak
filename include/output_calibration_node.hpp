@@ -3,6 +3,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/int8.hpp"
+#include "std_msgs/msg/float32.hpp"
 
 namespace bfr
 {
@@ -15,7 +16,7 @@ namespace bfr
         void drive_callback(const std_msgs::msg::Int8::SharedPtr msg) const;
 
         rclcpp::Subscription<std_msgs::msg::Int8>::SharedPtr driveSubscription;
-        rclcpp::Publisher<std_msgs::msg::Int8>::SharedPtr drivePublisher;
+        rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr drivePublisher;
     };
 } // namespace bfr
 
