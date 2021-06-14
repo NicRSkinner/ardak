@@ -2,9 +2,13 @@
 #define _DRIVE_CONTROLLER_NODE_H_
 
 #include "rclcpp/rclcpp.hpp"
+#include "rclcpp/qos.hpp"
+#include "rclcpp/qos_event.hpp"
+#include "rclcpp/duration.hpp"
 #include "rcl_interfaces/msg/set_parameters_result.hpp"
 #include "std_msgs/msg/int8.hpp"
 #include "bfr_msgs/msg/gamepad.hpp"
+#include "unittypes.h"
 #include "gamepad_definitions.hpp"
 
 namespace bfr
@@ -17,11 +21,19 @@ namespace bfr
     private:
         void loop();
         
+        void input_liveliness_changed(rclcpp::QOSLivelinessChangedInfo & event);
         void gamepad_callback(const bfr_msgs::msg::Gamepad::SharedPtr msg) const;
         rcl_interfaces::msg::SetParametersResult parametersCallback(
             const std::vector<rclcpp::Parameter> &parameters);
 
         bool gamepadEquipped = false;
+
+        bool inputAlive = false;
+        uint8_t outputCommand = 0;
+
+        bfr_base::Speed maxVelocity = bfr_base::Speed{0};
+        bfr_base::Speed minVelocity = bfr_base::Speed{0};
+        float driveGearRatio = 0.;
 
         bfr_msgs::msg::Gamepad lastReceivedMessage;
         rclcpp::TimerBase::SharedPtr loopTimer;

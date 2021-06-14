@@ -22,7 +22,10 @@ def generate_launch_description():
                 plugin='bfr::DriveControllerNode',
                 name='DriveControllerNode',
                 parameters=[
-                    {"gamepadEquipped": True}
+                    {"gamepadEquipped": True},
+                    {"maxVelocity": 10.0},
+                    {"minVelocity": 0.0},
+                    {"driveGearRatio": 1.0}
                 ]
             )
         ],
