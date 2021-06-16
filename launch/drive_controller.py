@@ -23,9 +23,10 @@ def generate_launch_description():
                 name='DriveControllerNode',
                 parameters=[
                     {"gamepadEquipped": True},
-                    {"maxVelocity": 10.0},
+                    {"maxVelocity": 16093.0},
                     {"minVelocity": 0.0},
-                    {"driveGearRatio": 1.0}
+                    {"driveGearRatio": 0.1},
+                    {"wheelCircumference": 57.026}
                 ]
             )
         ],

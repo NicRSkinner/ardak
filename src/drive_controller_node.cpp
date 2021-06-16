@@ -18,10 +18,10 @@ namespace bfr
         this->declare_parameter<double>("maxVelocity", 0.0f);
         this->declare_parameter<double>("minVelocity", 0.0f);
         this->declare_parameter<double>("driveGearRatio", 0.0f);
-        this->declare_parameter<double>("wheelDiameter", 0.0f);
+        this->declare_parameter<double>("wheelCircumference", 0.0f);
 
-        this->drivePublisher = this->create_publisher<std_msgs::msg::Int8>(
-            "appout/drive/drive_percent", 10
+        this->drivePublisher = this->create_publisher<std_msgs::msg::Float32>(
+            "appout/drive/output_command", 10
         );
     }
 
@@ -34,27 +34,40 @@ namespace bfr
 
         for (const auto &parameter : parameters)
         {
-            std::cout << parameter.get_name() << " " << parameter.get_type_name() << std::endl;
-
             if (parameter.get_name() == "maxVelocity" &&
                 parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
             {
+                this->maxVelocity.value = parameter.as_double();
+
                 result.successful = true;
-                result.reason = "NA";
+                result.reason = "maxVelocity set";
             }
 
             if (parameter.get_name() == "minVelocity" &&
                 parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
             {
+                this->minVelocity.value = parameter.as_double();
+
                 result.successful = true;
-                result.reason = "NA";
+                result.reason = "minVelocity set";
             }
 
             if (parameter.get_name() == "driveGearRatio" &&
                 parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
             {
+                this->driveGearRatio = parameter.as_double();
+
                 result.successful = true;
-                result.reason = "NA";
+                result.reason = "driveGearRatio set";
+            }
+
+            if (parameter.get_name() == "wheelCircumference" &&
+                parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+            {
+                this->wheelCircumference.value = parameter.as_double();
+
+                result.successful = true;
+                result.reason = "wheelCircumference set";
             }
 
             if (parameter.get_name() == "gamepadEquipped" &&
@@ -88,7 +101,7 @@ namespace bfr
                 }
 
                 result.successful = true;
-                result.reason = "NA";
+                result.reason = "gamepadEquipped set";
             }
         }
 
@@ -102,7 +115,7 @@ namespace bfr
         if (event.alive_count_change < 0)
         {
             this->inputAlive = false;
-            this->outputCommand = 0;
+            this->outputVelocity.value = 0;
         }
         else if (event.alive_count_change > 0)
         {
@@ -110,26 +123,57 @@ namespace bfr
         }
     }
 
-    void DriveControllerNode::gamepad_callback(const bfr_msgs::msg::Gamepad::SharedPtr msg) const
+    void DriveControllerNode::gamepad_callback(const bfr_msgs::msg::Gamepad::SharedPtr msg)
     {
-        std_msgs::msg::Int8 output;
+        
+        static bool rightPressedFirst;
+        static bool leftPressedFrist;
+
+        this->outputVelocity.value = bfr_base::scale(0., 100.,
+            this->minVelocity.value, this->maxVelocity.value, static_cast<double>(msg->value));
+
+        double outputTPS = (this->outputVelocity.value / 60.) * this->driveGearRatio;
+        float outputTPSFloat = static_cast<float>(outputTPS);
+        
+        std_msgs::msg::Float32 output;
 
         if (this->inputAlive)
         {
             if (msg->action == GamepadAction::RIGHT_TRIGGER)
             {
-                output.data = msg->value;
+                if (leftPressedFrist == false && this->outputVelocity.value != 0)
+                {
+                    rightPressedFirst = true;
+                    output.data = outputTPSFloat;
+                    this->drivePublisher->publish(output);
+                }
+                else if (rightPressedFirst == true && this->outputVelocity.value == 0)
+                {
+                    rightPressedFirst = false;
+                    output.data = outputTPSFloat;
+                    this->drivePublisher->publish(output);
+                }                
             }
             else if (msg->action == GamepadAction::LEFT_TRIGGER)
             {
-                output.data = msg->value * -1;
+                if (rightPressedFirst == false && this->outputVelocity.value != 0)
+                {
+                    leftPressedFrist = true;
+                    output.data = outputTPSFloat * -1;
+                    this->drivePublisher->publish(output);
+                }
+                else if (leftPressedFrist == true && this->outputVelocity.value == 0)
+                {
+                    leftPressedFrist = false;
+                    output.data = outputTPSFloat;
+                    this->drivePublisher->publish(output);
+                }
             }
             else if (msg->action == 127)
             {
                 output.data = 0;
+                this->drivePublisher->publish(output);
             }
-
-            this->drivePublisher->publish(output);
         }
     }
 
