@@ -13,15 +13,21 @@ namespace bfr
         this->callbackHandle = this->add_on_set_parameters_callback(
             std::bind(&DriveControllerNode::parametersCallback, this, std::placeholders::_1));
 
-        // TODO: Make all get parameters one call, for efficiency with the callback.
         this->declare_parameter<bool>("gamepadEquipped", false);
         this->declare_parameter<double>("maxVelocity", 0.0f);
         this->declare_parameter<double>("minVelocity", 0.0f);
         this->declare_parameter<double>("driveGearRatio", 0.0f);
         this->declare_parameter<double>("wheelCircumference", 0.0f);
+        this->declare_parameter<double>("steeringGearRatio", 0.0f);
+        this->declare_parameter<double>("maxSteeringAngle", 0.0f);
+        this->declare_parameter<double>("minSteeringAngle", 0.0f);
 
         this->drivePublisher = this->create_publisher<std_msgs::msg::Float32>(
             "appout/drive/output_command", 10
+        );
+
+        this->steeringPublisher = this->create_publisher<std_msgs::msg::Float32>(
+            "appout/steering/output_command", 10
         );
     }
 
@@ -68,6 +74,33 @@ namespace bfr
 
                 result.successful = true;
                 result.reason = "wheelCircumference set";
+            }
+
+            if (parameter.get_name() == "steeringGearRatio" &&
+                parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+            {
+                this->steeringGearRatio = parameter.as_double();
+
+                result.successful = true;
+                result.reason = "steeringGearRatio set";
+            }
+
+            if (parameter.get_name() == "maxSteeringAngle" &&
+                parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+            {
+                this->maxSteeringAngle.value = parameter.as_double();
+
+                result.successful = true;
+                result.reason = "maxSteeringAngle set";
+            }
+
+            if (parameter.get_name() == "minSteeringAngle" &&
+                parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+            {
+                this->minSteeringAngle.value = parameter.as_double();
+
+                result.successful = true;
+                result.reason = "minSteeringAngle set";
             }
 
             if (parameter.get_name() == "gamepadEquipped" &&
@@ -129,18 +162,18 @@ namespace bfr
         static bool rightPressedFirst;
         static bool leftPressedFrist;
 
-        this->outputVelocity.value = bfr_base::scale(0., 100.,
-            this->minVelocity.value, this->maxVelocity.value, static_cast<double>(msg->value));
-
-        double outputTPS = (this->outputVelocity.value / 60.) * this->driveGearRatio;
-        float outputTPSFloat = static_cast<float>(outputTPS);
-        
-        std_msgs::msg::Float32 output;
-
         if (this->inputAlive)
         {
             if (msg->action == GamepadAction::RIGHT_TRIGGER)
             {
+                this->outputVelocity.value = bfr_base::scale(0., 100.,
+                this->minVelocity.value, this->maxVelocity.value, static_cast<double>(msg->value));
+
+                double outputTPS = (this->outputVelocity.value / 60.) * this->driveGearRatio;
+                float outputTPSFloat = static_cast<float>(outputTPS);
+        
+                std_msgs::msg::Float32 output;
+
                 if (leftPressedFrist == false && this->outputVelocity.value != 0)
                 {
                     rightPressedFirst = true;
@@ -156,6 +189,14 @@ namespace bfr
             }
             else if (msg->action == GamepadAction::LEFT_TRIGGER)
             {
+                this->outputVelocity.value = bfr_base::scale(0., 100.,
+                this->minVelocity.value, this->maxVelocity.value, static_cast<double>(msg->value));
+
+                double outputTPS = (this->outputVelocity.value / 60.) * this->driveGearRatio;
+                float outputTPSFloat = static_cast<float>(outputTPS);
+        
+                std_msgs::msg::Float32 output;
+
                 if (rightPressedFirst == false && this->outputVelocity.value != 0)
                 {
                     leftPressedFrist = true;
@@ -169,8 +210,17 @@ namespace bfr
                     this->drivePublisher->publish(output);
                 }
             }
+            else if (msg->action == GamepadAction::LEFT_STICK_LEFT_RIGHT)
+            {
+                std_msgs::msg::Float32 steeringOutput;
+                steeringOutput.data = bfr_base::scale(0., 100., this->maxSteeringAngle.value,
+                    this->maxSteeringAngle.value, msg->value);
+
+                this->steeringPublisher->publish(steeringOutput);
+            }
             else if (msg->action == 127)
             {
+                std_msgs::msg::Float32 output;
                 output.data = 0;
                 this->drivePublisher->publish(output);
             }

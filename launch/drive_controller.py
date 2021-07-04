@@ -27,6 +27,10 @@ def generate_launch_description():
                     {"minVelocity": 0.0},
                     {"driveGearRatio": 0.1},
                     {"wheelCircumference": 57.026}
+                ],
+                remappings=[
+                    ("appout/drive/output_command", "odrive0/motor0/input_vel"),
+                    ("appout/steering/output_command", "odrive0/motor1/input_pos")
                 ]
             )
         ],

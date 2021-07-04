@@ -35,17 +35,22 @@ namespace bfr
 
         bool inputAlive = false;
         bfr_base::Speed outputVelocity = bfr_base::Speed{0};
+        bfr_base::Degrees outputAngle = bfr_base::Degrees{0};
 
         bfr_base::Speed maxVelocity = bfr_base::Speed{0};
         bfr_base::Speed minVelocity = bfr_base::Speed{0};
         float driveGearRatio = 0.;
+        float steeringGearRatio = 0.;
         bfr_base::Length<std::centi> wheelCircumference = bfr_base::Length<std::centi>(0_cm);
+        bfr_base::Degrees maxSteeringAngle = bfr_base::Degrees{0};
+        bfr_base::Degrees minSteeringAngle = bfr_base::Degrees{0};
 
         bfr_msgs::msg::Gamepad lastReceivedMessage;
         rclcpp::TimerBase::SharedPtr loopTimer;
         rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr callbackHandle;
         rclcpp::Subscription<bfr_msgs::msg::Gamepad>::SharedPtr gamepadSubscription;
         rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr drivePublisher;
+        rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr steeringPublisher;
     };
 } // namespace bfr
 
