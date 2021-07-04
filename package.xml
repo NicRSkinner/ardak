@@ -17,6 +17,9 @@
 
   <depend>rclcpp</depend>
   <depend>rclpy</depend>
+  <depend>rclcpp_components</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
   <depend>bfr_base</depend>
   <depend>bfr_msgs</depend>
 
