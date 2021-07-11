@@ -32,13 +32,30 @@ def generate_launch_description():
                 plugin='bfr::DriveControllerNode',
                 name='DriveControllerNode',
                 parameters=[
-                    {"gamepadEquipped": True}
+                    {"gamepadEquipped": True},
+                    {"maxVelocity": 16093.0},
+                    {"minVelocity": 0.0},
+                    {"driveGearRatio": 0.1},
+                    {"wheelCircumference": 57.026},
+                    {"steeringGearRatio": 0.667},
+                    {"maxSteeringAngle": 45.0},
+                    {"minSteeringAngle": -45.0}
+                ],
+                remappings=[
+                    ("appout/drive/output_command", "odrive0/motor0/input_vel"),
+                    ("appout/steering/output_command", "odrive0/motor1/input_pos")
                 ]
             )
         ],
         output="screen"
     )
 
+    gamepad = Node(
+        package="bfr_hal",
+        executable="gamepad.py"
+    )
+
     ld.add_action(container)
+    ld.add_action(gamepad)
 
     return ld
