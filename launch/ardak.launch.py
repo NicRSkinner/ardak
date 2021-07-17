@@ -17,16 +17,16 @@ def generate_launch_description():
         package='rclcpp_components',
         executable='component_container',
         composable_node_descriptions=[
-            ComposableNode(
-                package='ardak',
-                plugin='bfr::InputCalibrationNode',
-                name='InputCalibrationNode'
-            ),
-            ComposableNode(
-                package='ardak',
-                plugin='bfr::OutputCalibrationNode',
-                name="OutputCalibrationNode"
-            ),
+            #ComposableNode(
+            #    package='ardak',
+            #    plugin='bfr::InputCalibrationNode',
+            #    name='InputCalibrationNode'
+            #),
+            #ComposableNode(
+            #    package='ardak',
+            #    plugin='bfr::OutputCalibrationNode',
+            #    name="OutputCalibrationNode"
+            #),
             ComposableNode(
                 package='ardak',
                 plugin='bfr::DriveControllerNode',
@@ -37,7 +37,7 @@ def generate_launch_description():
                     {"minVelocity": 0.0},
                     {"driveGearRatio": 0.1},
                     {"wheelCircumference": 57.026},
-                    {"steeringGearRatio": 0.667},
+                    {"steeringGearRatio": 0.0667},
                     {"maxSteeringAngle": 45.0},
                     {"minSteeringAngle": -45.0}
                 ],
@@ -55,7 +55,13 @@ def generate_launch_description():
         executable="gamepad.py"
     )
 
+    odrive = Node(
+        package="odrive_ros2",
+        executable="odrive"
+    )
+
     ld.add_action(container)
     ld.add_action(gamepad)
+    ld.add_action(odrive)
 
     return ld

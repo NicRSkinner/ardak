@@ -185,7 +185,7 @@ namespace bfr
                     rightPressedFirst = false;
                     output.data = outputTPSFloat;
                     this->drivePublisher->publish(output);
-                }                
+                }
             }
             else if (msg->action == GamepadAction::LEFT_TRIGGER)
             {
@@ -212,9 +212,14 @@ namespace bfr
             }
             else if (msg->action == GamepadAction::LEFT_STICK_LEFT_RIGHT)
             {
+                // Output to the Odrive is in turns of the motor.
                 std_msgs::msg::Float32 steeringOutput;
-                steeringOutput.data = bfr_base::scale(0., 100., this->maxSteeringAngle.value,
+                float commandedAngle = bfr_base::scale(-100., 100., this->minSteeringAngle.value,
                     this->maxSteeringAngle.value, msg->value);
+                
+                // Convert commanded steering angle to turns in motor.
+                float turnsPerDegree = (1/this->steeringGearRatio) / 360.f;
+                steeringOutput.data = turnsPerDegree * commandedAngle;
 
                 this->steeringPublisher->publish(steeringOutput);
             }
