@@ -1,3 +1,16 @@
+/**
+ * @file drive_controller_node.cpp
+ * @author Nick Skinner (nskinner@zygenrobotics.com)
+ * @brief Drive controller for Ardak project. Commands the steering and drive system
+ *          as specificied by incoming signals from either a manual control or the 
+ *          onboard intelligence system.
+ * @version 0.1
+ * @date 2021-09-20
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #include "drive_controller_node.hpp"
 
 #include <chrono>
@@ -13,7 +26,7 @@ namespace bfr
         this->callbackHandle = this->add_on_set_parameters_callback(
             std::bind(&DriveControllerNode::parametersCallback, this, std::placeholders::_1));
 
-        this->declare_parameter<bool>("gamepadEquipped", false);
+        this->declare_parameter<bool>("manualControlAllowed", false);
         this->declare_parameter<double>("maxVelocity", 0.0f);
         this->declare_parameter<double>("minVelocity", 0.0f);
         this->declare_parameter<double>("driveGearRatio", 0.0f);
@@ -103,7 +116,7 @@ namespace bfr
                 result.reason = "minSteeringAngle set";
             }
 
-            if (parameter.get_name() == "gamepadEquipped" &&
+            if (parameter.get_name() == "manualControlAllowed" &&
                 parameter.get_type() == rclcpp::ParameterType::PARAMETER_BOOL)
             {
                 rclcpp::QoS input_qos(1);
@@ -114,9 +127,9 @@ namespace bfr
 
                 rclcpp::SubscriptionOptions sub_options;
                 sub_options.event_callbacks.liveliness_callback = std::bind(&DriveControllerNode::input_liveliness_changed, this, _1);
-                this->gamepadEquipped = parameter.as_bool();
+                this->manualControlAllowed = parameter.as_bool();
 
-                if (this->gamepadEquipped == false)
+                if (this->manualControlAllowed == false)
                 {
                     // This should stop the callback from being served.
                     this->gamepadSubscription.reset();
@@ -143,8 +156,6 @@ namespace bfr
 
     void DriveControllerNode::input_liveliness_changed(rclcpp::QOSLivelinessChangedInfo & event)
     {
-        std::cout << "liveliness_changed! " << event.alive_count_change << std::endl;
-
         if (event.alive_count_change < 0)
         {
             this->inputAlive = false;
@@ -158,7 +169,6 @@ namespace bfr
 
     void DriveControllerNode::gamepad_callback(const bfr_msgs::msg::Gamepad::SharedPtr msg)
     {
-        
         static bool rightPressedFirst;
         static bool leftPressedFrist;
 
