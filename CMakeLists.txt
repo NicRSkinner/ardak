@@ -43,7 +43,9 @@ target_compile_definitions(ardak_component
 target_link_libraries(ardak_component bfr_base::bfr_base)
 ament_target_dependencies(ardak_component
   "rclcpp"
-  "rclcpp_components")
+  "rclcpp_components"
+  "std_msgs"
+  "bfr_msgs")
 rclcpp_components_register_nodes(ardak_component "bfr::ArdakNode")
 set(node_plugins "${node_plugins}bfr::ArdakNode;$<TARGET_FILE:ardak_component>\n")
 

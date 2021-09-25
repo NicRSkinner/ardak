@@ -27,11 +27,12 @@
  */
 #include "std_msgs/msg/int8.hpp"
 #include "std_msgs/msg/float32.hpp"
+#include "std_msgs/msg/bool.hpp"
+#include "bfr_msgs/msg/gamepad.hpp"
 
 /**
  * ARDAK INCLUDES
  */
-#include "bfr_msgs/msg/gamepad.hpp"
 #include "unittypes.h"
 #include "gamepad_definitions.hpp"
 #include "scale.hpp"
@@ -50,12 +51,16 @@ namespace bfr
         void loop();
         
         void input_liveliness_changed(rclcpp::QOSLivelinessChangedInfo & event);
+        void safety_liveliness_changed(rclcpp::QOSLivelinessChangedInfo & event);
+        void safety_callback(const std_msgs::msg::Bool::SharedPtr msg);
         void gamepad_callback(const bfr_msgs::msg::Gamepad::SharedPtr msg);
 
         bool inputAlive = false;
+        bool run = false;
         bfr_base::Speed outputVelocity = bfr_base::Speed{0};
         bfr_base::Degrees outputAngle = bfr_base::Degrees{0};
         bfr_msgs::msg::Gamepad lastReceivedMessage;
+        rclcpp::QoS base_qos = rclcpp::QoS(1);
 
         /**
          * @brief PARAMETERS
@@ -76,6 +81,7 @@ namespace bfr
         /**
          * @brief ROS2 TOPICS
          */
+        rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr runSubscription;
         rclcpp::Subscription<bfr_msgs::msg::Gamepad>::SharedPtr gamepadSubscription;
         rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr drivePublisher;
         rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr steeringPublisher;

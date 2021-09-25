@@ -29,6 +29,11 @@ def generate_launch_description():
             #),
             ComposableNode(
                 package='ardak',
+                plugin='bfr::ArdakNode',
+                name='ArdakNode'
+            ),
+            ComposableNode(
+                package='ardak',
                 plugin='bfr::DriveControllerNode',
                 name='DriveControllerNode',
                 parameters=[

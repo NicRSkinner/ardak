@@ -11,10 +11,13 @@
  * 
  */
 
-#include "drive_controller_node.hpp"
-
+/**
+ * C++ BASE INCLUDES
+ */
 #include <chrono>
 #include <iostream>
+
+#include "drive_controller_node.hpp"
 
 using namespace std::literals::chrono_literals;
 using std::placeholders::_1;
@@ -23,6 +26,11 @@ namespace bfr
 {
     DriveControllerNode::DriveControllerNode(const rclcpp::NodeOptions &options) : Node("DriveController", options)
     {
+        this->base_qos.liveliness(RMW_QOS_POLICY_LIVELINESS_AUTOMATIC);
+        this->base_qos.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
+        this->base_qos.liveliness_lease_duration(2s);
+        this->base_qos.history(RMW_QOS_POLICY_HISTORY_KEEP_LAST);
+
         this->callbackHandle = this->add_on_set_parameters_callback(
             std::bind(&DriveControllerNode::parametersCallback, this, std::placeholders::_1));
 
@@ -34,6 +42,12 @@ namespace bfr
         this->declare_parameter<double>("steeringGearRatio", 0.0f);
         this->declare_parameter<double>("maxSteeringAngle", 0.0f);
         this->declare_parameter<double>("minSteeringAngle", 0.0f);
+
+        rclcpp::SubscriptionOptions sub_options;
+        sub_options.event_callbacks.liveliness_callback = std::bind(&DriveControllerNode::input_liveliness_changed, this, _1);
+        this->runSubscription = this->create_subscription<std_msgs::msg::Bool>(
+            "safety/run", this->base_qos, std::bind(&DriveControllerNode::safety_callback, this, _1),
+            sub_options);
 
         this->drivePublisher = this->create_publisher<std_msgs::msg::Float32>(
             "appout/drive/output_command", 10
@@ -119,12 +133,6 @@ namespace bfr
             if (parameter.get_name() == "manualControlAllowed" &&
                 parameter.get_type() == rclcpp::ParameterType::PARAMETER_BOOL)
             {
-                rclcpp::QoS input_qos(1);
-                input_qos.liveliness(RMW_QOS_POLICY_LIVELINESS_AUTOMATIC);
-                input_qos.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
-                input_qos.liveliness_lease_duration(2s);
-                input_qos.history(RMW_QOS_POLICY_HISTORY_KEEP_LAST);
-
                 rclcpp::SubscriptionOptions sub_options;
                 sub_options.event_callbacks.liveliness_callback = std::bind(&DriveControllerNode::input_liveliness_changed, this, _1);
                 this->manualControlAllowed = parameter.as_bool();
@@ -141,7 +149,7 @@ namespace bfr
                     this->loopTimer.reset();
 
                     this->gamepadSubscription = this->create_subscription<bfr_msgs::msg::Gamepad>(
-                        "hal/inputs/gamepad", input_qos, std::bind(&DriveControllerNode::gamepad_callback, this, _1),
+                        "hal/inputs/gamepad", this->base_qos, std::bind(&DriveControllerNode::gamepad_callback, this, _1),
                         sub_options
                     );
                 }
@@ -167,12 +175,25 @@ namespace bfr
         }
     }
 
+    void DriveControllerNode::safety_liveliness_changed(rclcpp::QOSLivelinessChangedInfo & event)
+    {
+        if (event.alive_count_change < 0)
+        {
+            this->run = false;
+        }
+    }
+
+    void DriveControllerNode::safety_callback(const std_msgs::msg::Bool::SharedPtr msg)
+    {
+        this->run = msg->data;
+    }
+
     void DriveControllerNode::gamepad_callback(const bfr_msgs::msg::Gamepad::SharedPtr msg)
     {
         static bool rightPressedFirst;
         static bool leftPressedFrist;
 
-        if (this->inputAlive)
+        if (this->inputAlive && this->run)
         {
             if (msg->action == GamepadAction::RIGHT_TRIGGER)
             {
