@@ -24,6 +24,8 @@
   <depend>bfr_msgs</depend>
   <depend>odrive_ros2</depend>
 
+  <exec_depend>robot_localization</exec_depend>
+
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 

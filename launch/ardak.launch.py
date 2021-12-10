@@ -43,8 +43,8 @@ def generate_launch_description():
                     {"driveGearRatio": 0.1},
                     {"wheelCircumference": 57.026},
                     {"steeringGearRatio": 0.0667},
-                    {"maxSteeringAngle": 45.0},
-                    {"minSteeringAngle": -45.0}
+                    {"maxSteeringAngle": 30.0},
+                    {"minSteeringAngle": -30.0}
                 ],
                 remappings=[
                     ("appout/drive/output_command", "odrive0/motor0/input_vel"),
