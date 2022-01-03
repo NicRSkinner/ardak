@@ -1,0 +1,4 @@
+# my_workspace/defaults.yaml
+build:
+  cmake-args: ["-DCMAKE_BUILD_TYPE=Release"]
+  event-handlers: ["console_direct+"]
