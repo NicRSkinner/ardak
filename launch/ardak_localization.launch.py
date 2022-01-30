@@ -28,89 +28,59 @@ def generate_launch_description():
           'subscribe_depth':True}]
 
     remappings=[
-          ('odom', 'rs_t265/odom'),
+          ('odom', '/rs_t265/odom'),
           ('rgb/image', '/rs_d435/image_raw'),
-          ('rgb/camera_info', 'rs_d435/image_raw/camera_info'),
+          ('rgb/camera_info', '/rs_d435/image_raw/camera_info'),
           ('depth/image', '/rs_d435/aligned_depth/image_raw')]
+
 
     return LaunchDescription([
 
     
-    #Node(
-    #    package='realsense_ros2',
-    #    executable='rs_t265_node',
-    #    name='rs_t265',
-    #    output='screen'
-    #),
-    #Node(
-    #    package='realsense_ros2',
-    #    executable='rs_d435_node',
-    #    name='rs_d435',
-    #    output='screen',
-    #    parameters=[
-    #        {"publish_depth": True},
-    #        {"publish_pointcloud": True},
-    #        {"is_color": True},
-    #        {"publish_image_raw_": True},
-    #        {"fps": 6}      # Can only take values of 6,15,30 or 60
-    #    ]
-    #),
     Node(
-        package='realsense2_camera',
-        namespace="d435",
-        name="d435",
-        executable='realsense2_camera_node',
-        parameters=[localization_config_path],
-        output='screen',
-        arguments=['--ros-args', '--log-level', 'info'],
-        emulate_tty=True,
+        package='realsense_ros2',
+        executable='rs_t265_node',
+        name='rs_t265',
+        output='screen'
     ),
     Node(
-        package='realsense2_camera',
-        namespace="t265",
-        name="t265",
-        executable='realsense2_camera_node',
-        parameters=[localization_config_path],
+        package='realsense_ros2',
+        executable='rs_d435_node',
+        name='rs_d435',
         output='screen',
-        arguments=['--ros-args', '--log-level', 'info'],
-        emulate_tty=True,
+        parameters=[
+            {"publish_depth": True},
+            {"publish_pointcloud": False},
+            {"is_color": True},
+            {"publish_image_raw_": True},
+            {"fps": 6}      # Can only take values of 6,15,30 or 60
+        ]
+    ),
+    Node(
+        ## Configure the TF of the robot 
+        package='tf2_ros',
+        node_executable='static_transform_publisher',
+        output='screen',
+        arguments=['0.0', '0.0', '0.0', '0.0', '0.0', '0.0', 't265_frame', 'base_link']
     ),
     Node(
         package='tf2_ros',
-        executable='static_transform_publisher',
+        node_executable='static_transform_publisher',
         output='screen',
-        arguments=['0.0', '0.3', '0.1', '0.0', '0.0', '0.0', 'base_link', 'base_camera']
+        arguments=['0.0', '0.025', '0.03', '-1.5708', '0.0', '-1.5708', 'base_link', 'camera_link_d435']
     ),
     Node(
         package='tf2_ros',
-        executable='static_transform_publisher',
+        node_executable='static_transform_publisher',
         output='screen',
-        arguments=['0.0', '0.0', '0.001', '0.0', '0.0', '0.0', 'base_camera', 'd435_link']
+        arguments=['0.0', '0.025', '0.03', '-1.5708', '0.0', '-1.5708', 'base_link', 'camera_link_d435_pcl']
     ),
     Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        output='screen',
-        arguments=['0.0', '0.0', '0.0', '1.5708', '0.0', '1.5708', 'd435_link', 'd435_rotated_frame']
+        package='rtabmap_ros', executable='rtabmap', output='screen',
+        parameters=parameters,
+        remappings=remappings,
+        arguments=['-d']
     ),
-    Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        output='screen',
-        arguments=['0.0', '0.0', '-0.001', '0.0', '0.0', '0.0', 'base_camera', 't265_link']
-    ),
-    Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        output='screen',
-        arguments=['0.0', '0.0', '0.0', '0.0', '0.0', '0.0', 't265_odom_frame', 'base_link']
-    ),
-    #Node(
-    #    package='rtabmap_ros', executable='rtabmap', output='screen',
-    #    parameters=parameters,
-    #    remappings=remappings,
-    #    arguments=['-d']
-    #),
     #Node(
     #    package='rtabmap_ros', executable='rtabmapviz', output='screen',
     #    parameters=parameters,
