@@ -51,6 +51,7 @@ namespace bfr
         void loop();
         
         void input_liveliness_changed(rclcpp::QOSLivelinessChangedInfo & event);
+        void input_deadline_changed(rclcpp::QOSDeadlineRequestedInfo & event);
         void safety_liveliness_changed(rclcpp::QOSLivelinessChangedInfo & event);
         void safety_callback(const std_msgs::msg::Bool::SharedPtr msg);
         void gamepad_callback(const bfr_msgs::msg::Gamepad::SharedPtr msg);

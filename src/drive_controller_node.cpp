@@ -29,6 +29,7 @@ namespace bfr
         this->base_qos.liveliness(RMW_QOS_POLICY_LIVELINESS_AUTOMATIC);
         this->base_qos.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
         this->base_qos.liveliness_lease_duration(2s);
+        this->base_qos.deadline(250ms);
         this->base_qos.history(RMW_QOS_POLICY_HISTORY_KEEP_LAST);
 
         this->callbackHandle = this->add_on_set_parameters_callback(
@@ -45,6 +46,7 @@ namespace bfr
 
         rclcpp::SubscriptionOptions sub_options;
         sub_options.event_callbacks.liveliness_callback = std::bind(&DriveControllerNode::input_liveliness_changed, this, _1);
+        sub_options.event_callbacks.deadline_callback = std::bind(&DriveControllerNode::input_deadline_changed, this, _1);
         this->runSubscription = this->create_subscription<std_msgs::msg::Bool>(
             "safety/run", this->base_qos, std::bind(&DriveControllerNode::safety_callback, this, _1),
             sub_options);
@@ -172,6 +174,19 @@ namespace bfr
         else if (event.alive_count_change > 0)
         {
             this->inputAlive = true;
+        }
+    }
+
+    void DriveControllerNode::input_deadline_changed(rclcpp::QOSDeadlineRequestedInfo & event)
+    {
+        // We've missed a message.
+        if (event.total_count_change > 0)
+        {
+            std::cout << "DriveController input deadline missed!" << std::endl;
+            
+            std_msgs::msg::Float32 output;
+            output.data = 0.f;
+            this->drivePublisher->publish(output);
         }
     }
 
