@@ -29,7 +29,7 @@ namespace bfr
         this->base_qos.liveliness(RMW_QOS_POLICY_LIVELINESS_AUTOMATIC);
         this->base_qos.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
         this->base_qos.liveliness_lease_duration(2s);
-        this->base_qos.deadline(250ms);
+        this->base_qos.deadline(500ms);
         this->base_qos.history(RMW_QOS_POLICY_HISTORY_KEEP_LAST);
 
         this->callbackHandle = this->add_on_set_parameters_callback(
@@ -137,6 +137,7 @@ namespace bfr
             {
                 rclcpp::SubscriptionOptions sub_options;
                 sub_options.event_callbacks.liveliness_callback = std::bind(&DriveControllerNode::input_liveliness_changed, this, _1);
+                sub_options.event_callbacks.deadline_callback = std::bind(&DriveControllerNode::input_deadline_changed, this, _1);
                 this->manualControlAllowed = parameter.as_bool();
 
                 if (this->manualControlAllowed == false)
