@@ -116,7 +116,7 @@ install(TARGETS
 )
 
 install(
-  DIRECTORY src launch rviz config world
+  DIRECTORY src launch rviz config world description
   DESTINATION share/${PROJECT_NAME}
 )
 
