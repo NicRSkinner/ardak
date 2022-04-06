@@ -25,8 +25,9 @@ find_package(bfr_base REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(bfr_msgs REQUIRED)
+find_package(robot_state_publisher REQUIRED)
 
-ament_export_dependencies(rclcpp rclcpp_components bfr_base)
+ament_export_dependencies(rclcpp rclcpp_components bfr_base robot_state_publisher)
 
 include_directories(
   include
@@ -93,13 +94,27 @@ if(NOT WIN32)
     "${ament_cmake_package_templates_ENVIRONMENT_HOOK_LIBRARY_PATH}")
 endif()
 
-add_executable(main src/main.cpp)
+add_library(joint_state_source STATIC
+  src/joint_state_publisher.cpp)
+ament_target_dependencies(joint_state_source
+  rclcpp
+)
 
-target_link_libraries(main
+add_executable(main src/main.cpp)
+add_executable(robot_states src/robot_states.cpp)
+
+target_link_libraries(
+  main
   ardak_component
   input_calibration_component)
 
+target_link_libraries(
+  robot_states
+  joint_state_source
+)
+
 ament_target_dependencies(main rclcpp)
+ament_target_dependencies(robot_states rclcpp robot_state_publisher)
 
 install(TARGETS
   ardak_component
@@ -112,6 +127,7 @@ install(TARGETS
 
 install(TARGETS
   main
+  robot_states
   DESTINATION lib/${PROJECT_NAME}
 )
 

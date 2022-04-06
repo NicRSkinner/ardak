@@ -1,13 +1,10 @@
 /**
- * @file ardak_node.hpp
+ * @file joint_state_publisher.hpp
  * @author Nick Skinner (nskinner@zygenrobotics.com)
- * @brief Primary application control for the ardak system. Dictates incoming signals to determine
- *          functional state of the machine and signal downstream packages to start/stop operations.
- *        Handles switching from autonomous modes to manual mode, as well as any debugging implementations that
- *          need to signal downstream packages.
+ * @brief Joint state publisher for base Ardak robot.
  * @version 0.1
  * 
- * @copyright Copyright (c) 2021
+ * @copyright Copyright (c) 2022
  * 
  */
 #ifndef _ARDAK_JOINT_STATE_PUBLISHER_H_
@@ -21,8 +18,12 @@
 #include "rclcpp/qos_event.hpp"
 #include "rclcpp/duration.hpp"
 
+#include "tf2_ros/transform_broadcaster.h"
+
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "std_msgs/msg/int32.hpp"
+
+#include <vector>
 
 namespace zyg
 {
@@ -32,7 +33,9 @@ namespace zyg
         explicit JointStatePublisherNode(const rclcpp::NodeOptions &options);
 
     private:
-        void publishJointState();
+        void leftEncoderCallback(const std_msgs::msg::Int32::SharedPtr msg);
+        void rightEncoderCallback(const std_msgs::msg::Int32::SharedPtr msg);
+        void publishJointStates();
         void loop();
 
         sensor_msgs::msg::JointState front_right_wheel_state;
@@ -45,12 +48,12 @@ namespace zyg
         rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr rear_left_wheel_encoder_subscription;
         rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr rear_right_wheel_encoder_subscription;
 
-        rclcpp::Publisher<sensor_msgs::msg::JointState> front_right_wheel_state_publisher;
-        rclcpp::Publisher<sensor_msgs::msg::JointState> front_left_wheel_state_publisher;
-        rclcpp::Publisher<sensor_msgs::msg::JointState> rear_right_wheel_state_publisher;
-        rclcpp::Publisher<sensor_msgs::msg::JointState> front_left_wheel_state_publisher;
+        rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_publisher;
 
         rclcpp::TimerBase::SharedPtr loopTimer;
+
+        int joined_right_wheel_position = 0;
+        int joined_left_wheel_position = 0;
     };
 }
 
