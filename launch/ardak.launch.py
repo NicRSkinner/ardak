@@ -11,48 +11,9 @@ def generate_launch_description():
     # Define LaunchDescription variable
     ld = LaunchDescription()
 
-    container = ComposableNodeContainer(
-        name='launch_container',
-        namespace='',
-        package='rclcpp_components',
-        executable='component_container',
-        composable_node_descriptions=[
-            #ComposableNode(
-            #    package='ardak',
-            #    plugin='bfr::InputCalibrationNode',
-            #    name='InputCalibrationNode'
-            #),
-            #ComposableNode(
-            #    package='ardak',
-            #    plugin='bfr::OutputCalibrationNode',
-            #    name="OutputCalibrationNode"
-            #),
-            ComposableNode(
-                package='ardak',
-                plugin='bfr::ArdakNode',
-                name='ArdakNode'
-            ),
-            ComposableNode(
-                package='ardak',
-                plugin='bfr::DriveControllerNode',
-                name='DriveControllerNode',
-                parameters=[
-                    {"manualControlAllowed": True},
-                    {"maxVelocity": 16093.0},
-                    {"minVelocity": 0.0},
-                    {"driveGearRatio": 0.1},
-                    {"wheelCircumference": 57.026},
-                    {"steeringGearRatio": 0.0667},
-                    {"maxSteeringAngle": 30.0},
-                    {"minSteeringAngle": -30.0}
-                ],
-                remappings=[
-                    ("appout/drive/output_command", "odrive0/motor0/input_vel"),
-                    ("appout/steering/output_command", "odrive0/motor1/input_pos")
-                ]
-            )
-        ],
-        output="screen"
+    ardak_nodes = Node(
+        package="ardak",
+        executable="main",
     )
 
     gamepad = Node(
@@ -65,7 +26,7 @@ def generate_launch_description():
         executable="odrive"
     )
 
-    ld.add_action(container)
+    ld.add_action(ardak_nodes)
     ld.add_action(gamepad)
     ld.add_action(odrive)
 

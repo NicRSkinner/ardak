@@ -40,23 +40,19 @@ namespace bfr
         this->declare_parameter<double>("minVelocity", 0.0f);
         this->declare_parameter<double>("driveGearRatio", 0.0f);
         this->declare_parameter<double>("wheelCircumference", 0.0f);
-        this->declare_parameter<double>("steeringGearRatio", 0.0f);
-        this->declare_parameter<double>("maxSteeringAngle", 0.0f);
-        this->declare_parameter<double>("minSteeringAngle", 0.0f);
+        this->declare_parameter<double>("maxSteeringVelocity", 0.0f);
+        this->declare_parameter<double>("minSteeringVelocity", 0.0f);
 
         rclcpp::SubscriptionOptions sub_options;
         sub_options.event_callbacks.liveliness_callback = std::bind(&DriveControllerNode::input_liveliness_changed, this, _1);
         sub_options.event_callbacks.deadline_callback = std::bind(&DriveControllerNode::input_deadline_changed, this, _1);
-        this->runSubscription = this->create_subscription<std_msgs::msg::Bool>(
-            "safety/run", this->base_qos, std::bind(&DriveControllerNode::safety_callback, this, _1),
-            sub_options);
 
-        this->drivePublisher = this->create_publisher<std_msgs::msg::Float32>(
-            "appout/drive/output_command", 10
+        this->leftDrivePublisher = this->create_publisher<std_msgs::msg::Float32>(
+            "appout/drive/left_drive_command", 10
         );
 
-        this->steeringPublisher = this->create_publisher<std_msgs::msg::Float32>(
-            "appout/steering/output_command", 10
+        this->rightDrivePublisher = this->create_publisher<std_msgs::msg::Float32>(
+            "appout/drive/right_drive_command", 10
         );
     }
 
@@ -105,31 +101,22 @@ namespace bfr
                 result.reason = "wheelCircumference set";
             }
 
-            if (parameter.get_name() == "steeringGearRatio" &&
+            if (parameter.get_name() == "maxSteeringVelocity" &&
                 parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
             {
-                this->steeringGearRatio = parameter.as_double();
+                this->maxSteeringVelocity.value = parameter.as_double();
 
                 result.successful = true;
-                result.reason = "steeringGearRatio set";
+                result.reason = "maxSteeringVelocity set";
             }
 
-            if (parameter.get_name() == "maxSteeringAngle" &&
+            if (parameter.get_name() == "minSteeringVelocity" &&
                 parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
             {
-                this->maxSteeringAngle.value = parameter.as_double();
+                this->minSteeringVelocity.value = parameter.as_double();
 
                 result.successful = true;
-                result.reason = "maxSteeringAngle set";
-            }
-
-            if (parameter.get_name() == "minSteeringAngle" &&
-                parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
-            {
-                this->minSteeringAngle.value = parameter.as_double();
-
-                result.successful = true;
-                result.reason = "minSteeringAngle set";
+                result.reason = "minSteeringVelocity set";
             }
 
             if (parameter.get_name() == "manualControlAllowed" &&
@@ -145,7 +132,7 @@ namespace bfr
                     // This should stop the callback from being served.
                     this->gamepadSubscription.reset();
 
-                    this->loopTimer = this->create_wall_timer(50ms, std::bind(&DriveControllerNode::loop, this));
+                    this->loopTimer = this->create_wall_timer(10ms, std::bind(&DriveControllerNode::loop, this));
                 }
                 else
                 {
@@ -170,7 +157,6 @@ namespace bfr
         if (event.alive_count_change < 0)
         {
             this->inputAlive = false;
-            this->outputVelocity.value = 0;
         }
         else if (event.alive_count_change > 0)
         {
@@ -187,94 +173,54 @@ namespace bfr
             
             std_msgs::msg::Float32 output;
             output.data = 0.f;
-            this->drivePublisher->publish(output);
+            this->leftDrivePublisher->publish(output);
+            this->rightDrivePublisher->publish(output);
         }
-    }
-
-    void DriveControllerNode::safety_liveliness_changed(rclcpp::QOSLivelinessChangedInfo & event)
-    {
-        if (event.alive_count_change < 0)
-        {
-            this->run = false;
-        }
-    }
-
-    void DriveControllerNode::safety_callback(const std_msgs::msg::Bool::SharedPtr msg)
-    {
-        this->run = msg->data;
     }
 
     void DriveControllerNode::gamepad_callback(const bfr_msgs::msg::Gamepad::SharedPtr msg)
     {
-        static bool rightPressedFirst;
-        static bool leftPressedFrist;
-
-        if (this->inputAlive && this->run)
+        if (msg->action == GamepadAction::ENABLE)
         {
-            if (msg->action == GamepadAction::RIGHT_TRIGGER)
-            {
-                this->outputVelocity.value = bfr_base::scale(0., 100.,
-                this->minVelocity.value, this->maxVelocity.value, static_cast<double>(msg->value));
+                this->running = true;
+        }
 
-                double outputTPS = (this->outputVelocity.value / 60.) * this->driveGearRatio;
-                float outputTPSFloat = static_cast<float>(outputTPS);
-        
+        if (this->inputAlive)
+        {
+            if (msg->action == GamepadAction::RIGHT_STICK_UP_DOWN)
+            {
+                double outputVelocity = 0.f;
                 std_msgs::msg::Float32 output;
 
-                if (leftPressedFrist == false && this->outputVelocity.value != 0)
+                if (msg->value > 10 || msg->value < -10)
                 {
-                    rightPressedFirst = true;
-                    output.data = outputTPSFloat;
-                    this->drivePublisher->publish(output);
+                    outputVelocity = bfr_base::scale(-100., 100.,
+                        this->minVelocity.value, this->maxVelocity.value, static_cast<double>(msg->value));
+
+                    output.data = static_cast<float>((outputVelocity / 60.) * this->driveGearRatio);
+                    this->rightDrivePublisher->publish(output);
                 }
-                else if (rightPressedFirst == true && this->outputVelocity.value == 0)
+                else
                 {
-                    rightPressedFirst = false;
-                    output.data = outputTPSFloat;
-                    this->drivePublisher->publish(output);
+                    output.data = 0.f;
+                    this->rightDrivePublisher->publish(output);
                 }
             }
-            else if (msg->action == GamepadAction::LEFT_TRIGGER)
+            else if (msg->action == GamepadAction::LEFT_STICK_UP_DOWN)
             {
-                this->outputVelocity.value = bfr_base::scale(0., 100.,
-                this->minVelocity.value, this->maxVelocity.value, static_cast<double>(msg->value));
-
-                double outputTPS = (this->outputVelocity.value / 60.) * this->driveGearRatio;
-                float outputTPSFloat = static_cast<float>(outputTPS);
-        
+                double outputVelocity = 0.f;
                 std_msgs::msg::Float32 output;
+                output.data = 0.f;
 
-                if (rightPressedFirst == false && this->outputVelocity.value != 0)
+                if (msg->value > 10 || msg->value < -10)
                 {
-                    leftPressedFrist = true;
-                    output.data = outputTPSFloat * -1;
-                    this->drivePublisher->publish(output);
-                }
-                else if (leftPressedFrist == true && this->outputVelocity.value == 0)
-                {
-                    leftPressedFrist = false;
-                    output.data = outputTPSFloat;
-                    this->drivePublisher->publish(output);
-                }
-            }
-            else if (msg->action == GamepadAction::LEFT_STICK_LEFT_RIGHT)
-            {
-                // Output to the Odrive is in turns of the motor.
-                std_msgs::msg::Float32 steeringOutput;
-                float commandedAngle = bfr_base::scale(-100., 100., this->minSteeringAngle.value,
-                    this->maxSteeringAngle.value, msg->value);
-                
-                // Convert commanded steering angle to turns in motor.
-                float turnsPerDegree = (1/this->steeringGearRatio) / 360.f;
-                steeringOutput.data = turnsPerDegree * commandedAngle;
+                    outputVelocity = bfr_base::scale(-100., 100.,
+                        this->minVelocity.value, this->maxVelocity.value, static_cast<double>(msg->value));
 
-                this->steeringPublisher->publish(steeringOutput);
-            }
-            else if (msg->action == 127)
-            {
-                std_msgs::msg::Float32 output;
-                output.data = 0;
-                this->drivePublisher->publish(output);
+                    output.data = static_cast<float>((outputVelocity / 60.) * this->driveGearRatio);
+                }
+
+                this->leftDrivePublisher->publish(output);
             }
         }
     }
@@ -284,12 +230,3 @@ namespace bfr
         std::cout << "Test" << std::endl;
     }
 }
-
-#include "rclcpp_components/register_node_macro.hpp"
-
-// Register the component with class_loader.
-// This acts as a sort of entry point, allowing the component to be discoverable when its library
-// is being loaded into a running process.
-
-// Ignore linting errors stating "int assumed" this seems to be a VSCode issue.
-RCLCPP_COMPONENTS_REGISTER_NODE(bfr::DriveControllerNode)

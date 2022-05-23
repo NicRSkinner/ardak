@@ -39,8 +39,7 @@ namespace bfr
         this->gamepadSubscription = this->create_subscription<bfr_msgs::msg::Gamepad>(
             "hal/inputs/gamepad", this->base_qos, std::bind(&ArdakNode::gamepad_callback, this, _1)
         );
-
-
+        
         this->loopTimer = this->create_wall_timer(150ms, std::bind(&ArdakNode::loop, this));
     }
 
@@ -64,10 +63,3 @@ namespace bfr
         this->runPublisher->publish(msg);
     }
 } // namespace bfr
-
-#include "rclcpp_components/register_node_macro.hpp"
-
-// Register the component with class_loader.
-// This acts as a sort of entry point, allowing the component to be discoverable when its library
-// is being loaded into a running process.
-RCLCPP_COMPONENTS_REGISTER_NODE(bfr::ArdakNode)

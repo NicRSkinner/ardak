@@ -53,13 +53,9 @@ namespace bfr
         void input_liveliness_changed(rclcpp::QOSLivelinessChangedInfo & event);
         void input_deadline_changed(rclcpp::QOSDeadlineRequestedInfo & event);
         void safety_liveliness_changed(rclcpp::QOSLivelinessChangedInfo & event);
-        void safety_callback(const std_msgs::msg::Bool::SharedPtr msg);
         void gamepad_callback(const bfr_msgs::msg::Gamepad::SharedPtr msg);
 
         bool inputAlive = false;
-        bool run = false;
-        bfr_base::Speed outputVelocity = bfr_base::Speed{0};
-        bfr_base::Degrees outputAngle = bfr_base::Degrees{0};
         bfr_msgs::msg::Gamepad lastReceivedMessage;
         rclcpp::QoS base_qos = rclcpp::QoS(1);
 
@@ -70,22 +66,21 @@ namespace bfr
         rcl_interfaces::msg::SetParametersResult parametersCallback(
             const std::vector<rclcpp::Parameter> &parameters);
         bool manualControlAllowed = false;
+        float driveGearRatio = 0.;
         bfr_base::Speed maxVelocity = bfr_base::Speed{0};
         bfr_base::Speed minVelocity = bfr_base::Speed{0};
-        float driveGearRatio = 0.;
-        float steeringGearRatio = 0.;
         bfr_base::Length<std::centi> wheelCircumference = bfr_base::Length<std::centi>(0_cm);
-        bfr_base::Degrees maxSteeringAngle = bfr_base::Degrees{0};
-        bfr_base::Degrees minSteeringAngle = bfr_base::Degrees{0};
+        bfr_base::Speed maxSteeringVelocity = bfr_base::Speed{0};
+        bfr_base::Speed minSteeringVelocity = bfr_base::Speed{0};
+        bool running = false;
 
 
         /**
          * @brief ROS2 TOPICS
          */
-        rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr runSubscription;
         rclcpp::Subscription<bfr_msgs::msg::Gamepad>::SharedPtr gamepadSubscription;
-        rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr drivePublisher;
-        rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr steeringPublisher;
+        rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr leftDrivePublisher;
+        rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr rightDrivePublisher;
 
         /**
          * @brief ROS2 TIMERS

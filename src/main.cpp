@@ -1,7 +1,7 @@
 #include <chrono>
 #include <iostream>
 #include "rclcpp/rclcpp.hpp"
-#include "input_calibration_node.hpp"
+#include "drive_controller_node.hpp"
 #include "ardak_node.hpp"
 
 using namespace std;
@@ -16,11 +16,11 @@ int main(int argc, char* argv[])
     options.use_intra_process_comms(true);
 
     cout << "Initializing ROS nodes" << endl;
-    auto input_cal_node = std::make_shared<bfr::InputCalibrationNode>(options);
+    auto drive_control_node = std::make_shared<bfr::DriveControllerNode>(options);
     auto ardak_node = std::make_shared<bfr::ArdakNode>(options);
 
-    cout << "Adding Input Calibration node" << endl;
-    exec.add_node(input_cal_node);
+    cout << "Adding Drive Controller node" << endl;
+    exec.add_node(drive_control_node);
 
     cout << "Adding Ardak main node" << endl;
     exec.add_node(ardak_node);

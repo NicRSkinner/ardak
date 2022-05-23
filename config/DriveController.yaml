@@ -2,9 +2,8 @@ DriveControllerNode:
   ros_parameters:
     manualControlAllowed: true
     maxVelocity: 16093.0
-    minVelocity: 0.0
+    minVelocity: -16093.0
     driveGearRatio: 0.1
-    wheelCircumference: 57.026
-    steeringGearRatio: 0.667
-    maxSteeringAngle: 45.0
-    minSteeringAngle: -45.0
+    wheelCircumference: 63.837
+    maxSteeringVelocity: 0.0
+    minSteeringVelocity: 0.0
