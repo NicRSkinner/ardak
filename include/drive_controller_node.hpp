@@ -13,6 +13,10 @@
 #ifndef _DRIVE_CONTROLLER_NODE_H_
 #define _DRIVE_CONTROLLER_NODE_H_
 
+#include <cstdio>
+#include <cstring>
+#include <string>
+
 /**
  * ROS2 BASE INCLUDES
  */

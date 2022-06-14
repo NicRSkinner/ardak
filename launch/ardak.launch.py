@@ -11,9 +11,20 @@ def generate_launch_description():
     # Define LaunchDescription variable
     ld = LaunchDescription()
 
+    drive_control_config_path = os.path.join(
+        get_package_share_directory('ardak'),
+        'config',
+        'DriveController.yaml'
+        )
+
     ardak_nodes = Node(
         package="ardak",
         executable="main",
+        parameters=[drive_control_config_path],
+        remappings=[
+            ("appout/drive/left_drive_command", "odrive0/motor0/input_vel"),
+            ("appout/drive/right_drive_command", "odrive0/motor1/input_vel")
+        ]
     )
 
     gamepad = Node(

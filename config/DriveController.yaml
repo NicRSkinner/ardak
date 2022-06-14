@@ -1,9 +1,9 @@
-DriveControllerNode:
-  ros_parameters:
+DriveController:
+  ros__parameters:
     manualControlAllowed: true
-    maxVelocity: 16093.0
-    minVelocity: -16093.0
-    driveGearRatio: 0.1
+    maxVelocity: 4828.0 # 3mph
+    minVelocity: -4828.0 # -3mph
+    driveGearRatio: 0.117
     wheelCircumference: 63.837
     maxSteeringVelocity: 0.0
     minSteeringVelocity: 0.0

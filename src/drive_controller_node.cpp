@@ -17,6 +17,7 @@
 #include <chrono>
 #include <iostream>
 
+
 #include "drive_controller_node.hpp"
 
 using namespace std::literals::chrono_literals;
@@ -35,7 +36,7 @@ namespace bfr
         this->callbackHandle = this->add_on_set_parameters_callback(
             std::bind(&DriveControllerNode::parametersCallback, this, std::placeholders::_1));
 
-        this->declare_parameter<bool>("manualControlAllowed", false);
+        this->declare_parameter<bool>("manualControlAllowed", true);
         this->declare_parameter<double>("maxVelocity", 0.0f);
         this->declare_parameter<double>("minVelocity", 0.0f);
         this->declare_parameter<double>("driveGearRatio", 0.0f);
@@ -154,6 +155,7 @@ namespace bfr
 
     void DriveControllerNode::input_liveliness_changed(rclcpp::QOSLivelinessChangedInfo & event)
     {
+        std::cout << "Input liveliness changed! " << event.alive_count_change << std::endl;
         if (event.alive_count_change < 0)
         {
             this->inputAlive = false;
@@ -169,12 +171,10 @@ namespace bfr
         // We've missed a message.
         if (event.total_count_change > 0)
         {
-            std::cout << "DriveController input deadline missed!" << std::endl;
-            
-            std_msgs::msg::Float32 output;
-            output.data = 0.f;
-            this->leftDrivePublisher->publish(output);
-            this->rightDrivePublisher->publish(output);
+            //std_msgs::msg::Float32 output;
+            //output.data = 0.f;
+            //this->leftDrivePublisher->publish(output);
+            //this->rightDrivePublisher->publish(output);
         }
     }
 
@@ -183,32 +183,15 @@ namespace bfr
         if (msg->action == GamepadAction::ENABLE)
         {
                 this->running = true;
+                RCLCPP_INFO(this->get_logger(), std::string("DriveController: Manual control enabled.").c_str());
         }
 
-        if (this->inputAlive)
+        if (this->inputAlive && this->running)
         {
             if (msg->action == GamepadAction::RIGHT_STICK_UP_DOWN)
             {
                 double outputVelocity = 0.f;
-                std_msgs::msg::Float32 output;
-
-                if (msg->value > 10 || msg->value < -10)
-                {
-                    outputVelocity = bfr_base::scale(-100., 100.,
-                        this->minVelocity.value, this->maxVelocity.value, static_cast<double>(msg->value));
-
-                    output.data = static_cast<float>((outputVelocity / 60.) * this->driveGearRatio);
-                    this->rightDrivePublisher->publish(output);
-                }
-                else
-                {
-                    output.data = 0.f;
-                    this->rightDrivePublisher->publish(output);
-                }
-            }
-            else if (msg->action == GamepadAction::LEFT_STICK_UP_DOWN)
-            {
-                double outputVelocity = 0.f;
+                double outputRPM  = 0.f;
                 std_msgs::msg::Float32 output;
                 output.data = 0.f;
 
@@ -216,8 +199,31 @@ namespace bfr
                 {
                     outputVelocity = bfr_base::scale(-100., 100.,
                         this->minVelocity.value, this->maxVelocity.value, static_cast<double>(msg->value));
+                    
+                    outputRPM = ((outputVelocity / 60.) * 100) / this->wheelCircumference.value;
+                    
+                    output.data = static_cast<float>(outputRPM / this->driveGearRatio);
+                    // This should cap out around 24TPS
+                }
+                
+                this->rightDrivePublisher->publish(output);
+            }
+            else if (msg->action == GamepadAction::LEFT_STICK_UP_DOWN)
+            {
+                double outputVelocity = 0.f;
+                double outputRPM = 0.f;
+                std_msgs::msg::Float32 output;
+                output.data = 0.f;
 
-                    output.data = static_cast<float>((outputVelocity / 60.) * this->driveGearRatio);
+                if (msg->value > 10 || msg->value < -10)
+                {
+                    outputVelocity = bfr_base::scale(-100., 100.,
+                        this->minVelocity.value, this->maxVelocity.value, static_cast<double>(msg->value));
+                    
+                    outputRPM = ((outputVelocity / 60.) * 100) / this->wheelCircumference.value;
+                    
+                    output.data = static_cast<float>(outputRPM / this->driveGearRatio);
+                    // This should cap out around 24TPS
                 }
 
                 this->leftDrivePublisher->publish(output);
