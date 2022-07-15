@@ -1,10 +1,10 @@
-/d435/d435:
+d435:
   ros__parameters:
     camera_name: "d435"
     serial_no: ""
     usb_port_id: ""
     device_type: "d4."
-    base_frame_id: "camera_link_d435"
+    base_frame_id: "camera_link"
     config_file: ""
     enable_pointcloud: false
     unite_imu_method: ""
@@ -36,6 +36,7 @@
     infra_qos: 'SYSTEM_DEFAULT'
     pointcloud_qos: 'SYSTEM_DEFAULT'
     align_depth: true
+    enable_sync: true
     filters: ""
     clip_distance: -2.
     linear_accel_cof: 0.01
@@ -54,7 +55,7 @@
     stereo_module.gain.2: 16
     wait_for_device_timeout: -1.
     reconnect_timeout: 6.
-/t265/t265:
+t265:
   ros__parameters:
     camera_name: "t265"
     serial_no: ""
@@ -75,8 +76,8 @@
     enable_confidence: true
     fisheye_fps: -1.
     confidence_fps: -1.
-    gyro_fps: -1.
-    accel_fps: -1.
+    gyro_fps: -1
+    accel_fps: -1
     color_qos: 'SYSTEM_DEFAULT'
     confidence_qos: 'SYSTEM_DEFAULT'
     depth_qos: 'SYSTEM_DEFAULT'
@@ -95,7 +96,7 @@
     ordered_pc: false
     calib_odom_file: ""
     topic_odom_in: ""
-    tf_publish_rate: 0.0
+    tf_publish_rate: 1.0
     diagnostics_period: 0.0
     rosbag_filename: ""
     temporal.holes_fill: 0
