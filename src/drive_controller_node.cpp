@@ -191,7 +191,9 @@ namespace bfr
             if (msg->action == GamepadAction::RIGHT_STICK_UP_DOWN)
             {
                 double outputVelocity = 0.f;
+                double outputRPH = 0.f;
                 double outputRPM  = 0.f;
+                double outputTPS = 0.f;
                 std_msgs::msg::Float32 output;
                 output.data = 0.f;
 
@@ -200,10 +202,12 @@ namespace bfr
                     outputVelocity = bfr_base::scale(-100., 100.,
                         this->minVelocity.value, this->maxVelocity.value, static_cast<double>(msg->value));
                     
-                    outputRPM = ((outputVelocity / 60.) * 100) / this->wheelCircumference.value;
+                    outputRPH = (outputVelocity * 100.) / this->wheelCircumference.value;
+                    outputRPM = outputRPH / 60.;
+                    outputTPS = outputRPM / 60.;                   
                     
-                    output.data = static_cast<float>(outputRPM / this->driveGearRatio);
-                    // This should cap out around 24TPS
+                    output.data = static_cast<float>(outputTPS / this->driveGearRatio);
+                    // This should cap out around 18TPS
                 }
                 
                 this->rightDrivePublisher->publish(output);
@@ -211,7 +215,9 @@ namespace bfr
             else if (msg->action == GamepadAction::LEFT_STICK_UP_DOWN)
             {
                 double outputVelocity = 0.f;
-                double outputRPM = 0.f;
+                double outputRPH = 0.f;
+                double outputRPM  = 0.f;
+                double outputTPS = 0.f;
                 std_msgs::msg::Float32 output;
                 output.data = 0.f;
 
@@ -220,12 +226,14 @@ namespace bfr
                     outputVelocity = bfr_base::scale(-100., 100.,
                         this->minVelocity.value, this->maxVelocity.value, static_cast<double>(msg->value));
                     
-                    outputRPM = ((outputVelocity / 60.) * 100) / this->wheelCircumference.value;
+                    outputRPH = (outputVelocity * 100.) / this->wheelCircumference.value;
+                    outputRPM = outputRPH / 60.;
+                    outputTPS = outputRPM / 60.;                   
                     
-                    output.data = static_cast<float>(outputRPM / this->driveGearRatio);
-                    // This should cap out around 24TPS
+                    output.data = static_cast<float>(outputTPS / this->driveGearRatio);
+                    // This should cap out around 18TPS
                 }
-
+                
                 this->leftDrivePublisher->publish(output);
             }
         }

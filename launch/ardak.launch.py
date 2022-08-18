@@ -1,16 +1,23 @@
+from email.policy import default
 import os
 
 from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument
 from launch_ros.actions import Node
 from launch.substitutions import LaunchConfiguration, PythonExpression
+from launch.conditions import IfCondition
 from launch_ros.actions import ComposableNodeContainer
 from launch_ros.descriptions import ComposableNode
 from ament_index_python.packages import get_package_share_directory
 
 
 def generate_launch_description():
-    # Define LaunchDescription variable
-    ld = LaunchDescription()
+
+    launch_args = [
+        DeclareLaunchArgument(name="localization", default_value="False"),
+        DeclareLaunchArgument(name="robot_state", default_value="False"),
+        DeclareLaunchArgument(name="joint_state", default_value="False")
+    ]
 
     drive_control_config_path = os.path.join(
         get_package_share_directory('ardak'),
@@ -47,6 +54,8 @@ def generate_launch_description():
         package='realsense_ros2',
         executable='rs_t265_node',
         name='rs_t265',
+        condition=IfCondition(PythonExpression(
+            [LaunchConfiguration("localization"), " == True"])),
         output='screen'
     )
 
@@ -54,28 +63,27 @@ def generate_launch_description():
         package='realsense_ros2',
         executable='rs_d435_node',
         name='rs_d435',
-        output='screen',
+        condition=IfCondition(PythonExpression(
+            [LaunchConfiguration("localization"), " == True"])),
         parameters=[
             {"publish_depth": True},
             {"publish_pointcloud": False},
             {"is_color": True},
             {"publish_image_raw_": True},
             {"fps": 6}      # Can only take values of 6,15,30 or 60
-        ]
-    )
-
-    rgbd_sync_node = Node(
-        package='rtabmap_ros', executable='rgbd_sync', output='screen',
-        parameters=parameters,
-        remappings=remappings,
-        arguments=['-d']
+        ],
+        output='screen'
     )
 
     rtabmap_node = Node(
-        package='rtabmap_ros', executable='rtabmap', output='screen',
+        package='rtabmap_ros',
+        executable='rtabmap',
+        condition=IfCondition(PythonExpression(
+            [LaunchConfiguration("localization"), " == True"])),
         parameters=parameters,
         remappings=remappings,
-        arguments=['-d']
+        arguments=['-d'],
+        output='screen',
     )
 
     ardak_nodes = Node(
@@ -101,39 +109,39 @@ def generate_launch_description():
     base_link_transform = Node(
         # Configure the TF of the robot
         package='tf2_ros',
-        node_executable='static_transform_publisher',
-        output='screen',
+        executable='static_transform_publisher',
         arguments=['0.0', '0.0', '0.0',
                    '0.0', '0.0', '0.0',
-                   't265_frame', 'base_link']
+                   't265_frame', 'base_link'],
+        output='screen'
     )
 
     camera_link_d435_node = Node(
         package='tf2_ros',
-        node_executable='static_transform_publisher',
-        output='screen',
+        executable='static_transform_publisher',
         arguments=['0.0', '0.025', '0.03',
                    '-1.5708', '0.0', '-1.5708',
-                   'base_link', 'camera_link_d435']
+                   'base_link', 'camera_link_d435'],
+        output='screen'
     )
 
     camera_link_d435_offset_node = Node(
         package='tf2_ros',
-        node_executable='static_transform_publisher',
-        output='screen',
+        executable='static_transform_publisher',
         arguments=['0.0', '0.025', '0.03',
                    '-1.5708', '0.0', '-1.5708',
-                   'base_link', 'camera_link_d435_pcl']
+                   'base_link', 'camera_link_d435_pcl'],
+        output='screen'
     )
 
-    ld.add_action(rs_t265_node)
-    ld.add_action(rs_d435_node)
-    ld.add_action(rtabmap_node)
-    ld.add_action(base_link_transform)
-    ld.add_action(camera_link_d435_node)
-    ld.add_action(camera_link_d435_offset_node)
-    ld.add_action(ardak_nodes)
-    ld.add_action(gamepad)
-    ld.add_action(odrive)
-
-    return ld
+    return LaunchDescription(launch_args + [
+        rs_t265_node,
+        rs_d435_node,
+        rtabmap_node,
+        camera_link_d435_node,
+        camera_link_d435_offset_node,
+        base_link_transform,
+        ardak_nodes,
+        gamepad,
+        odrive
+    ])
