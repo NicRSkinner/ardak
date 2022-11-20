@@ -66,4 +66,9 @@ namespace zyg
 
         // https://docs.ros.org/en/foxy/Tutorials/URDF/Using-URDF-with-Robot-State-Publisher.html#publish-the-state
     }
+
+    void loop()
+    {
+        
+    }
 }

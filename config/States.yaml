@@ -1,0 +1,4 @@
+ArdakJointStatePublisher:
+  ros__parameters:
+    driveGearRatio: 0.111
+    encodercpr: 4096

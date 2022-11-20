@@ -17,11 +17,11 @@
 #include <chrono>
 #include <iostream>
 
-
 #include "drive_controller_node.hpp"
 
 using namespace std::literals::chrono_literals;
 using std::placeholders::_1;
+
 
 namespace bfr
 {
@@ -168,16 +168,22 @@ namespace bfr
 
     void DriveControllerNode::input_deadline_changed(rclcpp::QOSDeadlineRequestedInfo & event)
     {
+        RCLCPP_INFO(this->get_logger(), std::string("DriveController: Message missed!").c_str());
+        
         // We've missed a message.
         if (event.total_count_change > 0)
         {
-            //std_msgs::msg::Float32 output;
-            //output.data = 0.f;
-            //this->leftDrivePublisher->publish(output);
-            //this->rightDrivePublisher->publish(output);
+            this->steering = 0;
+            this->speed = 0;
+
+            std_msgs::msg::Float32 output;
+            output.data = 0.f;
+            this->leftDrivePublisher->publish(output);
+            this->rightDrivePublisher->publish(output);
         }
     }
 
+    // Uses a dual-stick input from the gamepad for manual control
     void DriveControllerNode::gamepad_callback(const bfr_msgs::msg::Gamepad::SharedPtr msg)
     {
         if (msg->action == GamepadAction::ENABLE)
@@ -219,7 +225,7 @@ namespace bfr
                 double outputRPM  = 0.f;
                 double outputTPS = 0.f;
                 std_msgs::msg::Float32 output;
-                output.data = 0.f;
+                output.data = 0.f; 
 
                 if (msg->value > 10 || msg->value < -10)
                 {
@@ -237,6 +243,16 @@ namespace bfr
                 this->leftDrivePublisher->publish(output);
             }
         }
+    }
+
+    void DriveControllerNode::steering_callback(const std_msgs::msg::Int16 msg)
+    {
+
+    }
+
+    void DriveControllerNode::speed_callback(const std_msgs::msg::Int16 msg)
+    {
+
     }
 
     void DriveControllerNode::loop()

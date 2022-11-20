@@ -30,6 +30,7 @@
  * ROS2 MSGS INCLUDES
  */
 #include "std_msgs/msg/int8.hpp"
+#include "std_msgs/msg/int16.hpp"
 #include "std_msgs/msg/float32.hpp"
 #include "std_msgs/msg/bool.hpp"
 #include "bfr_msgs/msg/gamepad.hpp"
@@ -58,6 +59,8 @@ namespace bfr
         void input_deadline_changed(rclcpp::QOSDeadlineRequestedInfo & event);
         void safety_liveliness_changed(rclcpp::QOSLivelinessChangedInfo & event);
         void gamepad_callback(const bfr_msgs::msg::Gamepad::SharedPtr msg);
+        void steering_callback(const std_msgs::msg::Int16 msg);
+        void speed_callback(const std_msgs::msg::Int16 msg);
 
         bool inputAlive = false;
         bfr_msgs::msg::Gamepad lastReceivedMessage;
@@ -77,6 +80,9 @@ namespace bfr
         bfr_base::Speed maxSteeringVelocity = bfr_base::Speed{0};
         bfr_base::Speed minSteeringVelocity = bfr_base::Speed{0};
         bool running = false;
+
+        int steering = 0;
+        int speed = 0;
 
 
         /**

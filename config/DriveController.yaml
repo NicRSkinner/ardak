@@ -3,7 +3,7 @@ DriveController:
     manualControlAllowed: true
     maxVelocity: 4828.0 # 3mph
     minVelocity: -4828.0 # -3mph
-    driveGearRatio: 0.117
+    driveGearRatio: 0.111
     wheelCircumference: 63.837
     maxSteeringVelocity: 0.0
     minSteeringVelocity: 0.0
