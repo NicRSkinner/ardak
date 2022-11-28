@@ -1,7 +1,7 @@
-# Launch tftree
-# Launch realsense cameras
-# Launch pointcloud to laserscan  --  This may not happen as I intend to use rtabmap going forward if I can on the raspberry pi
-# Launch map algo
+# Due to issues with the realsens wrapped, an intermediary package may be ncessary
+# https://github.com/introlab/rtabmap_ros/issues/743
+
+# https://github.com/introlab/rtabmap_ros/issues/345
 
 import os
 from ament_index_python.packages import get_package_share_directory
@@ -33,64 +33,9 @@ def generate_launch_description():
         ('rgb/camera_info', '/rs_d435/image_raw/camera_info'),
         ('depth/image', '/rs_d435/aligned_depth/image_raw')]
 
-    return LaunchDescription([
-        Node(
-            package='realsense_ros2',
-            executable='rs_t265_node',
-            name='rs_t265',
-            output='screen'
-        ),
-        Node(
-            package='realsense_ros2',
-            executable='rs_d435_node',
-            name='rs_d435',
-            output='screen',
-            parameters=[
-                {"publish_depth": True},
-                {"publish_pointcloud": False},
-                {"is_color": True},
-                {"publish_image_raw_": True},
-                {"fps": 6}      # Can only take values of 6,15,30 or 60
-            ]
-        ),
-        Node(
-            # Configure the TF of the robot
-            package='tf2_ros',
-            executable='static_transform_publisher',
-            output='screen',
-            arguments=['0.0', '0.0', '0.0', '0.0',
-                       '0.0', '0.0', 't265_frame', 'base_link']
-        ),
-        Node(
-            package='tf2_ros',
-            executable='static_transform_publisher',
-            output='screen',
-            arguments=['0.0', '0.025', '0.03', '-1.5708', '0.0',
-                       '-1.5708', 'base_link', 'camera_link_d435']
-        ),
-        Node(
-            package='tf2_ros',
-            executable='static_transform_publisher',
-            output='screen',
-            arguments=['0.0', '0.025', '0.03', '-1.5708', '0.0',
-                       '-1.5708', 'base_link', 'camera_link_d435_pcl']
-        ),
-        Node(
-            package='rtabmap_ros', executable='rtabmap', output='screen',
-            parameters=parameters,
-            remappings=remappings,
-            arguments=['-d']
-        ),
-        # Node(
-        #    package='rtabmap_ros', executable='rtabmapviz', output='screen',
-        #    parameters=parameters,
-        #    remappings=remappings
-        # ),
+    def generate_launch_description():
+        use_sim_time = LaunchConfiguration('use_sim_time', default='false')
 
-        SetEnvironmentVariable('RCUTILS_CONSOLE_STDOUT_LINE_BUFFERED', '1'),
+        return LaunchDescription([
 
-        DeclareLaunchArgument(
-            'use_sim_time', default_value='false',
-            description='Use simulation (Gazebo) clock if true')
-
-    ])
+        ])

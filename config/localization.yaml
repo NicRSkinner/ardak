@@ -35,7 +35,7 @@ d435:
     fisheye_qos: 'SYSTEM_DEFAULT'
     infra_qos: 'SYSTEM_DEFAULT'
     pointcloud_qos: 'SYSTEM_DEFAULT'
-    align_depth: true
+    align_depth.enable: true
     enable_sync: true
     filters: ""
     clip_distance: -2.
