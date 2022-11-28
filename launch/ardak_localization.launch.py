@@ -1,4 +1,4 @@
-# Due to issues with the realsens wrapped, an intermediary package may be ncessary
+# Due to issues with the realsens wrapper, an intermediary package may be ncessary
 # https://github.com/introlab/rtabmap_ros/issues/743
 
 # https://github.com/introlab/rtabmap_ros/issues/345
@@ -21,21 +21,90 @@ def generate_launch_description():
         'localization.yaml'
     )
 
-    parameters = [{
-        'queue_size': 20,
-        'frame_id': 'camera_link_d435',
-        'use_sim_time': use_sim_time,
-        'subscribe_depth': True}]
+    pointcloud_remappings = [
+        {'depth/image', '/D400/depth/image_rect_raw'},
+        {'depth/camera_info', '/D400/depth/camera_info'},
+        {'cloud', '/D400/cloud_from_depth'}
+    ]
 
-    remappings = [
-        ('odom', '/rs_t265/odom'),
-        ('rgb/image', '/rs_d435/image_raw'),
-        ('rgb/camera_info', '/rs_d435/image_raw/camera_info'),
-        ('depth/image', '/rs_d435/aligned_depth/image_raw')]
+    pointcloud_parameters = [{
+        'approx_synd': False
+    }]
+
+    alignment_remappings = [
+        {'camera_info' , '/D400/color/camera_info'},
+        {'cloud', '/D400/cloud_from_depth'},
+        {'image_raw', '/D400/aligned_depth_to_color/image_raw'},
+    ]
+
+    alignment_parameters = [{
+        'decimation': 2,
+        'fixed_frame_id': 'D400_link',
+        'fill_holes_size': 1
+    }]
+
+    mapping_remappings = [
+        {'odom', '/T265/pose/sample'}
+    ]
+
+    mapping_parameters = [{
+        'frame_id': 'T265_link'
+    }]
 
     def generate_launch_description():
         use_sim_time = LaunchConfiguration('use_sim_time', default='false')
 
         return LaunchDescription([
+            # START: Build TF Tree
+            Node(
+                # Configure the TF of the robot
+                package='tf2_ros',
+                executable='static_transform_publisher',
+                output='screen',
+                arguments=['0.0', '0.0', '0.0', '0.0',
+                            '0.0', '0.0', 'odom', 'map']
+            ),
+            Node(
+                # Configure the TF of the robot
+                package='tf2_ros',
+                executable='static_transform_publisher',
+                output='screen',
+                arguments=['0.0', '0.0', '0.0', '0.0',
+                            '0.0', '0.0', 'base_link', 'base_footprint']
+            ),
+            Node(
+                # Configure the TF of the robot
+                package='tf2_ros',
+                executable='static_transform_publisher',
+                output='screen',
+                arguments=['0.0', '0.0', '0.0', '0.0',
+                            '0.0', '0.0', 'T265_link', 'base_link']
+            ),
+            Node(
+                package='tf2_ros',
+                executable='static_transform_publisher',
+                output='screen',
+                arguments=['0.0', '0.025', '0.03', '-1.5708', '0.0',
+                        '-1.5708', 'D435_link', 'T265_link']
+            ),
+            # END: Build TF Tree
 
+            # START: Launch D435 and T265 cammeras
+            # END: Launch D435 and T265 cammeras
+            
+            # START: Align depth image to color image
+            Node(
+                package='rtabmap_ros',
+                executable='point_cloud_xyz',
+                parameters=pointcloud_parameters,
+                remmappings=pointcloud_remappings,
+                output='screen'
+            ),
+            Node(
+                package='rtabmap_ros',
+                executable='pointcloud_to_depthimage',
+                parameters=alignment_parameters,
+                remappings=alignment_remappings
+            )
+            # END: Align depth image to color image
         ])
