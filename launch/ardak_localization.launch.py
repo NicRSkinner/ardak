@@ -4,16 +4,18 @@
 # https://github.com/introlab/rtabmap_ros/issues/345
 
 import os
+
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch.actions import DeclareLaunchArgument, SetEnvironmentVariable, declare_launch_argument
 from launch_ros.actions import Node
 from launch.conditions import IfCondition
-
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
-    use_sim_time = LaunchConfiguration('use_sim_time', default='false')
+    camera_dir = get_package_share_directory('realsense2_camera')
 
     localization_config_path = os.path.join(
         get_package_share_directory('ardak'),
@@ -22,9 +24,9 @@ def generate_launch_description():
     )
 
     pointcloud_remappings = [
-        {'depth/image', '/D400/depth/image_rect_raw'},
-        {'depth/camera_info', '/D400/depth/camera_info'},
-        {'cloud', '/D400/cloud_from_depth'}
+        ('depth/image', '/D400/depth/image_rect_raw'),
+        ('depth/camera_info', '/D400/depth/camera_info'),
+        ('cloud', '/D400/cloud_from_depth')
     ]
 
     pointcloud_parameters = [{
@@ -32,9 +34,9 @@ def generate_launch_description():
     }]
 
     alignment_remappings = [
-        {'camera_info' , '/D400/color/camera_info'},
-        {'cloud', '/D400/cloud_from_depth'},
-        {'image_raw', '/D400/aligned_depth_to_color/image_raw'},
+        ('camera_info' , '/D400/color/camera_info'),
+        ('cloud', '/D400/cloud_from_depth'),
+        ('image_raw', '/D400/aligned_depth_to_color/image_raw'),
     ]
 
     alignment_parameters = [{
@@ -44,67 +46,89 @@ def generate_launch_description():
     }]
 
     mapping_remappings = [
-        {'odom', '/T265/pose/sample'}
+        ('odom', '/T265/pose/sample'),
+        ('rgb/image', '/D400/color/image_raw'),
+        ('rgb/camera_info', '/D400/color/camera_info'),
+        ('depth/image', '/D400/aligned_depth_to_color/image_raw')
     ]
 
     mapping_parameters = [{
-        'frame_id': 'T265_link'
+        'queue_size': 20,
+        'frame_id': 'D400_link',
+        'use_sim_time': False,
+        'imu_topic': '/T265/imu',
+        'wait_imu_to_init': True
     }]
 
-    def generate_launch_description():
-        use_sim_time = LaunchConfiguration('use_sim_time', default='false')
+    camera_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            camera_dir + '/launch/rs_d400_and_t265_launch.py')
+        )
 
-        return LaunchDescription([
-            # START: Build TF Tree
-            Node(
-                # Configure the TF of the robot
-                package='tf2_ros',
-                executable='static_transform_publisher',
-                output='screen',
-                arguments=['0.0', '0.0', '0.0', '0.0',
-                            '0.0', '0.0', 'odom', 'map']
-            ),
-            Node(
-                # Configure the TF of the robot
-                package='tf2_ros',
-                executable='static_transform_publisher',
-                output='screen',
-                arguments=['0.0', '0.0', '0.0', '0.0',
-                            '0.0', '0.0', 'base_link', 'base_footprint']
-            ),
-            Node(
-                # Configure the TF of the robot
-                package='tf2_ros',
-                executable='static_transform_publisher',
-                output='screen',
-                arguments=['0.0', '0.0', '0.0', '0.0',
-                            '0.0', '0.0', 'T265_link', 'base_link']
-            ),
-            Node(
-                package='tf2_ros',
-                executable='static_transform_publisher',
-                output='screen',
-                arguments=['0.0', '0.025', '0.03', '-1.5708', '0.0',
-                        '-1.5708', 'D435_link', 'T265_link']
-            ),
-            # END: Build TF Tree
+    print ("returning launch description")
+    return LaunchDescription([
+        # START: Build TF Tree
 
-            # START: Launch D435 and T265 cammeras
-            # END: Launch D435 and T265 cammeras
-            
-            # START: Align depth image to color image
-            Node(
-                package='rtabmap_ros',
-                executable='point_cloud_xyz',
-                parameters=pointcloud_parameters,
-                remmappings=pointcloud_remappings,
-                output='screen'
-            ),
-            Node(
-                package='rtabmap_ros',
-                executable='pointcloud_to_depthimage',
-                parameters=alignment_parameters,
-                remappings=alignment_remappings
-            )
-            # END: Align depth image to color image
-        ])
+        Node(
+            # Configure the TF of the robot
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            output='screen',
+            arguments=['0.0', '0.0', '0.0', '0.0',
+                        '0.0', '0.0', 'T265_link', 'base_footprint']
+        ),
+        Node(
+            # Configure the TF of the robot
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            output='screen',
+            arguments=['0.0', '0.0', '0.0', '0.0',
+                        '0.0', '0.0', 'base_footprint', 'base_link']
+        ),
+        Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            output='screen',
+            arguments=['0.0', '0.025', '0.03', '0.0', '0.0',
+                    '0.0', 'base_link', 'D400_link']
+        ),
+
+        # END: Build TF Tree
+
+        # START: Launch D435 and T265 cammeras
+        camera_launch,
+        # END: Launch D435 and T265 cammeras
+        
+        # START: Align depth image to color image
+        Node(
+            package='rtabmap_ros',
+            executable='point_cloud_xyz',
+            parameters=pointcloud_parameters,
+            remappings=pointcloud_remappings,
+            output='screen'
+        ),
+        Node(
+            package='rtabmap_ros',
+            executable='pointcloud_to_depthimage',
+            parameters=alignment_parameters,
+            remappings=alignment_remappings
+        ),
+        # END: Align depth image to color image
+
+        # START: Mapping
+        Node(
+            package='rtabmap_ros',
+            executable='rtabmap',
+            output='screen',
+            parameters=mapping_parameters,
+            remappings=mapping_remappings,
+            arguments=['-d']
+        ),
+        # END: Mapping
+
+        SetEnvironmentVariable('RCUTILS_CONSOLE_STDOUT_LINE_BUFFERED', '1'),
+
+        DeclareLaunchArgument(
+            'use_sim_time', default_value='false',
+            description='Use simulation (Gazebo) clock if true')
+    ])
