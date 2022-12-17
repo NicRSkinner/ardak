@@ -30,7 +30,7 @@ def generate_launch_description():
     ]
 
     pointcloud_parameters = [{
-        'approx_synd': False
+        'approx_sync': True
     }]
 
     alignment_remappings = [
@@ -41,7 +41,7 @@ def generate_launch_description():
 
     alignment_parameters = [{
         'decimation': 2,
-        'fixed_frame_id': 'D400_link',
+        'fixed_frame_id': 'base_link',
         'fill_holes_size': 1
     }]
 
@@ -53,10 +53,10 @@ def generate_launch_description():
     ]
 
     mapping_parameters = [{
-        'queue_size': 20,
-        'frame_id': 'D400_link',
+        'queue_size': 200,
+        'frame_id': 'base_link',
         'use_sim_time': False,
-        'imu_topic': '/T265/imu',
+        'approx_sync': True,
         'wait_imu_to_init': True
     }]
 

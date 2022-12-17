@@ -1,4 +1,5 @@
 import os
+import launch
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.conditions import IfCondition, UnlessCondition
@@ -8,49 +9,45 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
     pkg_share = FindPackageShare(package='ardak').find('ardak')
-    default_rviz_config_path = os.path.join(pkg_share, 'rviz/rviz_basic_settings.rviz')
+    default_rviz_config_path = os.path.join(pkg_share, 'rviz/urdf_config.rviz')
     default_urdf_model_path = os.path.join(pkg_share, 'description/ardak_description.urdf')
- 
-    gui = LaunchConfiguration('gui')
-    urdf_model = LaunchConfiguration('urdf_model')
-    rviz_config_file = LaunchConfiguration('rviz_config_file')
-    use_robot_state_pub = LaunchConfiguration('use_robot_state_pub')
-    use_rviz = LaunchConfiguration('use_rviz')
-    use_sim_time = LaunchConfiguration('use_sim_time')
-
-    declare_urdf_model_path_cmd = DeclareLaunchArgument(
-        name='urdf_model', 
-        default_value=default_urdf_model_path, 
-        description='Absolute path to robot urdf file')
-
-    declare_use_robot_state_pub_cmd = DeclareLaunchArgument(
-        name='use_robot_state_pub',
-        default_value='True',
-        description='Whether to start the robot state publisher')
-
-    declare_use_sim_time_cmd = DeclareLaunchArgument(
-        name='use_sim_time',
-        default_value='True',
-        description='Use simulation (Gazebo) clock if true')
 
     # Subscribe to the joint states of the robot, and publish the 3D pose of each link.
-    start_robot_state_publisher_cmd = Node(
-        condition=IfCondition(use_robot_state_pub),
+    robot_state_publisher_node = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
-        name='robot_state_publisher',
+        parameters=[{'robot_description': Command(['xacro ', LaunchConfiguration('model')])}]
+    )
+
+    joint_state_pubisher_node = Node(
+        package='joint_state_publisher',
+        executable='joint_state_publisher',
+        name='joint_state_publisher',
+        condition=launch.conditions.UnlessCondition(LaunchConfiguration('gui'))
+    )
+    joint_state_pubisher_node_gui = Node(
+        package='joint_state_publisher_gui',
+        executable='joint_state_publisher_gui',
+        name='joint_state_publisher_gui',
+        condition=launch.conditions.IfCondition(LaunchConfiguration('gui'))
+    )
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
         output='screen',
-        parameters=[{'use_sim_time': use_sim_time, 
-        'robot_description': Command(['xacro ', urdf_model])}],
-        arguments=[default_urdf_model_path])
+        arguments=['-d', LaunchConfiguration('rvizconfig')]
+    )
 
-
-    ld = LaunchDescription()
-
-    ld.add_action(declare_urdf_model_path_cmd)
-    ld.add_action(declare_use_robot_state_pub_cmd)
-    ld.add_action(declare_use_sim_time_cmd)
-    
-    ld.add_action(start_robot_state_publisher_cmd)
-
-    return ld
+    return LaunchDescription([
+        DeclareLaunchArgument(name='gui', default_value='True',
+                              description='flag to enable joint_state_publiser_gui'),
+        DeclareLaunchArgument(name='model', default_value=default_urdf_model_path,
+                              description='Absolute path to the urdf model'),
+        DeclareLaunchArgument(name='rvizconfig', default_value=default_rviz_config_path,
+                              description='Absolute path to the rviz config file.'),
+        joint_state_pubisher_node,
+        joint_state_pubisher_node_gui,
+        robot_state_publisher_node,
+        rviz_node
+    ])

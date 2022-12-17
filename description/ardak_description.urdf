@@ -2,101 +2,82 @@
 <robot name="ardak" xmlns:xacro="http://ros.org/wiki/xacro">
 
   <!-- Define robot constants -->
-  <xacro:property name="base_width" value="0.61" />
-  <xacro:property name="base_length" value="0.72" />
-  <xacro:property name="base_height" value="0.24" />
+  <xacro:property name="base_width" value="0.35"/>
+  <xacro:property name="base_length" value="0.7112"/>
+  <xacro:property name="base_height" value="0.302244"/>
 
-  <xacro:property name="wheel_radius" value="0.05" />
-  <xacro:property name="wheel_width" value="0.03" />
-  <xacro:property name="wheel_link_zoff" value="0.1" />
-  <xacro:property name="wheel_link_yoff" value="0.1" />
-  <xacro:property name="wheel_link_xoff" value="0.1" />
+  <xacro:property name="wheel_radius" value="0.1016"/>
+  <xacro:property name="wheel_width" value="0.10795"/>
+  <xacro:property name="wheel_ygap" value="0.0295"/>
+  <xacro:property name="wheel_zoff" value="-0.044792"/>
+  <xacro:property name="wheel_xoff" value="-0.09163"/>
 
-  <xacro:property name="camera_link_zoff" value="0.1" />
-  <xacro:property name="camera_link_yoff" value="0.1" />
-  <xacro:property name="camera_link_xoff" value="0.1" />
+  <xacro:property name="camera_link_zoff" value="-0.129044" />
+  <xacro:property name="camera_link_yoff" value="0.0" />
+  <xacro:property name="camera_link_xoff" value="-0.033831" />
+
+  <xacro:property name="d435_link_zoff" value="0.0" />
+  <xacro:property name="d435_link_yoff" value="0.0" />
+  <xacro:property name="d435_link_xoff" value="0.0" />
+
+  <xacro:property name="t265_link_zoff" value="0.0" />
+  <xacro:property name="t265_link_yoff" value="0.0" />
+  <xacro:property name="t265_link_xoff" value="0.0" />
+
 
   <link name="base_link">
-    <parent link="t265_frame" />
     <visual>
       <geometry>
-        <box size="${base_length} ${base_width} ${base_height}" />
+        <box size="${base_length} ${base_width} ${base_height}"/>
       </geometry>
+      <material name="Cyan">
+        <color rgba="0 1.0 1.0 1.0"/>
+      </material>
     </visual>
   </link>
+
+  <link name="base_footprint"/>
+
+  <joint name="base_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="base_footprint"/>
+    <origin xyz="0.0 0.0 ${-(wheel_radius+wheel_zoff)}" rpy="0 0 0"/>
+  </joint>
   
   <link name="camera_link">
     <parent link="base_to_camera_joint" />
   </link>
 
-  <link name="front_left_wheel">
-    <parent link="front_left_drive_joint" />
-    <origin xyz="0 0 0" />
-    <visual>
-      <geometry>
-        <cylinder length="${wheel_width}" radius="${wheel_radius}" />
-      </geometry>
-    </visual>
-  </link>
+  <xacro:macro name="wheel" params="prefix x_reflect y_reflect">
+    <link name="${prefix}_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+        <geometry>
+            <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        </geometry>
+        <material name="Gray">
+          <color rgba="0.5 0.5 0.5 1.0"/>
+        </material>
+      </visual>
+    </link>
 
-  <link name="front_right_wheel">
-    <parent link="front_right_drive_joint" />
-    <origin xyz="0 0 0" />
-    <visual>
-      <geometry>
-        <cylinder length="${wheel_width}" radius="${wheel_radius}" />
-      </geometry>
-    </visual>
-  </link>
+    <joint name="${prefix}_joint" type="continuous">
+      <parent link="base_link"/>
+      <child link="${prefix}_link"/>
+      <origin xyz="${x_reflect*(base_length/2 + wheel_xoff)} ${y_reflect*(base_width/2+wheel_ygap + wheel_width/2)} ${-(base_height/2 + wheel_zoff)}" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+    </joint>
+  </xacro:macro>
 
-  <link name="rear_left_wheel">
-    <parent link="rear_left_drive_joint" />
-    <origin xyz="0 0 0" />
-    <visual>
-      <geometry>
-        <cylinder length="${wheel_width}" radius="${wheel_radius}" />
-      </geometry>
-    </visual>
-  </link>
-
-  <link name="rear_right_wheel">
-    <parent link="rear_right_drive_joint" />
-    <origin xyz="0 0 0" />
-    <visual>
-      <geometry>
-        <cylinder length="${wheel_width}" radius="${wheel_radius}" />
-      </geometry>
-    </visual>
-  </link>
+  <xacro:wheel prefix="drive_wheel_rear_left" x_reflect="-1" y_reflect="1" />
+  <xacro:wheel prefix="drive_wheel_rear_right" x_reflect="-1" y_reflect="-1" />
+  <xacro:wheel prefix="drive_wheel_front_left" x_reflect="1" y_reflect="1" />
+  <xacro:wheel prefix="drive_wheel_front_right" x_reflect="1" y_reflect="-1" />
 
   <joint name="base_to_camera_joint" type="fixed">
     <parent link="base_link" />
     <child link="camera_link" />
-    <origin xyz="${camera_link_xoff} ${camera_link_yoff} ${camera_link_zoff}" />
-  </joint>
-
-  <joint name="front_left_drive_joint" type="continuous" >
-    <parent link="base_link" />
-    <child link="front_left_wheel" />
-    <origin xyz="${-wheel_link_xoff} ${wheel_link_yoff} ${-wheel_link_zoff}" />
-  </joint>
-
-  <joint name="front_right_drive_joint" type="continuous" >
-    <parent link="base_link" />
-    <child link="front_right_wheel" />
-    <origin xyz="${wheel_link_xoff} ${wheel_link_yoff} ${-wheel_link_zoff}" />
-  </joint>
-
-  <joint name="rear_left_drive_joint" type="continuous" >
-    <parent link="base_link" />
-    <child link="rear_left_wheel" />
-    <origin xyz="${-wheel_link_xoff} ${-wheel_link_yoff} ${-wheel_link_zoff}" />
-  </joint>
-
-  <joint name="rear_right_drive_joint" type="continuous" >
-    <parent link="base_link" />
-    <child link="rear_right_wheel" />
-    <origin xyz="${wheel_link_xoff} ${-wheel_link_yoff} ${-wheel_link_zoff}" />
+    <origin xyz="${base_length/2 + camera_link_xoff} ${camera_link_yoff} ${base_height/2 + camera_link_zoff}" />
   </joint>
 
 </robot>
