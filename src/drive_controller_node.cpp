@@ -2,13 +2,13 @@
  * @file drive_controller_node.cpp
  * @author Nick Skinner (nskinner@zygenrobotics.com)
  * @brief Drive controller for Ardak project. Commands the steering and drive system
- *          as specificied by incoming signals from either a manual control or the 
+ *          as specificied by incoming signals from either a manual control or the
  *          onboard intelligence system.
  * @version 0.1
  * @date 2021-09-20
- * 
+ *
  * @copyright Copyright (c) 2021
- * 
+ *
  */
 
 /**
@@ -21,7 +21,6 @@
 
 using namespace std::literals::chrono_literals;
 using std::placeholders::_1;
-
 
 namespace bfr
 {
@@ -42,19 +41,22 @@ namespace bfr
         this->declare_parameter<double>("driveGearRatio", 0.0f);
         this->declare_parameter<double>("wheelCircumference", 0.0f);
         this->declare_parameter<double>("maxSteeringVelocity", 0.0f);
-        this->declare_parameter<double>("minSteeringVelocity", 0.0f);
+        this->declare_parameter<double>("wheelbase", 0.0f);
 
         rclcpp::SubscriptionOptions sub_options;
         sub_options.event_callbacks.liveliness_callback = std::bind(&DriveControllerNode::input_liveliness_changed, this, _1);
         sub_options.event_callbacks.deadline_callback = std::bind(&DriveControllerNode::input_deadline_changed, this, _1);
 
         this->leftDrivePublisher = this->create_publisher<std_msgs::msg::Float32>(
-            "appout/drive/left_drive_command", 10
-        );
+            "appout/drive/left_drive_command", 10);
 
         this->rightDrivePublisher = this->create_publisher<std_msgs::msg::Float32>(
-            "appout/drive/right_drive_command", 10
-        );
+            "appout/drive/right_drive_command", 10);
+
+        // This echos the input for autonomous systems, and calculates for tank-drive manual
+        // inputs
+        this->twistPublisher = this->create_publisher<geometry_msgs::msg::Twist>(
+            "appout/drive/wheel_cmd", 10);
     }
 
     rcl_interfaces::msg::SetParametersResult DriveControllerNode::parametersCallback(
@@ -111,13 +113,13 @@ namespace bfr
                 result.reason = "maxSteeringVelocity set";
             }
 
-            if (parameter.get_name() == "minSteeringVelocity" &&
+            if (parameter.get_name() == "wheelbase" &&
                 parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
             {
-                this->minSteeringVelocity.value = parameter.as_double();
+                this->wheelbase = parameter.as_double();
 
                 result.successful = true;
-                result.reason = "minSteeringVelocity set";
+                result.reason = "wheelbase set";
             }
 
             if (parameter.get_name() == "manualControlAllowed" &&
@@ -141,8 +143,7 @@ namespace bfr
 
                     this->gamepadSubscription = this->create_subscription<bfr_msgs::msg::Gamepad>(
                         "hal/inputs/gamepad", this->base_qos, std::bind(&DriveControllerNode::gamepad_callback, this, _1),
-                        sub_options
-                    );
+                        sub_options);
                 }
 
                 result.successful = true;
@@ -153,7 +154,7 @@ namespace bfr
         return result;
     }
 
-    void DriveControllerNode::input_liveliness_changed(rclcpp::QOSLivelinessChangedInfo & event)
+    void DriveControllerNode::input_liveliness_changed(rclcpp::QOSLivelinessChangedInfo &event)
     {
         std::cout << "Input liveliness changed! " << event.alive_count_change << std::endl;
         if (event.alive_count_change < 0)
@@ -166,21 +167,21 @@ namespace bfr
         }
     }
 
-    void DriveControllerNode::input_deadline_changed(rclcpp::QOSDeadlineRequestedInfo & event)
+    void DriveControllerNode::input_deadline_changed(rclcpp::QOSDeadlineRequestedInfo &event)
     {
-        RCLCPP_INFO(this->get_logger(), std::string("DriveController: Message missed!").c_str());
-        
-        // We've missed a message.
-        if (event.total_count_change > 0)
-        {
-            this->steering = 0;
-            this->speed = 0;
+        // RCLCPP_INFO(this->get_logger(), std::string("DriveController: Message missed!").c_str());
 
+        // We've missed a message.
+        /*if (event.total_count_change > 0)
+        {
             std_msgs::msg::Float32 output;
             output.data = 0.f;
+            this->lastRightCommand = 0.f;
+            this->lastLeftCommand = 0.f;
             this->leftDrivePublisher->publish(output);
             this->rightDrivePublisher->publish(output);
-        }
+            this->twistPublisher->publish(this->tank_to_twist(this->lastLeftCommand, this->lastRightCommand));
+        }*/
     }
 
     // Uses a dual-stick input from the gamepad for manual control
@@ -188,8 +189,8 @@ namespace bfr
     {
         if (msg->action == GamepadAction::ENABLE)
         {
-                this->running = true;
-                RCLCPP_INFO(this->get_logger(), std::string("DriveController: Manual control enabled.").c_str());
+            this->running = true;
+            RCLCPP_INFO(this->get_logger(), std::string("DriveController: Manual control enabled.").c_str());
         }
 
         if (this->inputAlive && this->running)
@@ -198,7 +199,7 @@ namespace bfr
             {
                 double outputVelocity = 0.f;
                 double outputRPH = 0.f;
-                double outputRPM  = 0.f;
+                double outputRPM = 0.f;
                 double outputTPS = 0.f;
                 std_msgs::msg::Float32 output;
                 output.data = 0.f;
@@ -206,53 +207,74 @@ namespace bfr
                 if (msg->value > 10 || msg->value < -10)
                 {
                     outputVelocity = bfr_base::scale(-100., 100.,
-                        this->minVelocity.value, this->maxVelocity.value, static_cast<double>(msg->value));
-                    
+                                                     this->minVelocity.value, this->maxVelocity.value, static_cast<double>(msg->value));
+
                     outputRPH = (outputVelocity * 100.) / this->wheelCircumference.value;
                     outputRPM = outputRPH / 60.;
-                    outputTPS = outputRPM / 60.;                   
-                    
+                    outputTPS = outputRPM / 60.;
+
                     output.data = static_cast<float>(outputTPS / this->driveGearRatio);
                     // This should cap out around 18TPS
                 }
-                
+
+                this->lastRightCommand = (outputRPM * 2 * 3.14f) / 60.0;
                 this->rightDrivePublisher->publish(output);
             }
             else if (msg->action == GamepadAction::LEFT_STICK_UP_DOWN)
             {
                 double outputVelocity = 0.f;
                 double outputRPH = 0.f;
-                double outputRPM  = 0.f;
+                double outputRPM = 0.f;
                 double outputTPS = 0.f;
                 std_msgs::msg::Float32 output;
-                output.data = 0.f; 
+                output.data = 0.f;
 
                 if (msg->value > 10 || msg->value < -10)
                 {
                     outputVelocity = bfr_base::scale(-100., 100.,
-                        this->minVelocity.value, this->maxVelocity.value, static_cast<double>(msg->value));
-                    
+                                                     this->minVelocity.value, this->maxVelocity.value, static_cast<double>(msg->value));
+
                     outputRPH = (outputVelocity * 100.) / this->wheelCircumference.value;
                     outputRPM = outputRPH / 60.;
-                    outputTPS = outputRPM / 60.;                   
-                    
+                    outputTPS = outputRPM / 60.;
+
                     output.data = static_cast<float>(outputTPS / this->driveGearRatio);
                     // This should cap out around 18TPS
                 }
-                
+
+                this->lastLeftCommand = (outputRPM * 2 * 3.14f) / 60.0;
                 this->leftDrivePublisher->publish(output);
             }
+
+            this->twistPublisher->publish(this->tank_to_twist(this->lastLeftCommand, this->lastRightCommand));
         }
+    }
+
+    geometry_msgs::msg::Twist DriveControllerNode::tank_to_twist(double leftWheelVelocity, double rightWheelVelocity)
+    {
+        geometry_msgs::msg::Twist outputTwist;
+
+        // Linear velocity = (Right wheel velocity + Left wheel velocity) / 2
+
+        outputTwist.linear.x = (rightWheelVelocity + leftWheelVelocity) / 2;
+        outputTwist.linear.y = 0.0f; // Always 0 (we cannot scoot sideways)
+        outputTwist.linear.z = 0.0f; // Always 0 (we cannot fly)
+
+        // Angular velocity = (Right wheel velocity - Left wheel velocity) / wheelbase
+
+        outputTwist.angular.x = 0.0f; // Always 0 (we cannot fly)
+        outputTwist.angular.y = 0.0f; // Always 0 (we cannot fly)
+        outputTwist.angular.z = (rightWheelVelocity - leftWheelVelocity) / this->wheelbase;
+
+        return outputTwist;
     }
 
     void DriveControllerNode::steering_callback(const std_msgs::msg::Int16 msg)
     {
-
     }
 
     void DriveControllerNode::speed_callback(const std_msgs::msg::Int16 msg)
     {
-
     }
 
     void DriveControllerNode::loop()

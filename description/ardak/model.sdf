@@ -3,14 +3,14 @@
     <link name='base_link'>
       <inertial>
         <pose>0 0 0 0 -0 0</pose>
-        <mass>1</mass>
+        <mass>18.14</mass>
         <inertia>
-          <ixx>0.1</ixx>
+          <ixx>2.66469</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>1</iyy>
+          <iyy>1.75844</iyy>
           <iyz>0</iyz>
-          <izz>0.1</izz>
+          <izz>3.34158</izz>
         </inertia>
       </inertial>
       <collision name='base_link_collision'>
@@ -66,12 +66,12 @@
         <pose>0 0 0 0 -0 0</pose>
         <mass>1</mass>
         <inertia>
-          <ixx>0.1</ixx>
+          <ixx>0.00354045</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>1</iyy>
+          <iyy>0.00628056</iyy>
           <iyz>0</iyz>
-          <izz>0.1</izz>
+          <izz>0.00628056</izz>
         </inertia>
       </inertial>
       <collision name='drive_wheel_front_left_link_collision'>
@@ -82,6 +82,22 @@
             <radius>0.1016</radius>
           </cylinder>
         </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <kp>1e+06</kp>
+              <kd>100</kd>
+              <min_depth>0.01</min_depth>
+            </ode>
+          </contact>
+          <friction>
+            <ode>
+              <mu2>0.8</mu2>
+              <fdir1>1 0 0</fdir1>
+            </ode>
+          </friction>
+        </surface>
+        <max_contacts>3</max_contacts>
       </collision>
       <visual name='drive_wheel_front_left_link_visual'>
         <pose>0 0 0 1.5708 -0 0</pose>
@@ -92,6 +108,9 @@
           </cylinder>
         </geometry>
       </visual>
+      <mu>0.8</mu>
+      <slip1>0.5</slip1>
+      <slip2>0</slip2>
     </link>
     <joint name='drive_wheel_front_right_joint' type='revolute'>
       <pose relative_to='base_link'>0.26397 -0.258475 -0.10633 0 -0 0</pose>
@@ -115,12 +134,12 @@
         <pose>0 0 0 0 -0 0</pose>
         <mass>1</mass>
         <inertia>
-          <ixx>0.1</ixx>
+          <ixx>0.00354045</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>1</iyy>
+          <iyy>0.00628056</iyy>
           <iyz>0</iyz>
-          <izz>0.1</izz>
+          <izz>0.00628056</izz>
         </inertia>
       </inertial>
       <collision name='drive_wheel_front_right_link_collision'>
@@ -131,6 +150,22 @@
             <radius>0.1016</radius>
           </cylinder>
         </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <kp>1e+06</kp>
+              <kd>100</kd>
+              <min_depth>0.01</min_depth>
+            </ode>
+          </contact>
+          <friction>
+            <ode>
+              <mu2>0.8</mu2>
+              <fdir1>1 0 0</fdir1>
+            </ode>
+          </friction>
+        </surface>
+        <max_contacts>3</max_contacts>
       </collision>
       <visual name='drive_wheel_front_right_link_visual'>
         <pose>0 0 0 1.5708 -0 0</pose>
@@ -141,6 +176,9 @@
           </cylinder>
         </geometry>
       </visual>
+      <mu>0.8</mu>
+      <slip1>0.5</slip1>
+      <slip2>0</slip2>
     </link>
     <joint name='drive_wheel_rear_left_joint' type='revolute'>
       <pose relative_to='base_link'>-0.26397 0.258475 -0.10633 0 -0 0</pose>
@@ -164,12 +202,12 @@
         <pose>0 0 0 0 -0 0</pose>
         <mass>1</mass>
         <inertia>
-          <ixx>0.1</ixx>
+          <ixx>0.00354045</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>1</iyy>
+          <iyy>0.00628056</iyy>
           <iyz>0</iyz>
-          <izz>0.1</izz>
+          <izz>0.00628056</izz>
         </inertia>
       </inertial>
       <collision name='drive_wheel_rear_left_link_collision'>
@@ -180,6 +218,22 @@
             <radius>0.1016</radius>
           </cylinder>
         </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <kp>1e+06</kp>
+              <kd>100</kd>
+              <min_depth>0.01</min_depth>
+            </ode>
+          </contact>
+          <friction>
+            <ode>
+              <mu2>0.8</mu2>
+              <fdir1>1 0 0</fdir1>
+            </ode>
+          </friction>
+        </surface>
+        <max_contacts>3</max_contacts>
       </collision>
       <visual name='drive_wheel_rear_left_link_visual'>
         <pose>0 0 0 1.5708 -0 0</pose>
@@ -190,6 +244,9 @@
           </cylinder>
         </geometry>
       </visual>
+      <mu>0.8</mu>
+      <slip1>0.5</slip1>
+      <slip2>0</slip2>
     </link>
     <joint name='drive_wheel_rear_right_joint' type='revolute'>
       <pose relative_to='base_link'>-0.26397 -0.258475 -0.10633 0 -0 0</pose>
@@ -213,12 +270,12 @@
         <pose>0 0 0 0 -0 0</pose>
         <mass>1</mass>
         <inertia>
-          <ixx>0.1</ixx>
+          <ixx>0.00354045</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>1</iyy>
+          <iyy>0.00628056</iyy>
           <iyz>0</iyz>
-          <izz>0.1</izz>
+          <izz>0.00628056</izz>
         </inertia>
       </inertial>
       <collision name='drive_wheel_rear_right_link_collision'>
@@ -229,6 +286,22 @@
             <radius>0.1016</radius>
           </cylinder>
         </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <kp>1e+06</kp>
+              <kd>100</kd>
+              <min_depth>0.01</min_depth>
+            </ode>
+          </contact>
+          <friction>
+            <ode>
+              <mu2>0.8</mu2>
+              <fdir1>1 0 0</fdir1>
+            </ode>
+          </friction>
+        </surface>
+        <max_contacts>3</max_contacts>
       </collision>
       <visual name='drive_wheel_rear_right_link_visual'>
         <pose>0 0 0 1.5708 -0 0</pose>
@@ -239,14 +312,33 @@
           </cylinder>
         </geometry>
       </visual>
+      <mu>0.8</mu>
+      <slip1>0.5</slip1>
+      <slip2>0</slip2>
     </link>
-    <frame name='base_joint' attached_to='base_link'>
-      <pose>0 0 -0.20793 0 -0 0</pose>
-    </frame>
-    <frame name='base_footprint' attached_to='base_joint'/>
-    <frame name='base_to_camera_joint' attached_to='base_link'>
-      <pose>0.321769 0 0.022078 0 -0 0</pose>
-    </frame>
-    <frame name='camera_link' attached_to='base_to_camera_joint'/>
+    <static>0</static>
+    <plugin name='skid_steer_drive' filename='libgazebo_ros_diff_drive.so'>
+      <update_rate>100.0</update_rate>
+      <num_wheel_pairs>2</num_wheel_pairs>
+      <left_joint>drive_wheel_front_left_joint</left_joint>
+      <right_joint>drive_wheel_front_right_joint</right_joint>
+      <left_joint>drive_wheel_rear_left_joint</left_joint>
+      <right_joint>drive_wheel_rear_right_joint</right_joint>
+      <wheel_separation>0.43347499999999994</wheel_separation>
+      <wheel_separation>0.43347499999999994</wheel_separation>
+      <wheel_diameter>0.2032</wheel_diameter>
+      <wheel_diameter>0.2032</wheel_diameter>
+      <max_wheel_torque>10</max_wheel_torque>
+      <max_wheel_acceleration>1.0</max_wheel_acceleration>
+      <torque>40</torque>
+      <ros>
+        <namespace>/</namespace>
+        <remapping>cmd_vel:=wheel_cmd</remapping>
+      </ros>
+      <publish_odom>1</publish_odom>
+      <publish_odom_tf>1</publish_odom_tf>
+      <publish_wheel_tf>0</publish_wheel_tf>
+      <robot_base_frame>base_link</robot_base_frame>
+    </plugin>
   </model>
 </sdf>

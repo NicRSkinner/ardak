@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<robot name="ardak" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="ardak"
+  xmlns:xacro="http://ros.org/wiki/xacro">
 
   <!-- Define robot constants -->
   <xacro:property name="base_width" value="0.35"/>
@@ -41,14 +42,60 @@
       </geometry>
     </collision>
     <inertial>
-      <mass value="1" />
-      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="1" iyz="0.0" izz="0.1" />
+      <mass value="18.14" />
+      <inertia ixx="2.664688434" ixy="0.0" ixz="0.0" iyy="1.758437644" iyz="0.0" izz="3.341575268" />
     </inertial>
   </link>
 
   <gazebo reference="base_link">
     <material>Gazebo/White</material>
-  </gazebo>  
+  </gazebo>
+
+  <xacro:macro name="wheel_gz" params="prefix">
+    <gazebo reference="${prefix}_link">
+      <kp>1000000.0</kp>
+      <kd>100.0</kd>
+      <mu>0.8</mu>
+      <mu2>0.8</mu2>
+      <slip1>0.5</slip1>
+      <slip2>0</slip2>
+      <minDepth>0.01</minDepth>
+      <maxContacts>3</maxContacts>
+      <fdir1>1 0 0</fdir1>
+    </gazebo>
+  </xacro:macro>
+
+  <gazebo>
+    <plugin name="skid_steer_drive" filename="libgazebo_ros_diff_drive.so">
+      <update_rate>100.0</update_rate>
+
+      <num_wheel_pairs>2</num_wheel_pairs>
+      <left_joint>drive_wheel_front_left_joint</left_joint>
+      <right_joint>drive_wheel_front_right_joint</right_joint>
+      <left_joint>drive_wheel_rear_left_joint</left_joint>
+      <right_joint>drive_wheel_rear_right_joint</right_joint>
+
+      <wheel_separation>${(base_width+wheel_ygap + wheel_width/2)}</wheel_separation>
+      <wheel_separation>${(base_width+wheel_ygap + wheel_width/2)}</wheel_separation>
+      <wheel_diameter>${wheel_radius*2}</wheel_diameter>
+      <wheel_diameter>${wheel_radius*2}</wheel_diameter>
+
+      <!-- limits -->
+      <max_wheel_torque>10</max_wheel_torque>
+      <max_wheel_acceleration>1.0</max_wheel_acceleration>
+
+      <torque>40</torque>
+      <ros>
+        <namespace>/</namespace>
+        <remapping>cmd_vel:=wheel_cmd</remapping>
+      </ros>
+
+      <publish_odom>true</publish_odom>
+      <publish_odom_tf>true</publish_odom_tf>
+      <publish_wheel_tf>false</publish_wheel_tf>
+      <robot_base_frame>base_link</robot_base_frame>
+    </plugin>
+  </gazebo>
 
   <link name="base_footprint" />
 
@@ -57,7 +104,7 @@
     <child link="base_footprint"/>
     <origin xyz="0.0 0.0 ${-(wheel_radius+(base_height/2 + wheel_zoff))}" rpy="0 0 0"/>
   </joint>
-  
+
   <link name="camera_link">
     <parent link="base_to_camera_joint" />
   </link>
@@ -67,21 +114,21 @@
       <visual>
         <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
         <geometry>
-            <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+          <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
         </geometry>
         <material name="Gray">
           <color rgba="0.5 0.5 0.5 1.0"/>
         </material>
       </visual>
       <collision>
-        <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>2
+        <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
         <geometry>
           <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
         </geometry>
       </collision>
       <inertial>
         <mass value="1" />
-        <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="1" iyz="0.0" izz="0.1" />
+        <inertia ixx="0.00354044791667" ixy="0" ixz="0" iyy="0.0062805625" iyz="0" izz="0.0062805625"/>
       </inertial>
       <axis>
         <xyz> 0 1 0 </xyz>
@@ -97,9 +144,13 @@
   </xacro:macro>
 
   <xacro:wheel prefix="drive_wheel_rear_left" x_reflect="-1" y_reflect="1" />
+  <xacro:wheel_gz prefix="drive_wheel_rear_left" />
   <xacro:wheel prefix="drive_wheel_rear_right" x_reflect="-1" y_reflect="-1" />
+  <xacro:wheel_gz prefix="drive_wheel_rear_right" />
   <xacro:wheel prefix="drive_wheel_front_left" x_reflect="1" y_reflect="1" />
+  <xacro:wheel_gz prefix="drive_wheel_front_left" />
   <xacro:wheel prefix="drive_wheel_front_right" x_reflect="1" y_reflect="-1" />
+  <xacro:wheel_gz prefix="drive_wheel_front_right" />
 
   <joint name="base_to_camera_joint" type="fixed">
     <parent link="base_link" />

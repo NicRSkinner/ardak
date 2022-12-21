@@ -6,4 +6,4 @@ DriveController:
     driveGearRatio: 0.111
     wheelCircumference: 63.837
     maxSteeringVelocity: 0.0
-    minSteeringVelocity: 0.0
+    wheelbase: 0.433

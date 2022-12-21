@@ -1,9 +1,10 @@
 import os
 import launch
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription
 from launch.conditions import IfCondition, UnlessCondition
-from launch.substitutions import Command, LaunchConfiguration
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import Command, LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
@@ -11,8 +12,39 @@ from launch_ros.substitutions import FindPackageShare
 def generate_launch_description():
     pkg_share = FindPackageShare(package='ardak').find('ardak')
     default_rviz_config_path = os.path.join(pkg_share, 'rviz/urdf_config.rviz')
-    default_urdf_model_path = os.path.join(
-        pkg_share, 'description/ardak_description.urdf')
+    default_sdf_model_path = os.path.join(
+        pkg_share, 'description/ardak/model.sdf')
+    default_world_path = os.path.join(
+        pkg_share, 'world/testworld.sdf'
+    )
+    robot_name_in_model = 'ardak'
+
+    drive_control_config_path = os.path.join(
+        pkg_share,
+        'config',
+        'DriveController.yaml'
+    )
+
+    # Pose where we want to spawn the robot
+    spawn_x_val = '0.0'
+    spawn_y_val = '0.0'
+    spawn_z_val = '0.0'
+    spawn_yaw_val = '0.0'
+
+    # Set the path to different files and folders.
+    pkg_gazebo_ros = FindPackageShare(package='gazebo_ros').find('gazebo_ros')
+    gazebo_models_path = os.path.join(pkg_share, 'description')
+    os.environ["GAZEBO_MODEL_PATH"] = gazebo_models_path
+
+    # Launch configuration variables specific to simulation
+    gui = LaunchConfiguration('gui')
+    headless = LaunchConfiguration('headless')
+    namespace = LaunchConfiguration('namespace')
+    sdf_model = LaunchConfiguration('sdf_model')
+    use_namespace = LaunchConfiguration('use_namespace')
+    use_sim_time = LaunchConfiguration('use_sim_time')
+    use_simulator = LaunchConfiguration('use_simulator')
+    world = LaunchConfiguration('world')
 
     pointcloud_remappings = [
         ('depth/image', '/D400/depth/image_rect_raw'),
@@ -108,17 +140,75 @@ def generate_launch_description():
         condition=launch.conditions.IfCondition(LaunchConfiguration('rviz'))
     )
 
+    simulation_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(os.path.join(
+            pkg_gazebo_ros, 'launch', 'gzserver.launch.py')),
+        condition=IfCondition(use_simulator),
+        launch_arguments={'world': world}.items())
+
+    simulation_client_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(os.path.join(
+            pkg_gazebo_ros, 'launch', 'gzclient.launch.py')),
+        condition=IfCondition(PythonExpression([use_simulator, ' and not ', headless])))
+
+    # Launch the robot
+    entity_node = Node(
+        package='gazebo_ros',
+        executable='spawn_entity.py',
+        arguments=['-entity', robot_name_in_model,
+                   '-file', sdf_model,
+                   '-x', spawn_x_val,
+                   '-y', spawn_y_val,
+                   '-z', spawn_z_val,
+                   '-Y', spawn_yaw_val],
+        output='screen')
+
+    # All of the Ardak nodes used for simulation only
+    ardak_nodes = Node(
+        package="ardak",
+        executable="main",
+        parameters=[drive_control_config_path],
+        remappings=[
+            ("appout/drive/left_drive_command", "odrive0/motor0/input_vel"),
+            ("appout/drive/right_drive_command", "odrive0/motor1/input_vel"),
+            ("appout/drive/wheel_cmd", "wheel_cmd")
+        ]
+    )
+
+    gamepad_node = Node(
+        package="bfr_hal",
+        executable="gamepad.py"
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument(name='gui', default_value='True',
                               description='flag to enable joint_state_publiser_gui'),
         DeclareLaunchArgument(name='rviz', default_value='False',
                               description='flag to use rviz instead of gazebo'),
-        DeclareLaunchArgument(name='model', default_value=default_urdf_model_path,
-                              description='Absolute path to the urdf model'),
         DeclareLaunchArgument(name='rvizconfig', default_value=default_rviz_config_path,
                               description='Absolute path to the rviz config file.'),
-        joint_state_pubisher_node,
-        joint_state_pubisher_node_gui,
-        robot_state_publisher_node,
-        rviz_node
+        DeclareLaunchArgument(name='namespace', default_value='',
+                              description='top-level namespace'),
+        DeclareLaunchArgument(name='use_namespace', default_value='False',
+                              description='Whether to apply a namespace to the navigation stack.'),
+        DeclareLaunchArgument(name='sdf_model', default_value=default_sdf_model_path,
+                              description='Absolute path to the sdf model.'),
+        DeclareLaunchArgument(name='headless', default_value='False',
+                              description='Whether to execute gzclient'),
+        DeclareLaunchArgument(name='use_sim_time', default_value='true',
+                              description='Use simulation (Gazebo) clock if true'),
+        DeclareLaunchArgument(name='use_simulator', default_value='True',
+                              description='Whether to start the simulator'),
+        DeclareLaunchArgument(name='world', default_value=default_world_path,
+                              description='Full path to the world model file to load'),
+
+        # joint_state_pubisher_node,
+        # joint_state_pubisher_node_gui,
+        # robot_state_publisher_node,
+        # rviz_node,
+        simulation_launch,
+        simulation_client_launch,
+        entity_node,
+        gamepad_node,
+        ardak_nodes
     ])

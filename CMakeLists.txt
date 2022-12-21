@@ -47,7 +47,8 @@ add_executable(main src/main.cpp src/ardak_node.cpp src/drive_controller_node.cp
 ament_target_dependencies(main
   rclcpp
   bfr_base
-  bfr_msgs)
+  bfr_msgs
+  geometry_msgs)
 
 add_executable(robot_states src/robot_states.cpp)
 
