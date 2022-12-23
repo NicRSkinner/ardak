@@ -15,7 +15,7 @@ def generate_launch_description():
     default_sdf_model_path = os.path.join(
         pkg_share, 'description/ardak/model.sdf')
     default_world_path = os.path.join(
-        pkg_share, 'world/testworld.sdf'
+        pkg_share, 'world/ardak_world.sdf'
     )
     robot_name_in_model = 'ardak'
 

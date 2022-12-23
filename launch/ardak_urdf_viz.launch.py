@@ -7,16 +7,19 @@ from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
+
 def generate_launch_description():
     pkg_share = FindPackageShare(package='ardak').find('ardak')
     default_rviz_config_path = os.path.join(pkg_share, 'rviz/urdf_config.rviz')
-    default_urdf_model_path = os.path.join(pkg_share, 'description/ardak_description.urdf')
+    default_urdf_model_path = os.path.join(
+        pkg_share, 'description/ardak/ardak.urdf')
 
     # Subscribe to the joint states of the robot, and publish the 3D pose of each link.
     robot_state_publisher_node = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
-        parameters=[{'robot_description': Command(['xacro ', LaunchConfiguration('model')])}]
+        parameters=[{'robot_description': Command(
+            ['xacro ', LaunchConfiguration('model')])}]
     )
 
     joint_state_pubisher_node = Node(
