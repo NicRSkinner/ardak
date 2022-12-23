@@ -1,6 +1,130 @@
 <sdf version='1.7'>
   <model name='ardak'>
-    <link name='base_link'>
+<link name="realsense_link">
+  <pose>0 0.0175 0.0125 0 0 0</pose>
+  <visual name="realsense_link_visual">
+    <pose>0 0 0 -1.57 0 -1.57</pose>
+    <geometry>
+      <mesh>
+        <uri>model://ardak/meshes/d435.dae</uri>
+      </mesh>
+    </geometry>
+  </visual>
+  <collision name="realsense_link_collision">
+    <pose>0 0 0 -1.57 0 -1.57</pose>
+    <geometry>
+      <box>
+        <size>0.02505 0.090 0.025</size>
+      </box>
+    </geometry>
+  </collision>
+  <inertial>
+    <pose>0 0 0 0 0 0</pose>
+    <inertia>
+      <ixx>0.001</ixx>
+      <ixy>0.000</ixy>
+      <ixz>0.000</ixz>
+      <iyy>0.001</iyy>
+      <iyz>0.000</iyz>
+      <izz>0.001</izz>
+    </inertia>
+    <mass>0.564</mass>
+  </inertial>
+
+  <sensor name="cameradepth" type="depth">
+    <camera name="camera">
+      <horizontal_fov>1.57</horizontal_fov>
+      <image>
+        <width>1280</width>
+        <height>720</height>
+      </image>
+      <clip>
+        <near>0.1</near>
+        <far>100</far>
+      </clip>
+      <noise>
+        <type>gaussian</type>
+        <mean>0.0</mean>
+        <stddev>0.100</stddev>
+      </noise>
+    </camera>
+    <always_on>1</always_on>
+    <update_rate>30</update_rate>
+    <visualize>0</visualize>
+  </sensor>
+  <sensor name="cameracolor" type="camera">
+    <camera name="camera">
+      <horizontal_fov>1.57</horizontal_fov>
+      <image>
+        <width>1280</width>
+        <height>720</height>
+        <format>RGB_INT8</format>
+      </image>
+      <clip>
+        <near>0.1</near>
+        <far>100</far>
+      </clip>
+      <noise>
+        <type>gaussian</type>
+        <mean>0.0</mean>
+        <stddev>0.007</stddev>
+      </noise>
+    </camera>
+    <always_on>1</always_on>
+    <update_rate>30</update_rate>
+    <visualize>1</visualize>
+  </sensor>
+  <sensor name="cameraired1" type="camera">
+    <camera name="camera">
+      <horizontal_fov>1.57</horizontal_fov>
+      <image>
+        <width>1280</width>
+        <height>720</height>
+        <format>L_INT8</format>
+      </image>
+      <clip>
+        <near>0.1</near>
+        <far>100</far>
+      </clip>
+      <noise>
+        <type>gaussian</type>
+        <mean>0.0</mean>
+        <stddev>0.05</stddev>
+      </noise>
+    </camera>
+    <always_on>1</always_on>
+    <update_rate>1</update_rate>
+    <visualize>0</visualize>
+  </sensor>
+  <sensor name="cameraired2" type="camera">
+    <camera name="camera">
+      <horizontal_fov>1.57</horizontal_fov>
+      <image>
+        <width>1280</width>
+        <height>720</height>
+        <format>L_INT8</format>
+      </image>
+      <clip>
+        <near>0.1</near>
+        <far>100</far>
+      </clip>
+      <noise>
+        <type>gaussian</type>
+        <mean>0.0</mean>
+        <stddev>0.05</stddev>
+      </noise>
+    </camera>
+    <always_on>1</always_on>
+    <update_rate>1</update_rate>
+    <visualize>0</visualize>
+  </sensor>
+</link>
+
+<joint name="realsense_joint" type="fixed">
+  <parent>base_link</parent>
+  <child>realsense_link</child>
+  <pose>0.4 0 0.4 0 0 0</pose>
+</joint>    <link name='base_link'>
       <inertial>
         <pose>0 0 0 0 -0 0</pose>
         <mass>18.14</mass>
@@ -44,6 +168,556 @@
         </material>
       </visual>
     </link>
+    <joint name='base_footprint_joint' type='fixed'>
+      <pose relative_to='base_link'>0 0 -0.20793 0 -0 0</pose>
+      <parent>base_link</parent>
+      <child>base_footprint</child>
+      <axis>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+        </ode>
+      </physics>
+    </joint>
+    <link name='base_footprint'>
+      <pose relative_to='base_footprint_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0.001</izz>
+        </inertia>
+      </inertial>
+      <collision name='base_footprint_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='base_footprint_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0.1</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='camera_link_joint' type='fixed'>
+      <pose relative_to='base_link'>0 0 0 0 -0 0</pose>
+      <parent>base_link</parent>
+      <child>camera_link</child>
+      <axis>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+        </ode>
+      </physics>
+    </joint>
+    <link name='camera_link'>
+      <pose relative_to='camera_link_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0.001</izz>
+        </inertia>
+      </inertial>
+      <collision name='camera_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='camera_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0.1</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='camera_depth_joint' type='fixed'>
+      <pose relative_to='camera_link'>0 0 0 0 -0 0</pose>
+      <parent>camera_link</parent>
+      <child>camera_depth_frame</child>
+      <axis>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+        </ode>
+      </physics>
+    </joint>
+    <link name='camera_depth_frame'>
+      <pose relative_to='camera_depth_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0.001</izz>
+        </inertia>
+      </inertial>
+      <collision name='camera_depth_frame_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='camera_depth_frame_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0.1</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='camera_color_joint' type='fixed'>
+      <pose relative_to='camera_depth_frame'>0 0 0 0 -0 0</pose>
+      <parent>camera_depth_frame</parent>
+      <child>camera_color_frame</child>
+      <axis>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+        </ode>
+      </physics>
+    </joint>
+    <link name='camera_color_frame'>
+      <pose relative_to='camera_color_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0.001</izz>
+        </inertia>
+      </inertial>
+      <collision name='camera_color_frame_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='camera_color_frame_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0.1</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='camera_color_optical_joint' type='fixed'>
+      <pose relative_to='camera_color_frame'>0 0 0 0 -0 0</pose>
+      <parent>camera_color_frame</parent>
+      <child>camera_color_optical_frame</child>
+      <axis>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+        </ode>
+      </physics>
+    </joint>
+    <link name='camera_color_optical_frame'>
+      <pose relative_to='camera_color_optical_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0.001</izz>
+        </inertia>
+      </inertial>
+      <collision name='camera_color_optical_frame_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='camera_color_optical_frame_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0.1</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='camera_depth_optical_joint' type='fixed'>
+      <pose relative_to='camera_depth_frame'>0 0 0 0 -0 0</pose>
+      <parent>camera_depth_frame</parent>
+      <child>camera_depth_optical_frame</child>
+      <axis>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+        </ode>
+      </physics>
+    </joint>
+    <link name='camera_depth_optical_frame'>
+      <pose relative_to='camera_depth_optical_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0.001</izz>
+        </inertia>
+      </inertial>
+      <collision name='camera_depth_optical_frame_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='camera_depth_optical_frame_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0.1</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='camera_left_ir_joint' type='fixed'>
+      <pose relative_to='camera_depth_frame'>0 0 0 0 -0 0</pose>
+      <parent>camera_depth_frame</parent>
+      <child>camera_left_ir_frame</child>
+      <axis>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+        </ode>
+      </physics>
+    </joint>
+    <link name='camera_left_ir_frame'>
+      <pose relative_to='camera_left_ir_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0.001</izz>
+        </inertia>
+      </inertial>
+      <collision name='camera_left_ir_frame_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='camera_left_ir_frame_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0.1</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='camera_left_ir_optical_joint' type='fixed'>
+      <pose relative_to='camera_left_ir_frame'>0 0 0 0 -0 0</pose>
+      <parent>camera_left_ir_frame</parent>
+      <child>camera_left_ir_optical_frame</child>
+      <axis>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+        </ode>
+      </physics>
+    </joint>
+    <link name='camera_left_ir_optical_frame'>
+      <pose relative_to='camera_left_ir_optical_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0.001</izz>
+        </inertia>
+      </inertial>
+      <collision name='camera_left_ir_optical_frame_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='camera_left_ir_optical_frame_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0.1</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='camera_right_ir_joint' type='fixed'>
+      <pose relative_to='camera_depth_frame'>0 0 0 0 -0 0</pose>
+      <parent>camera_depth_frame</parent>
+      <child>camera_right_ir_frame</child>
+      <axis>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+        </ode>
+      </physics>
+    </joint>
+    <link name='camera_right_ir_frame'>
+      <pose relative_to='camera_right_ir_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0.001</izz>
+        </inertia>
+      </inertial>
+      <collision name='camera_right_ir_frame_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='camera_right_ir_frame_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0.1</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='camera_right_ir_optical_joint' type='fixed'>
+      <pose relative_to='camera_right_ir_frame'>0 0 0 0 -0 0</pose>
+      <parent>camera_right_ir_frame</parent>
+      <child>camera_right_ir_optical_frame</child>
+      <axis>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+        </ode>
+      </physics>
+    </joint>
+    <link name='camera_right_ir_optical_frame'>
+      <pose relative_to='camera_right_ir_optical_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0.001</izz>
+        </inertia>
+      </inertial>
+      <collision name='camera_right_ir_optical_frame_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='camera_right_ir_optical_frame_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0.1</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
     <joint name='drive_wheel_front_left_joint' type='revolute'>
       <pose relative_to='base_link'>0.26397 0.258475 -0.10633 0 -0 0</pose>
       <parent>base_link</parent>
@@ -59,6 +733,18 @@
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+        </ode>
+      </physics>
+      <joint_properties>
+        <damping>1.0</damping>
+        <friction>1.0</friction>
+      </joint_properties>
     </joint>
     <link name='drive_wheel_front_left_link'>
       <pose relative_to='drive_wheel_front_left_joint'>0 0 0 0 -0 0</pose>
@@ -66,7 +752,7 @@
         <pose>0 0 0 0 -0 0</pose>
         <mass>1</mass>
         <inertia>
-          <ixx>0.00354045</ixx>
+          <ixx>0.00628056</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
           <iyy>0.00628056</iyy>
@@ -92,7 +778,8 @@
           </contact>
           <friction>
             <ode>
-              <mu2>0.8</mu2>
+              <mu>0.8</mu>
+              <mu2>0.5</mu2>
               <fdir1>1 0 0</fdir1>
             </ode>
           </friction>
@@ -108,8 +795,7 @@
           </cylinder>
         </geometry>
       </visual>
-      <mu>0.8</mu>
-      <slip1>0.5</slip1>
+      <slip1>0.75</slip1>
       <slip2>0</slip2>
     </link>
     <joint name='drive_wheel_front_right_joint' type='revolute'>
@@ -127,6 +813,18 @@
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+        </ode>
+      </physics>
+      <joint_properties>
+        <damping>1.0</damping>
+        <friction>1.0</friction>
+      </joint_properties>
     </joint>
     <link name='drive_wheel_front_right_link'>
       <pose relative_to='drive_wheel_front_right_joint'>0 0 0 0 -0 0</pose>
@@ -134,7 +832,7 @@
         <pose>0 0 0 0 -0 0</pose>
         <mass>1</mass>
         <inertia>
-          <ixx>0.00354045</ixx>
+          <ixx>0.00628056</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
           <iyy>0.00628056</iyy>
@@ -160,7 +858,8 @@
           </contact>
           <friction>
             <ode>
-              <mu2>0.8</mu2>
+              <mu>0.8</mu>
+              <mu2>0.5</mu2>
               <fdir1>1 0 0</fdir1>
             </ode>
           </friction>
@@ -176,8 +875,7 @@
           </cylinder>
         </geometry>
       </visual>
-      <mu>0.8</mu>
-      <slip1>0.5</slip1>
+      <slip1>0.75</slip1>
       <slip2>0</slip2>
     </link>
     <joint name='drive_wheel_rear_left_joint' type='revolute'>
@@ -195,6 +893,18 @@
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+        </ode>
+      </physics>
+      <joint_properties>
+        <damping>1.0</damping>
+        <friction>1.0</friction>
+      </joint_properties>
     </joint>
     <link name='drive_wheel_rear_left_link'>
       <pose relative_to='drive_wheel_rear_left_joint'>0 0 0 0 -0 0</pose>
@@ -202,7 +912,7 @@
         <pose>0 0 0 0 -0 0</pose>
         <mass>1</mass>
         <inertia>
-          <ixx>0.00354045</ixx>
+          <ixx>0.00628056</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
           <iyy>0.00628056</iyy>
@@ -228,7 +938,8 @@
           </contact>
           <friction>
             <ode>
-              <mu2>0.8</mu2>
+              <mu>0.8</mu>
+              <mu2>0.5</mu2>
               <fdir1>1 0 0</fdir1>
             </ode>
           </friction>
@@ -244,8 +955,7 @@
           </cylinder>
         </geometry>
       </visual>
-      <mu>0.8</mu>
-      <slip1>0.5</slip1>
+      <slip1>0.75</slip1>
       <slip2>0</slip2>
     </link>
     <joint name='drive_wheel_rear_right_joint' type='revolute'>
@@ -263,6 +973,18 @@
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+        </ode>
+      </physics>
+      <joint_properties>
+        <damping>1.0</damping>
+        <friction>1.0</friction>
+      </joint_properties>
     </joint>
     <link name='drive_wheel_rear_right_link'>
       <pose relative_to='drive_wheel_rear_right_joint'>0 0 0 0 -0 0</pose>
@@ -270,7 +992,7 @@
         <pose>0 0 0 0 -0 0</pose>
         <mass>1</mass>
         <inertia>
-          <ixx>0.00354045</ixx>
+          <ixx>0.00628056</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
           <iyy>0.00628056</iyy>
@@ -296,7 +1018,8 @@
           </contact>
           <friction>
             <ode>
-              <mu2>0.8</mu2>
+              <mu>0.8</mu>
+              <mu2>0.5</mu2>
               <fdir1>1 0 0</fdir1>
             </ode>
           </friction>
@@ -312,13 +1035,11 @@
           </cylinder>
         </geometry>
       </visual>
-      <mu>0.8</mu>
-      <slip1>0.5</slip1>
+      <slip1>0.75</slip1>
       <slip2>0</slip2>
     </link>
-    <static>0</static>
     <plugin name='skid_steer_drive' filename='libgazebo_ros_diff_drive.so'>
-      <update_rate>100.0</update_rate>
+      <update_rate>1000.0</update_rate>
       <num_wheel_pairs>2</num_wheel_pairs>
       <left_joint>drive_wheel_front_left_joint</left_joint>
       <right_joint>drive_wheel_front_right_joint</right_joint>
@@ -328,7 +1049,7 @@
       <wheel_separation>0.43347499999999994</wheel_separation>
       <wheel_diameter>0.2032</wheel_diameter>
       <wheel_diameter>0.2032</wheel_diameter>
-      <max_wheel_torque>10</max_wheel_torque>
+      <max_wheel_torque>40</max_wheel_torque>
       <max_wheel_acceleration>1.0</max_wheel_acceleration>
       <torque>40</torque>
       <ros>
@@ -337,8 +1058,36 @@
       </ros>
       <publish_odom>1</publish_odom>
       <publish_odom_tf>1</publish_odom_tf>
-      <publish_wheel_tf>0</publish_wheel_tf>
+      <publish_wheel_tf>1</publish_wheel_tf>
       <robot_base_frame>base_link</robot_base_frame>
+      <covariance_x>0.001</covariance_x>
+      <covariance_y>0.001</covariance_y>
+      <covariance_yaw>0.01</covariance_yaw>
+    </plugin>
+    <static>0</static>
+    <plugin name='camera' filename='librealsense_gazebo_plugin.so'>
+      <prefix>camera</prefix>
+      <prefix>camera</prefix>
+      <depthUpdateRate>30.0</depthUpdateRate>
+      <colorUpdateRate>30.0</colorUpdateRate>
+      <infraredUpdateRate>1.0</infraredUpdateRate>
+      <depthTopicName>aligned_depth_to_color/image_raw</depthTopicName>
+      <depthCameraInfoTopicName>depth/camera_info</depthCameraInfoTopicName>
+      <colorTopicName>color/image_raw</colorTopicName>
+      <colorCameraInfoTopicName>color/camera_info</colorCameraInfoTopicName>
+      <infrared1TopicName>infra1/image_raw</infrared1TopicName>
+      <infrared1CameraInfoTopicName>infra1/camera_info</infrared1CameraInfoTopicName>
+      <infrared2TopicName>infra2/image_raw</infrared2TopicName>
+      <infrared2CameraInfoTopicName>infra2/camera_info</infrared2CameraInfoTopicName>
+      <colorOpticalframeName>camera_color_optical_frame</colorOpticalframeName>
+      <depthOpticalframeName>camera_depth_optical_frame</depthOpticalframeName>
+      <infrared1OpticalframeName>camera_left_ir_optical_frame</infrared1OpticalframeName>
+      <infrared2OpticalframeName>camera_right_ir_optical_frame</infrared2OpticalframeName>
+      <rangeMinDepth>0.3</rangeMinDepth>
+      <rangeMaxDepth>3.0</rangeMaxDepth>
+      <pointCloud>1</pointCloud>
+      <pointCloudTopicName>depth/color/points</pointCloudTopicName>
+      <pointCloudCutoff>0.3</pointCloudCutoff>
     </plugin>
   </model>
 </sdf>

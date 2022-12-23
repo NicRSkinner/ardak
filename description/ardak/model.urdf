@@ -4,6 +4,68 @@
 <!-- |    EDITING THIS FILE BY HAND IS NOT RECOMMENDED                                 | -->
 <!-- =================================================================================== -->
 <robot name="ardak">
+  <gazebo>
+    <plugin filename="libgazebo_ros_diff_drive.so" name="skid_steer_drive">
+      <update_rate>1000.0</update_rate>
+      <num_wheel_pairs>2</num_wheel_pairs>
+      <left_joint>drive_wheel_front_left_joint</left_joint>
+      <right_joint>drive_wheel_front_right_joint</right_joint>
+      <left_joint>drive_wheel_rear_left_joint</left_joint>
+      <right_joint>drive_wheel_rear_right_joint</right_joint>
+      <wheel_separation>0.43347499999999994</wheel_separation>
+      <wheel_separation>0.43347499999999994</wheel_separation>
+      <wheel_diameter>0.2032</wheel_diameter>
+      <wheel_diameter>0.2032</wheel_diameter>
+      <!-- limits -->
+      <max_wheel_torque>40</max_wheel_torque>
+      <max_wheel_acceleration>1.0</max_wheel_acceleration>
+      <torque>40</torque>
+      <ros>
+        <namespace>/</namespace>
+        <remapping>cmd_vel:=wheel_cmd</remapping>
+      </ros>
+      <publish_odom>true</publish_odom>
+      <publish_odom_tf>true</publish_odom_tf>
+      <publish_wheel_tf>true</publish_wheel_tf>
+      <robot_base_frame>base_link</robot_base_frame>
+      <covariance_x>0.001</covariance_x>
+      <!-- 0.0001 -->
+      <covariance_y>0.001</covariance_y>
+      <!-- 0.0001 -->
+      <covariance_yaw>0.01</covariance_yaw>
+      <!-- 0.01 -->
+    </plugin>
+  </gazebo>
+  <gazebo reference="base_link">
+    <material>Gazebo/White</material>
+  </gazebo>
+  <gazebo>
+    <plugin filename="librealsense_gazebo_plugin.so" name="camera">
+      <prefix>camera</prefix>
+      <prefix>camera</prefix>
+      <depthUpdateRate>30.0</depthUpdateRate>
+      <colorUpdateRate>30.0</colorUpdateRate>
+      <infraredUpdateRate>1.0</infraredUpdateRate>
+      <depthTopicName>aligned_depth_to_color/image_raw</depthTopicName>
+      <depthCameraInfoTopicName>depth/camera_info</depthCameraInfoTopicName>
+      <colorTopicName>color/image_raw</colorTopicName>
+      <colorCameraInfoTopicName>color/camera_info</colorCameraInfoTopicName>
+      <infrared1TopicName>infra1/image_raw</infrared1TopicName>
+      <infrared1CameraInfoTopicName>infra1/camera_info</infrared1CameraInfoTopicName>
+      <infrared2TopicName>infra2/image_raw</infrared2TopicName>
+      <infrared2CameraInfoTopicName>infra2/camera_info</infrared2CameraInfoTopicName>
+      <colorOpticalframeName>camera_color_optical_frame</colorOpticalframeName>
+      <depthOpticalframeName>camera_depth_optical_frame</depthOpticalframeName>
+      <infrared1OpticalframeName>camera_left_ir_optical_frame</infrared1OpticalframeName>
+      <infrared2OpticalframeName>camera_right_ir_optical_frame</infrared2OpticalframeName>
+      <rangeMinDepth>0.3</rangeMinDepth>
+      <rangeMaxDepth>3.0</rangeMaxDepth>
+      <pointCloud>true</pointCloud>
+      <pointCloudTopicName>depth/color/points</pointCloudTopicName>
+      <pointCloudCutoff>0.3</pointCloudCutoff>
+    </plugin>
+  </gazebo>
+  <!-- <xacro:include filename="$(find ardak)/description/ardak/realsense_camera.gazebo" /> -->
   <link name="base_link">
     <visual>
       <geometry>
@@ -19,49 +81,42 @@
         <box size="0.7112 0.35 0.302244"/>
       </geometry>
     </collision>
+    <!-- Need to check these values -->
+    <!-- Origin needed for inertial? -->
     <inertial>
       <mass value="18.14"/>
       <inertia ixx="2.664688434" ixy="0.0" ixz="0.0" iyy="1.758437644" iyz="0.0" izz="3.341575268"/>
     </inertial>
   </link>
-  <gazebo reference="base_link">
-    <material>Gazebo/White</material>
-  </gazebo>
-  <gazebo>
-    <plugin filename="libgazebo_ros_diff_drive.so" name="skid_steer_drive">
-      <update_rate>100.0</update_rate>
-      <num_wheel_pairs>2</num_wheel_pairs>
-      <left_joint>drive_wheel_front_left_joint</left_joint>
-      <right_joint>drive_wheel_front_right_joint</right_joint>
-      <left_joint>drive_wheel_rear_left_joint</left_joint>
-      <right_joint>drive_wheel_rear_right_joint</right_joint>
-      <wheel_separation>0.43347499999999994</wheel_separation>
-      <wheel_separation>0.43347499999999994</wheel_separation>
-      <wheel_diameter>0.2032</wheel_diameter>
-      <wheel_diameter>0.2032</wheel_diameter>
-      <!-- limits -->
-      <max_wheel_torque>10</max_wheel_torque>
-      <max_wheel_acceleration>1.0</max_wheel_acceleration>
-      <torque>40</torque>
-      <ros>
-        <namespace>/</namespace>
-        <remapping>cmd_vel:=wheel_cmd</remapping>
-      </ros>
-      <publish_odom>true</publish_odom>
-      <publish_odom_tf>true</publish_odom_tf>
-      <publish_wheel_tf>false</publish_wheel_tf>
-      <robot_base_frame>base_link</robot_base_frame>
-    </plugin>
-  </gazebo>
-  <link name="base_footprint"/>
-  <joint name="base_joint" type="fixed">
+  <link name="base_footprint">
+    <visual>
+      <geometry>
+        <box size="0.0 0.0 0.1"/>
+      </geometry>
+      <material name="Cyan">
+        <color rgba="0 1.0 1.0 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.0 0.0 0.0"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+  <joint name="base_footprint_joint" type="fixed">
     <parent link="base_link"/>
     <child link="base_footprint"/>
     <origin rpy="0 0 0" xyz="0.0 0.0 -0.20793"/>
   </joint>
-  <link name="camera_link">
-    <parent link="base_to_camera_joint"/>
-  </link>
+  <gazebo reference="base_footprint_joint">
+    <disableFixedJointLumping>true</disableFixedJointLumping>
+    <preserveFixedJoint>true</preserveFixedJoint>
+  </gazebo>
   <link name="drive_wheel_rear_left_link">
     <visual>
       <origin rpy="1.5707963267948966 0 0" xyz="0 0 0"/>
@@ -80,11 +135,11 @@
     </collision>
     <inertial>
       <mass value="1"/>
-      <inertia ixx="0.00354044791667" ixy="0" ixz="0" iyy="0.0062805625" iyz="0" izz="0.0062805625"/>
+      <inertia ixx="0.0062805625" ixy="0" ixz="0" iyy="0.0062805625" iyz="0" izz="0.0062805625"/>
     </inertial>
-    <axis>
-      <xyz> 0 1 0 </xyz>
-    </axis>
+    <!--<axis>
+        <xyz> 0 1 0 </xyz>
+      </axis>-->
   </link>
   <joint name="drive_wheel_rear_left_joint" type="continuous">
     <parent link="base_link"/>
@@ -95,13 +150,19 @@
   <gazebo reference="drive_wheel_rear_left_link">
     <kp>1000000.0</kp>
     <kd>100.0</kd>
-    <mu>0.8</mu>
-    <mu2>0.8</mu2>
-    <slip1>0.5</slip1>
+    <mu1>0.8</mu1>
+    <mu2>0.5</mu2>
+    <slip1>0.75</slip1>
     <slip2>0</slip2>
     <minDepth>0.01</minDepth>
     <maxContacts>3</maxContacts>
     <fdir1>1 0 0</fdir1>
+  </gazebo>
+  <gazebo reference="drive_wheel_rear_left_joint">
+    <joint_properties>
+      <damping>1.0</damping>
+      <friction>1.0</friction>
+    </joint_properties>
   </gazebo>
   <link name="drive_wheel_rear_right_link">
     <visual>
@@ -121,11 +182,11 @@
     </collision>
     <inertial>
       <mass value="1"/>
-      <inertia ixx="0.00354044791667" ixy="0" ixz="0" iyy="0.0062805625" iyz="0" izz="0.0062805625"/>
+      <inertia ixx="0.0062805625" ixy="0" ixz="0" iyy="0.0062805625" iyz="0" izz="0.0062805625"/>
     </inertial>
-    <axis>
-      <xyz> 0 1 0 </xyz>
-    </axis>
+    <!--<axis>
+        <xyz> 0 1 0 </xyz>
+      </axis>-->
   </link>
   <joint name="drive_wheel_rear_right_joint" type="continuous">
     <parent link="base_link"/>
@@ -136,13 +197,19 @@
   <gazebo reference="drive_wheel_rear_right_link">
     <kp>1000000.0</kp>
     <kd>100.0</kd>
-    <mu>0.8</mu>
-    <mu2>0.8</mu2>
-    <slip1>0.5</slip1>
+    <mu1>0.8</mu1>
+    <mu2>0.5</mu2>
+    <slip1>0.75</slip1>
     <slip2>0</slip2>
     <minDepth>0.01</minDepth>
     <maxContacts>3</maxContacts>
     <fdir1>1 0 0</fdir1>
+  </gazebo>
+  <gazebo reference="drive_wheel_rear_right_joint">
+    <joint_properties>
+      <damping>1.0</damping>
+      <friction>1.0</friction>
+    </joint_properties>
   </gazebo>
   <link name="drive_wheel_front_left_link">
     <visual>
@@ -162,11 +229,11 @@
     </collision>
     <inertial>
       <mass value="1"/>
-      <inertia ixx="0.00354044791667" ixy="0" ixz="0" iyy="0.0062805625" iyz="0" izz="0.0062805625"/>
+      <inertia ixx="0.0062805625" ixy="0" ixz="0" iyy="0.0062805625" iyz="0" izz="0.0062805625"/>
     </inertial>
-    <axis>
-      <xyz> 0 1 0 </xyz>
-    </axis>
+    <!--<axis>
+        <xyz> 0 1 0 </xyz>
+      </axis>-->
   </link>
   <joint name="drive_wheel_front_left_joint" type="continuous">
     <parent link="base_link"/>
@@ -177,13 +244,19 @@
   <gazebo reference="drive_wheel_front_left_link">
     <kp>1000000.0</kp>
     <kd>100.0</kd>
-    <mu>0.8</mu>
-    <mu2>0.8</mu2>
-    <slip1>0.5</slip1>
+    <mu1>0.8</mu1>
+    <mu2>0.5</mu2>
+    <slip1>0.75</slip1>
     <slip2>0</slip2>
     <minDepth>0.01</minDepth>
     <maxContacts>3</maxContacts>
     <fdir1>1 0 0</fdir1>
+  </gazebo>
+  <gazebo reference="drive_wheel_front_left_joint">
+    <joint_properties>
+      <damping>1.0</damping>
+      <friction>1.0</friction>
+    </joint_properties>
   </gazebo>
   <link name="drive_wheel_front_right_link">
     <visual>
@@ -203,11 +276,11 @@
     </collision>
     <inertial>
       <mass value="1"/>
-      <inertia ixx="0.00354044791667" ixy="0" ixz="0" iyy="0.0062805625" iyz="0" izz="0.0062805625"/>
+      <inertia ixx="0.0062805625" ixy="0" ixz="0" iyy="0.0062805625" iyz="0" izz="0.0062805625"/>
     </inertial>
-    <axis>
-      <xyz> 0 1 0 </xyz>
-    </axis>
+    <!--<axis>
+        <xyz> 0 1 0 </xyz>
+      </axis>-->
   </link>
   <joint name="drive_wheel_front_right_joint" type="continuous">
     <parent link="base_link"/>
@@ -218,17 +291,281 @@
   <gazebo reference="drive_wheel_front_right_link">
     <kp>1000000.0</kp>
     <kd>100.0</kd>
-    <mu>0.8</mu>
-    <mu2>0.8</mu2>
-    <slip1>0.5</slip1>
+    <mu1>0.8</mu1>
+    <mu2>0.5</mu2>
+    <slip1>0.75</slip1>
     <slip2>0</slip2>
     <minDepth>0.01</minDepth>
     <maxContacts>3</maxContacts>
     <fdir1>1 0 0</fdir1>
   </gazebo>
-  <joint name="base_to_camera_joint" type="fixed">
+  <gazebo reference="drive_wheel_front_right_joint">
+    <joint_properties>
+      <damping>1.0</damping>
+      <friction>1.0</friction>
+    </joint_properties>
+  </gazebo>
+  <!-- Vision/Positioning Systems (Realsense D435 and T265) -->
+  <!-- For simulation, a script places all of the realsense camera sdf information here. -->
+  <link name="camera_link">
+    <visual>
+      <geometry>
+        <box size="0.0 0.0 0.1"/>
+      </geometry>
+      <material name="Cyan">
+        <color rgba="0 1.0 1.0 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.0 0.0 0.0"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+  <joint name="camera_link_joint" type="fixed">
     <parent link="base_link"/>
     <child link="camera_link"/>
-    <origin xyz="0.321769 0.0 0.022078000000000014"/>
+    <pose rpy="0 0 0" xyz="0 0.0175 0.0125 "/>
   </joint>
+  <gazebo reference="camera_link_joint">
+    <disableFixedJointLumping>true</disableFixedJointLumping>
+    <preserveFixedJoint>true</preserveFixedJoint>
+  </gazebo>
+  <link name="camera_depth_frame">
+    <visual>
+      <geometry>
+        <box size="0.0 0.0 0.1"/>
+      </geometry>
+      <material name="Cyan">
+        <color rgba="0 1.0 1.0 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.0 0.0 0.0"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+  <joint name="camera_depth_joint" type="fixed">
+    <parent link="camera_link"/>
+    <child link="camera_depth_frame"/>
+    <pose rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+  <gazebo reference="camera_depth_joint">
+    <disableFixedJointLumping>true</disableFixedJointLumping>
+    <preserveFixedJoint>true</preserveFixedJoint>
+  </gazebo>
+  <link name="camera_depth_optical_frame">
+    <visual>
+      <geometry>
+        <box size="0.0 0.0 0.1"/>
+      </geometry>
+      <material name="Cyan">
+        <color rgba="0 1.0 1.0 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.0 0.0 0.0"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+  <joint name="camera_depth_optical_joint" type="fixed">
+    <parent link="camera_depth_frame"/>
+    <child link="camera_depth_optical_frame"/>
+    <pose rpy="-1.57 0 -1.57" xyz="0 0 0 "/>
+  </joint>
+  <gazebo reference="camera_depth_optical_joint">
+    <disableFixedJointLumping>true</disableFixedJointLumping>
+    <preserveFixedJoint>true</preserveFixedJoint>
+  </gazebo>
+  <link name="camera_color_frame">
+    <visual>
+      <geometry>
+        <box size="0.0 0.0 0.1"/>
+      </geometry>
+      <material name="Cyan">
+        <color rgba="0 1.0 1.0 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.0 0.0 0.0"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+  <joint name="camera_color_joint" type="fixed">
+    <parent link="camera_depth_frame"/>
+    <child link="camera_color_frame"/>
+    <pose rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+  <gazebo reference="camera_color_joint">
+    <disableFixedJointLumping>true</disableFixedJointLumping>
+    <preserveFixedJoint>true</preserveFixedJoint>
+  </gazebo>
+  <link name="camera_color_optical_frame">
+    <visual>
+      <geometry>
+        <box size="0.0 0.0 0.1"/>
+      </geometry>
+      <material name="Cyan">
+        <color rgba="0 1.0 1.0 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.0 0.0 0.0"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+  <joint name="camera_color_optical_joint" type="fixed">
+    <parent link="camera_color_frame"/>
+    <child link="camera_color_optical_frame"/>
+    <pose rpy="-1.57 0 -1.57" xyz="0 0 0 "/>
+  </joint>
+  <gazebo reference="camera_color_optical_joint">
+    <disableFixedJointLumping>true</disableFixedJointLumping>
+    <preserveFixedJoint>true</preserveFixedJoint>
+  </gazebo>
+  <link name="camera_left_ir_frame">
+    <visual>
+      <geometry>
+        <box size="0.0 0.0 0.1"/>
+      </geometry>
+      <material name="Cyan">
+        <color rgba="0 1.0 1.0 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.0 0.0 0.0"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+  <joint name="camera_left_ir_joint" type="fixed">
+    <parent link="camera_depth_frame"/>
+    <child link="camera_left_ir_frame"/>
+    <pose rpy="0 0 0 " xyz="0 0 0 "/>
+  </joint>
+  <gazebo reference="camera_left_ir_joint">
+    <disableFixedJointLumping>true</disableFixedJointLumping>
+    <preserveFixedJoint>true</preserveFixedJoint>
+  </gazebo>
+  <link name="camera_left_ir_optical_frame">
+    <visual>
+      <geometry>
+        <box size="0.0 0.0 0.1"/>
+      </geometry>
+      <material name="Cyan">
+        <color rgba="0 1.0 1.0 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.0 0.0 0.0"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+  <joint name="camera_left_ir_optical_joint" type="fixed">
+    <parent link="camera_left_ir_frame"/>
+    <child link="camera_left_ir_optical_frame"/>
+    <pose rpy="-1.57 0 -1.57" xyz="0 0 0 "/>
+  </joint>
+  <gazebo reference="camera_left_ir_optical_joint">
+    <disableFixedJointLumping>true</disableFixedJointLumping>
+    <preserveFixedJoint>true</preserveFixedJoint>
+  </gazebo>
+  <link name="camera_right_ir_frame">
+    <visual>
+      <geometry>
+        <box size="0.0 0.0 0.1"/>
+      </geometry>
+      <material name="Cyan">
+        <color rgba="0 1.0 1.0 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.0 0.0 0.0"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+  <joint name="camera_right_ir_joint" type="fixed">
+    <parent link="camera_depth_frame"/>
+    <child link="camera_right_ir_frame"/>
+    <pose rpy="0 0 0" xyz="0 -0.050 0 "/>
+  </joint>
+  <gazebo reference="camera_right_ir_joint">
+    <disableFixedJointLumping>true</disableFixedJointLumping>
+    <preserveFixedJoint>true</preserveFixedJoint>
+  </gazebo>
+  <link name="camera_right_ir_optical_frame">
+    <visual>
+      <geometry>
+        <box size="0.0 0.0 0.1"/>
+      </geometry>
+      <material name="Cyan">
+        <color rgba="0 1.0 1.0 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.0 0.0 0.0"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+  <joint name="camera_right_ir_optical_joint" type="fixed">
+    <parent link="camera_right_ir_frame"/>
+    <child link="camera_right_ir_optical_frame"/>
+    <pose rpy="-1.57 0 -1.57" xyz="0 0 0 "/>
+  </joint>
+  <gazebo reference="camera_right_ir_optical_joint">
+    <disableFixedJointLumping>true</disableFixedJointLumping>
+    <preserveFixedJoint>true</preserveFixedJoint>
+  </gazebo>
 </robot>
