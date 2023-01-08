@@ -773,14 +773,15 @@
             <ode>
               <kp>1e+06</kp>
               <kd>100</kd>
+              <max_vel>1</max_vel>
               <min_depth>0.01</min_depth>
             </ode>
           </contact>
           <friction>
             <ode>
-              <mu>0.8</mu>
-              <mu2>0.5</mu2>
-              <fdir1>1 0 0</fdir1>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 1 0</fdir1>
             </ode>
           </friction>
         </surface>
@@ -795,7 +796,7 @@
           </cylinder>
         </geometry>
       </visual>
-      <slip1>0.75</slip1>
+      <slip1>0</slip1>
       <slip2>0</slip2>
     </link>
     <joint name='drive_wheel_front_right_joint' type='revolute'>
@@ -853,14 +854,15 @@
             <ode>
               <kp>1e+06</kp>
               <kd>100</kd>
+              <max_vel>1</max_vel>
               <min_depth>0.01</min_depth>
             </ode>
           </contact>
           <friction>
             <ode>
-              <mu>0.8</mu>
-              <mu2>0.5</mu2>
-              <fdir1>1 0 0</fdir1>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 1 0</fdir1>
             </ode>
           </friction>
         </surface>
@@ -875,7 +877,7 @@
           </cylinder>
         </geometry>
       </visual>
-      <slip1>0.75</slip1>
+      <slip1>0</slip1>
       <slip2>0</slip2>
     </link>
     <joint name='drive_wheel_rear_left_joint' type='revolute'>
@@ -933,14 +935,15 @@
             <ode>
               <kp>1e+06</kp>
               <kd>100</kd>
+              <max_vel>1</max_vel>
               <min_depth>0.01</min_depth>
             </ode>
           </contact>
           <friction>
             <ode>
-              <mu>0.8</mu>
-              <mu2>0.5</mu2>
-              <fdir1>1 0 0</fdir1>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 1 0</fdir1>
             </ode>
           </friction>
         </surface>
@@ -955,7 +958,7 @@
           </cylinder>
         </geometry>
       </visual>
-      <slip1>0.75</slip1>
+      <slip1>0</slip1>
       <slip2>0</slip2>
     </link>
     <joint name='drive_wheel_rear_right_joint' type='revolute'>
@@ -1013,14 +1016,15 @@
             <ode>
               <kp>1e+06</kp>
               <kd>100</kd>
+              <max_vel>1</max_vel>
               <min_depth>0.01</min_depth>
             </ode>
           </contact>
           <friction>
             <ode>
-              <mu>0.8</mu>
-              <mu2>0.5</mu2>
-              <fdir1>1 0 0</fdir1>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 1 0</fdir1>
             </ode>
           </friction>
         </surface>
@@ -1035,7 +1039,7 @@
           </cylinder>
         </geometry>
       </visual>
-      <slip1>0.75</slip1>
+      <slip1>0</slip1>
       <slip2>0</slip2>
     </link>
     <plugin name='skid_steer_drive' filename='libgazebo_ros_diff_drive.so'>
