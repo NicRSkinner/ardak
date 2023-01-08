@@ -410,7 +410,7 @@
     </inertial>
   </link>
   <joint name="camera_color_joint" type="fixed">
-    <parent link="camera_depth_frame"/>
+    <parent link="camera_link"/>
     <child link="camera_color_frame"/>
     <origin rpy="0 0 0" xyz="0 0 0.01"/>
   </joint>

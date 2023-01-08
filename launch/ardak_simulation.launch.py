@@ -14,6 +14,8 @@ def generate_launch_description():
     default_rviz_config_path = os.path.join(pkg_share, 'rviz/urdf_config.rviz')
     default_sdf_model_path = os.path.join(
         pkg_share, 'description/ardak/model.sdf')
+    default_urdf_model_path = os.path.join(
+        pkg_share, 'description/ardak/ardak.urdf')
     default_world_path = os.path.join(
         pkg_share, 'world/ardak_world.sdf'
     )
@@ -37,7 +39,6 @@ def generate_launch_description():
     os.environ["GAZEBO_MODEL_PATH"] = gazebo_models_path
 
     # Launch configuration variables specific to simulation
-    gui = LaunchConfiguration('gui')
     headless = LaunchConfiguration('headless')
     namespace = LaunchConfiguration('namespace')
     sdf_model = LaunchConfiguration('sdf_model')
@@ -45,34 +46,13 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time')
     use_simulator = LaunchConfiguration('use_simulator')
     world = LaunchConfiguration('world')
-
-    pointcloud_remappings = [
-        ('depth/image', '/D400/depth/image_rect_raw'),
-        ('depth/camera_info', '/D400/depth/camera_info'),
-        ('cloud', '/D400/cloud_from_depth')
-    ]
-
-    pointcloud_parameters = [{
-        'approx_sync': True
-    }]
-
-    alignment_remappings = [
-        ('camera_info', '/D400/color/camera_info'),
-        ('cloud', '/D400/cloud_from_depth'),
-        ('image_raw', '/D400/aligned_depth_to_color/image_raw'),
-    ]
-
-    alignment_parameters = [{
-        'decimation': 2,
-        'fixed_frame_id': 'base_link',
-        'fill_holes_size': 1
-    }]
+    urdf_model = LaunchConfiguration('urdf_model')
 
     mapping_remappings = [
-        ('odom', '/T265/pose/sample'),
-        ('rgb/image', '/D400/color/image_raw'),
-        ('rgb/camera_info', '/D400/color/camera_info'),
-        ('depth/image', '/D400/aligned_depth_to_color/image_raw')
+        ('odom', '/odom'),
+        ('rgb/image', '/color/image_raw'),
+        ('rgb/camera_info', '/color/camera_info'),
+        ('depth/image', '/aligned_depth_to_color/image_raw')
     ]
 
     mapping_parameters = [{
@@ -88,38 +68,7 @@ def generate_launch_description():
         package='robot_state_publisher',
         executable='robot_state_publisher',
         parameters=[{'robot_description': Command(
-            ['xacro ', LaunchConfiguration('model')])}]
-    )
-
-    joint_state_pubisher_node = Node(
-        package='joint_state_publisher',
-        executable='joint_state_publisher',
-        name='joint_state_publisher',
-        condition=launch.conditions.UnlessCondition(LaunchConfiguration('gui'))
-    )
-
-    joint_state_pubisher_node_gui = Node(
-        package='joint_state_publisher_gui',
-        executable='joint_state_publisher_gui',
-        name='joint_state_publisher_gui',
-        condition=launch.conditions.IfCondition(LaunchConfiguration('gui'))
-    )
-
-    # Need node for simulated realsense D435 camera
-    # Need node for simulated T265 camera
-
-    pointcloud_node = Node(
-        package='rtabmap_ros',
-        executable='point_cloud_xyz',
-        parameters=pointcloud_parameters,
-        remappings=pointcloud_remappings,
-        output='screen'
-    )
-    alignment_node = Node(
-        package='rtabmap_ros',
-        executable='pointcloud_to_depthimage',
-        parameters=alignment_parameters,
-        remappings=alignment_remappings
+            ['xacro ', LaunchConfiguration('urdf_model')])}]
     )
 
     mapping_node = Node(
@@ -181,8 +130,6 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        DeclareLaunchArgument(name='gui', default_value='True',
-                              description='flag to enable joint_state_publiser_gui'),
         DeclareLaunchArgument(name='rviz', default_value='False',
                               description='flag to use rviz instead of gazebo'),
         DeclareLaunchArgument(name='rvizconfig', default_value=default_rviz_config_path,
@@ -201,14 +148,15 @@ def generate_launch_description():
                               description='Whether to start the simulator'),
         DeclareLaunchArgument(name='world', default_value=default_world_path,
                               description='Full path to the world model file to load'),
+        DeclareLaunchArgument(name='urdf_model', default_value=default_urdf_model_path,
+                              description='Full path to the urdf model.'),
 
-        # joint_state_pubisher_node,
-        # joint_state_pubisher_node_gui,
-        # robot_state_publisher_node,
-        # rviz_node,
+        rviz_node,
         simulation_launch,
         simulation_client_launch,
         entity_node,
+        robot_state_publisher_node,
         gamepad_node,
-        ardak_nodes
+        ardak_nodes,
+        mapping_node
     ])

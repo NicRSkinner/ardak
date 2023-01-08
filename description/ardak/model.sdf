@@ -278,64 +278,9 @@
         </geometry>
       </visual>
     </link>
-    <joint name='camera_depth_joint' type='fixed'>
+    <joint name='camera_color_joint' type='fixed'>
       <pose relative_to='camera_link'>0 0 0.01 0 -0 0</pose>
       <parent>camera_link</parent>
-      <child>camera_depth_frame</child>
-      <axis>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-        <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-1e+16</lower>
-          <upper>1e+16</upper>
-        </limit>
-      </axis>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-        </ode>
-      </physics>
-    </joint>
-    <link name='camera_depth_frame'>
-      <pose relative_to='camera_depth_joint'>0 0 0 0 -0 0</pose>
-      <inertial>
-        <pose>0 0 0 0 -0 0</pose>
-        <mass>0.1</mass>
-        <inertia>
-          <ixx>0</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0</iyy>
-          <iyz>0</iyz>
-          <izz>0.001</izz>
-        </inertia>
-      </inertial>
-      <collision name='camera_depth_frame_collision'>
-        <pose>0 0 0 0 -0 0</pose>
-        <geometry>
-          <box>
-            <size>0 0 0</size>
-          </box>
-        </geometry>
-      </collision>
-      <visual name='camera_depth_frame_visual'>
-        <pose>0 0 0 0 -0 0</pose>
-        <geometry>
-          <box>
-            <size>0 0 0.1</size>
-          </box>
-        </geometry>
-      </visual>
-    </link>
-    <joint name='camera_color_joint' type='fixed'>
-      <pose relative_to='camera_depth_frame'>0 0 0.01 0 -0 0</pose>
-      <parent>camera_depth_frame</parent>
       <child>camera_color_frame</child>
       <axis>
         <dynamics>
@@ -435,6 +380,61 @@
         </geometry>
       </collision>
       <visual name='camera_color_optical_frame_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0.1</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='camera_depth_joint' type='fixed'>
+      <pose relative_to='camera_link'>0 0 0.01 0 -0 0</pose>
+      <parent>camera_link</parent>
+      <child>camera_depth_frame</child>
+      <axis>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+        </ode>
+      </physics>
+    </joint>
+    <link name='camera_depth_frame'>
+      <pose relative_to='camera_depth_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0.001</izz>
+        </inertia>
+      </inertial>
+      <collision name='camera_depth_frame_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='camera_depth_frame_visual'>
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
