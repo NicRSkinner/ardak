@@ -1,7 +1,7 @@
 <sdf version='1.7'>
   <model name='ardak'>
 <link name="realsense_link">
-  <pose>0 0.0175 0.0125 0 0 0</pose>
+  <pose relative_to='camera_link'>0 0 0 0 -0 0</pose>
   <visual name="realsense_link_visual">
     <pose>0 0 0 -1.57 0 -1.57</pose>
     <geometry>
@@ -224,7 +224,7 @@
       </visual>
     </link>
     <joint name='camera_link_joint' type='fixed'>
-      <pose relative_to='base_link'>0 0 0 0 -0 0</pose>
+      <pose relative_to='base_link'>0.3236 0 0.022122 0 -0 0</pose>
       <parent>base_link</parent>
       <child>camera_link</child>
       <axis>
@@ -279,7 +279,7 @@
       </visual>
     </link>
     <joint name='camera_depth_joint' type='fixed'>
-      <pose relative_to='camera_link'>0 0 0 0 -0 0</pose>
+      <pose relative_to='camera_link'>0 0 0.01 0 -0 0</pose>
       <parent>camera_link</parent>
       <child>camera_depth_frame</child>
       <axis>
@@ -334,7 +334,7 @@
       </visual>
     </link>
     <joint name='camera_color_joint' type='fixed'>
-      <pose relative_to='camera_depth_frame'>0 0 0 0 -0 0</pose>
+      <pose relative_to='camera_depth_frame'>0 0 0.01 0 -0 0</pose>
       <parent>camera_depth_frame</parent>
       <child>camera_color_frame</child>
       <axis>
@@ -389,7 +389,7 @@
       </visual>
     </link>
     <joint name='camera_color_optical_joint' type='fixed'>
-      <pose relative_to='camera_color_frame'>0 0 0 0 -0 0</pose>
+      <pose relative_to='camera_color_frame'>0 0 0 -1.57 -0 -1.57</pose>
       <parent>camera_color_frame</parent>
       <child>camera_color_optical_frame</child>
       <axis>
@@ -444,7 +444,7 @@
       </visual>
     </link>
     <joint name='camera_depth_optical_joint' type='fixed'>
-      <pose relative_to='camera_depth_frame'>0 0 0 0 -0 0</pose>
+      <pose relative_to='camera_depth_frame'>0 0 0 -1.57 -0 -1.57</pose>
       <parent>camera_depth_frame</parent>
       <child>camera_depth_optical_frame</child>
       <axis>
@@ -554,7 +554,7 @@
       </visual>
     </link>
     <joint name='camera_left_ir_optical_joint' type='fixed'>
-      <pose relative_to='camera_left_ir_frame'>0 0 0 0 -0 0</pose>
+      <pose relative_to='camera_left_ir_frame'>0 0 0 -1.57 -0 -1.57</pose>
       <parent>camera_left_ir_frame</parent>
       <child>camera_left_ir_optical_frame</child>
       <axis>
@@ -609,7 +609,7 @@
       </visual>
     </link>
     <joint name='camera_right_ir_joint' type='fixed'>
-      <pose relative_to='camera_depth_frame'>0 0 0 0 -0 0</pose>
+      <pose relative_to='camera_depth_frame'>0 -0.05 0 0 -0 0</pose>
       <parent>camera_depth_frame</parent>
       <child>camera_right_ir_frame</child>
       <axis>
@@ -664,7 +664,7 @@
       </visual>
     </link>
     <joint name='camera_right_ir_optical_joint' type='fixed'>
-      <pose relative_to='camera_right_ir_frame'>0 0 0 0 -0 0</pose>
+      <pose relative_to='camera_right_ir_frame'>0 0 0 -1.57 -0 -1.57</pose>
       <parent>camera_right_ir_frame</parent>
       <child>camera_right_ir_optical_frame</child>
       <axis>
@@ -779,8 +779,8 @@
           </contact>
           <friction>
             <ode>
-              <mu>3</mu>
-              <mu2>3</mu2>
+              <mu>1</mu>
+              <mu2>1</mu2>
             </ode>
           </friction>
         </surface>
@@ -858,8 +858,8 @@
           </contact>
           <friction>
             <ode>
-              <mu>3</mu>
-              <mu2>3</mu2>
+              <mu>1</mu>
+              <mu2>1</mu2>
             </ode>
           </friction>
         </surface>
@@ -937,8 +937,8 @@
           </contact>
           <friction>
             <ode>
-              <mu>3</mu>
-              <mu2>3</mu2>
+              <mu>1</mu>
+              <mu2>1</mu2>
             </ode>
           </friction>
         </surface>
@@ -1016,8 +1016,8 @@
           </contact>
           <friction>
             <ode>
-              <mu>3</mu>
-              <mu2>3</mu2>
+              <mu>1</mu>
+              <mu2>1</mu2>
             </ode>
           </friction>
         </surface>

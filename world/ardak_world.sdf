@@ -75,7 +75,6 @@
       <ode>
         <solver>
           <friction_model>cone_model</friction_model>
-          <sor>1.5</sor>
         </solver>
       </ode>
     </physics>
