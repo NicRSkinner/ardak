@@ -779,13 +779,11 @@
           </contact>
           <friction>
             <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-              <fdir1>0 1 0</fdir1>
+              <mu>3</mu>
+              <mu2>3</mu2>
             </ode>
           </friction>
         </surface>
-        <max_contacts>3</max_contacts>
       </collision>
       <visual name='drive_wheel_front_left_link_visual'>
         <pose>0 0 0 1.5708 -0 0</pose>
@@ -796,7 +794,7 @@
           </cylinder>
         </geometry>
       </visual>
-      <slip1>0</slip1>
+      <slip1>0.5</slip1>
       <slip2>0</slip2>
     </link>
     <joint name='drive_wheel_front_right_joint' type='revolute'>
@@ -860,13 +858,11 @@
           </contact>
           <friction>
             <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-              <fdir1>0 1 0</fdir1>
+              <mu>3</mu>
+              <mu2>3</mu2>
             </ode>
           </friction>
         </surface>
-        <max_contacts>3</max_contacts>
       </collision>
       <visual name='drive_wheel_front_right_link_visual'>
         <pose>0 0 0 1.5708 -0 0</pose>
@@ -877,7 +873,7 @@
           </cylinder>
         </geometry>
       </visual>
-      <slip1>0</slip1>
+      <slip1>0.5</slip1>
       <slip2>0</slip2>
     </link>
     <joint name='drive_wheel_rear_left_joint' type='revolute'>
@@ -941,13 +937,11 @@
           </contact>
           <friction>
             <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-              <fdir1>0 1 0</fdir1>
+              <mu>3</mu>
+              <mu2>3</mu2>
             </ode>
           </friction>
         </surface>
-        <max_contacts>3</max_contacts>
       </collision>
       <visual name='drive_wheel_rear_left_link_visual'>
         <pose>0 0 0 1.5708 -0 0</pose>
@@ -958,7 +952,7 @@
           </cylinder>
         </geometry>
       </visual>
-      <slip1>0</slip1>
+      <slip1>0.5</slip1>
       <slip2>0</slip2>
     </link>
     <joint name='drive_wheel_rear_right_joint' type='revolute'>
@@ -1022,13 +1016,11 @@
           </contact>
           <friction>
             <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-              <fdir1>0 1 0</fdir1>
+              <mu>3</mu>
+              <mu2>3</mu2>
             </ode>
           </friction>
         </surface>
-        <max_contacts>3</max_contacts>
       </collision>
       <visual name='drive_wheel_rear_right_link_visual'>
         <pose>0 0 0 1.5708 -0 0</pose>
@@ -1039,10 +1031,10 @@
           </cylinder>
         </geometry>
       </visual>
-      <slip1>0</slip1>
+      <slip1>0.5</slip1>
       <slip2>0</slip2>
     </link>
-    <plugin name='skid_steer_drive' filename='libgazebo_ros_diff_drive.so'>
+    <plugin name='diff_drive' filename='libgazebo_ros_diff_drive.so'>
       <update_rate>1000.0</update_rate>
       <num_wheel_pairs>2</num_wheel_pairs>
       <left_joint>drive_wheel_front_left_joint</left_joint>
@@ -1070,7 +1062,6 @@
     </plugin>
     <static>0</static>
     <plugin name='camera' filename='librealsense_gazebo_plugin.so'>
-      <prefix>camera</prefix>
       <prefix>camera</prefix>
       <depthUpdateRate>30.0</depthUpdateRate>
       <colorUpdateRate>30.0</colorUpdateRate>
