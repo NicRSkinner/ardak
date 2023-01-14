@@ -46,6 +46,7 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time')
     use_simulator = LaunchConfiguration('use_simulator')
     world = LaunchConfiguration('world')
+    use_manual_drive = LaunchConfiguration('use_manual_drive')
     urdf_model = LaunchConfiguration('urdf_model')
 
     mapping_remappings = [
@@ -58,10 +59,19 @@ def generate_launch_description():
     mapping_parameters = [{
         'queue_size': 200,
         'frame_id': 'base_link',
-        'use_sim_time': True,
+        'use_sim_time': use_sim_time,
         'approx_sync': True,
         'wait_imu_to_init': True,
+    }]
 
+    ardak_parameters = [{
+        'manualControlAllowed': use_manual_drive,
+        'maxVelocity': 4828.0,  # 3mph
+        'minVelocity': -4828.0,  # -3mph
+        'driveGearRatio': 0.111,
+        'wheelCircumference': 63.837,
+        'maxSteeringVelocity': 0.0,
+        'wheelbase': 0.433,
     }]
 
     # Subscribe to the joint states of the robot, and publish the 3D pose of each link.
@@ -117,7 +127,7 @@ def generate_launch_description():
     ardak_nodes = Node(
         package="ardak",
         executable="main",
-        parameters=[drive_control_config_path],
+        parameters=ardak_parameters,
         remappings=[
             ("appout/drive/left_drive_command", "odrive0/motor0/input_vel"),
             ("appout/drive/right_drive_command", "odrive0/motor1/input_vel"),
@@ -127,7 +137,8 @@ def generate_launch_description():
 
     gamepad_node = Node(
         package="bfr_hal",
-        executable="gamepad.py"
+        executable="gamepad.py",
+        condition=IfCondition(LaunchConfiguration('use_manual_drive'))
     )
 
     return LaunchDescription([
@@ -151,6 +162,8 @@ def generate_launch_description():
                               description='Full path to the world model file to load'),
         DeclareLaunchArgument(name='urdf_model', default_value=default_urdf_model_path,
                               description='Full path to the urdf model.'),
+        DeclareLaunchArgument(name='use_manual_drive', default_value='False',
+                              description='Use manual driving rather than nav2 input points.'),
 
         rviz_node,
         simulation_launch,
