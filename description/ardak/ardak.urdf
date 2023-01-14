@@ -28,8 +28,6 @@
   <!-- Include Gazebo plugins and simulation definitions -->
   <xacro:include filename="$(find ardak)/description/ardak/ardak.gazebo" />
 
-  <!-- <xacro:include filename="$(find ardak)/description/ardak/realsense_camera.gazebo" /> -->
-
   <xacro:macro name="fixedlink" params="joint_name">
     <gazebo reference="${joint_name}">
       <disableFixedJointLumping>true</disableFixedJointLumping>
@@ -114,9 +112,6 @@
         <mass value="1" />
         <inertia ixx="0.0062805625" ixy="0" ixz="0" iyy="0.0062805625" iyz="0" izz="0.0062805625"/>
       </inertial>
-      <!--<axis>
-        <xyz> 0 1 0 </xyz>
-      </axis>-->
     </link>
 
     <joint name="${prefix}_joint" type="continuous">
@@ -124,6 +119,7 @@
       <child link="${prefix}_link"/>
       <origin xyz="${x_reflect*(base_length/2 + wheel_xoff)} ${y_reflect*(base_width/2+wheel_ygap + wheel_width/2)} ${-(base_height/2 + wheel_zoff)}" rpy="0 0 0"/>
       <axis xyz="0 1 0"/>
+      <dynamics friction="100.0" damping="100.0" />
     </joint>
   </xacro:macro>
 
@@ -137,13 +133,6 @@
       <slip2>0</slip2>
       <minDepth>0.01</minDepth>
       <maxVel>1.0</maxVel>
-    </gazebo>
-
-    <gazebo reference="${prefix}_joint">
-      <joint_properties>
-        <damping>1.0</damping>
-        <friction>1.0</friction>
-      </joint_properties>
     </gazebo>
   </xacro:macro>
 

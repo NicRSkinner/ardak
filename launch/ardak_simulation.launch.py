@@ -17,7 +17,7 @@ def generate_launch_description():
     default_urdf_model_path = os.path.join(
         pkg_share, 'description/ardak/ardak.urdf')
     default_world_path = os.path.join(
-        pkg_share, 'world/ardak_world.sdf'
+        pkg_share, 'world/facility_with_ramp.sdf'
     )
     robot_name_in_model = 'ardak'
 
@@ -58,9 +58,10 @@ def generate_launch_description():
     mapping_parameters = [{
         'queue_size': 200,
         'frame_id': 'base_link',
-        'use_sim_time': False,
+        'use_sim_time': True,
         'approx_sync': True,
-        'wait_imu_to_init': True
+        'wait_imu_to_init': True,
+
     }]
 
     # Subscribe to the joint states of the robot, and publish the 3D pose of each link.
@@ -142,7 +143,7 @@ def generate_launch_description():
                               description='Absolute path to the sdf model.'),
         DeclareLaunchArgument(name='headless', default_value='False',
                               description='Whether to execute gzclient'),
-        DeclareLaunchArgument(name='use_sim_time', default_value='true',
+        DeclareLaunchArgument(name='use_sim_time', default_value='True',
                               description='Use simulation (Gazebo) clock if true'),
         DeclareLaunchArgument(name='use_simulator', default_value='True',
                               description='Whether to start the simulator'),
