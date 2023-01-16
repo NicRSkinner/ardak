@@ -135,11 +135,14 @@ namespace bfr
                     // This should stop the callback from being served.
                     this->gamepadSubscription.reset();
 
-                    this->loopTimer = this->create_wall_timer(10ms, std::bind(&DriveControllerNode::loop, this));
+                    this->cmdSubscription = this->create_subscription<geometry_msgs::msg::Twist>(
+                        "cmd_vel", 10, std::bind(&DriveControllerNode::twist_callback, this, _1));
+
+                    // this->loopTimer = this->create_wall_timer(10ms, std::bind(&DriveControllerNode::loop, this));
                 }
                 else
                 {
-                    this->loopTimer.reset();
+                    this->cmdSubscription.reset();
 
                     this->gamepadSubscription = this->create_subscription<bfr_msgs::msg::Gamepad>(
                         "hal/inputs/gamepad", this->base_qos, std::bind(&DriveControllerNode::gamepad_callback, this, _1),
@@ -250,6 +253,16 @@ namespace bfr
         }
     }
 
+    void DriveControllerNode::twist_callback(const geometry_msgs::msg::Twist::SharedPtr msg)
+    {
+        geometry_msgs::msg::Twist out;
+        out.angular = msg.get()->angular;
+        out.linear = msg.get()->linear;
+
+        // For simulation, re-output as a remapping. Tank drive for real-world applications.
+        this->twistPublisher->publish(out);
+    }
+
     geometry_msgs::msg::Twist DriveControllerNode::tank_to_twist(double leftWheelVelocity, double rightWheelVelocity)
     {
         geometry_msgs::msg::Twist outputTwist;
@@ -269,11 +282,7 @@ namespace bfr
         return outputTwist;
     }
 
-    void DriveControllerNode::steering_callback(const std_msgs::msg::Int16 msg)
-    {
-    }
-
-    void DriveControllerNode::speed_callback(const std_msgs::msg::Int16 msg)
+    std::vector<double> DriveControllerNode::twist_to_tank(geometry_msgs::msg::Twist input)
     {
     }
 

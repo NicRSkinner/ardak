@@ -1,4 +1,5 @@
 import os
+from ament_index_python.packages import get_package_share_directory
 import launch
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription
@@ -11,7 +12,7 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
     pkg_share = FindPackageShare(package='ardak').find('ardak')
-    default_rviz_config_path = os.path.join(pkg_share, 'rviz/urdf_config.rviz')
+    default_rviz_config_path = os.path.join(pkg_share, 'rviz/nav_config.rviz')
     default_sdf_model_path = os.path.join(
         pkg_share, 'description/ardak/model.sdf')
     default_urdf_model_path = os.path.join(
@@ -20,11 +21,18 @@ def generate_launch_description():
         pkg_share, 'world/facility_with_ramp.sdf'
     )
     robot_name_in_model = 'ardak'
+    navigation_dir = nav2_dir = get_package_share_directory('nav2_bringup')
 
     drive_control_config_path = os.path.join(
         pkg_share,
         'config',
         'DriveController.yaml'
+    )
+
+    nav_control_config_path = os.path.join(
+        pkg_share,
+        'config',
+        'Navigation.yaml'
     )
 
     # Pose where we want to spawn the robot
@@ -141,8 +149,22 @@ def generate_launch_description():
         condition=IfCondition(LaunchConfiguration('use_manual_drive'))
     )
 
+    nav2_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            nav2_dir + '/launch/navigation_launch.py'),
+        launch_arguments={
+            'use_sim_time': 'True',
+            'params_file': nav_control_config_path
+        }.items()
+    )
+
+    nav2_rviz = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            nav2_dir + '/launch/rviz_launch.py')
+    )
+
     return LaunchDescription([
-        DeclareLaunchArgument(name='rviz', default_value='False',
+        DeclareLaunchArgument(name='rviz', default_value='True',
                               description='flag to use rviz instead of gazebo'),
         DeclareLaunchArgument(name='rvizconfig', default_value=default_rviz_config_path,
                               description='Absolute path to the rviz config file.'),
@@ -165,12 +187,13 @@ def generate_launch_description():
         DeclareLaunchArgument(name='use_manual_drive', default_value='False',
                               description='Use manual driving rather than nav2 input points.'),
 
-        rviz_node,
         simulation_launch,
         simulation_client_launch,
         entity_node,
         robot_state_publisher_node,
         gamepad_node,
         ardak_nodes,
-        mapping_node
+        mapping_node,
+        nav2_launch,
+        rviz_node,
     ])

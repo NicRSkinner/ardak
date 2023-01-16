@@ -16,6 +16,7 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
+#include <vector>
 
 /**
  * ROS2 BASE INCLUDES
@@ -59,9 +60,9 @@ namespace bfr
         void input_deadline_changed(rclcpp::QOSDeadlineRequestedInfo &event);
         void safety_liveliness_changed(rclcpp::QOSLivelinessChangedInfo &event);
         void gamepad_callback(const bfr_msgs::msg::Gamepad::SharedPtr msg);
-        void steering_callback(const std_msgs::msg::Int16 msg);
-        void speed_callback(const std_msgs::msg::Int16 msg);
+        void twist_callback(const geometry_msgs::msg::Twist::SharedPtr msg);
         geometry_msgs::msg::Twist tank_to_twist(double leftVelocity, double rightVelocity);
+        std::vector<double> twist_to_tank(geometry_msgs::msg::Twist input);
 
         bool inputAlive = false;
         bfr_msgs::msg::Gamepad lastReceivedMessage;
@@ -90,6 +91,7 @@ namespace bfr
          * @brief ROS2 TOPICS
          */
         rclcpp::Subscription<bfr_msgs::msg::Gamepad>::SharedPtr gamepadSubscription;
+        rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmdSubscription;
         rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr leftDrivePublisher;
         rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr rightDrivePublisher;
         rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr twistPublisher;

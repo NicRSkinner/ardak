@@ -1,6 +1,6 @@
 DriveController:
   ros__parameters:
-    manualControlAllowed: true
+    manualControlAllowed: false
     maxVelocity: 4828.0 # 3mph
     minVelocity: -4828.0 # -3mph
     driveGearRatio: 0.111
