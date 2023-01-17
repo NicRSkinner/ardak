@@ -86,8 +86,11 @@ def generate_launch_description():
     robot_state_publisher_node = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
-        parameters=[{'robot_description': Command(
-            ['xacro ', LaunchConfiguration('urdf_model')])}]
+        parameters=[
+            {
+                'robot_description': Command(['xacro ', LaunchConfiguration('urdf_model')]),
+                'use_sim_time': use_sim_time
+            }]
     )
 
     mapping_node = Node(
@@ -153,7 +156,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             nav2_dir + '/launch/navigation_launch.py'),
         launch_arguments={
-            'use_sim_time': 'True',
+            'use_sim_time': use_sim_time,
             'params_file': nav_control_config_path
         }.items()
     )
