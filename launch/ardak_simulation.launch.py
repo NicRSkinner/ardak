@@ -70,6 +70,7 @@ def generate_launch_description():
         'use_sim_time': use_sim_time,
         'approx_sync': True,
         'wait_imu_to_init': True,
+        'wait_for_transform': 2.0,
     }]
 
     ardak_parameters = [{

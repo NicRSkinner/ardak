@@ -64,7 +64,6 @@
       <pointCloudCutoff>0.3</pointCloudCutoff>
     </plugin>
   </gazebo>
-  <!-- <xacro:include filename="$(find ardak)/description/ardak/realsense_camera.gazebo" /> -->
   <link name="base_link">
     <visual>
       <geometry>
@@ -136,15 +135,13 @@
       <mass value="1"/>
       <inertia ixx="0.0062805625" ixy="0" ixz="0" iyy="0.0062805625" iyz="0" izz="0.0062805625"/>
     </inertial>
-    <!--<axis>
-        <xyz> 0 1 0 </xyz>
-      </axis>-->
   </link>
   <joint name="drive_wheel_rear_left_joint" type="continuous">
     <parent link="base_link"/>
     <child link="drive_wheel_rear_left_link"/>
     <origin rpy="0 0 0" xyz="-0.26397000000000004 0.258475 -0.10633000000000001"/>
     <axis xyz="0 1 0"/>
+    <!--<dynamics friction="100.0" damping="100.0" />-->
   </joint>
   <gazebo reference="drive_wheel_rear_left_link">
     <kp>1000000.0</kp>
@@ -155,12 +152,6 @@
     <slip2>0</slip2>
     <minDepth>0.01</minDepth>
     <maxVel>1.0</maxVel>
-  </gazebo>
-  <gazebo reference="drive_wheel_rear_left_joint">
-    <joint_properties>
-      <damping>1.0</damping>
-      <friction>1.0</friction>
-    </joint_properties>
   </gazebo>
   <link name="drive_wheel_rear_right_link">
     <visual>
@@ -182,15 +173,13 @@
       <mass value="1"/>
       <inertia ixx="0.0062805625" ixy="0" ixz="0" iyy="0.0062805625" iyz="0" izz="0.0062805625"/>
     </inertial>
-    <!--<axis>
-        <xyz> 0 1 0 </xyz>
-      </axis>-->
   </link>
   <joint name="drive_wheel_rear_right_joint" type="continuous">
     <parent link="base_link"/>
     <child link="drive_wheel_rear_right_link"/>
     <origin rpy="0 0 0" xyz="-0.26397000000000004 -0.258475 -0.10633000000000001"/>
     <axis xyz="0 1 0"/>
+    <!--<dynamics friction="100.0" damping="100.0" />-->
   </joint>
   <gazebo reference="drive_wheel_rear_right_link">
     <kp>1000000.0</kp>
@@ -201,12 +190,6 @@
     <slip2>0</slip2>
     <minDepth>0.01</minDepth>
     <maxVel>1.0</maxVel>
-  </gazebo>
-  <gazebo reference="drive_wheel_rear_right_joint">
-    <joint_properties>
-      <damping>1.0</damping>
-      <friction>1.0</friction>
-    </joint_properties>
   </gazebo>
   <link name="drive_wheel_front_left_link">
     <visual>
@@ -228,15 +211,13 @@
       <mass value="1"/>
       <inertia ixx="0.0062805625" ixy="0" ixz="0" iyy="0.0062805625" iyz="0" izz="0.0062805625"/>
     </inertial>
-    <!--<axis>
-        <xyz> 0 1 0 </xyz>
-      </axis>-->
   </link>
   <joint name="drive_wheel_front_left_joint" type="continuous">
     <parent link="base_link"/>
     <child link="drive_wheel_front_left_link"/>
     <origin rpy="0 0 0" xyz="0.26397000000000004 0.258475 -0.10633000000000001"/>
     <axis xyz="0 1 0"/>
+    <!--<dynamics friction="100.0" damping="100.0" />-->
   </joint>
   <gazebo reference="drive_wheel_front_left_link">
     <kp>1000000.0</kp>
@@ -247,12 +228,6 @@
     <slip2>0</slip2>
     <minDepth>0.01</minDepth>
     <maxVel>1.0</maxVel>
-  </gazebo>
-  <gazebo reference="drive_wheel_front_left_joint">
-    <joint_properties>
-      <damping>1.0</damping>
-      <friction>1.0</friction>
-    </joint_properties>
   </gazebo>
   <link name="drive_wheel_front_right_link">
     <visual>
@@ -274,15 +249,13 @@
       <mass value="1"/>
       <inertia ixx="0.0062805625" ixy="0" ixz="0" iyy="0.0062805625" iyz="0" izz="0.0062805625"/>
     </inertial>
-    <!--<axis>
-        <xyz> 0 1 0 </xyz>
-      </axis>-->
   </link>
   <joint name="drive_wheel_front_right_joint" type="continuous">
     <parent link="base_link"/>
     <child link="drive_wheel_front_right_link"/>
     <origin rpy="0 0 0" xyz="0.26397000000000004 -0.258475 -0.10633000000000001"/>
     <axis xyz="0 1 0"/>
+    <!--<dynamics friction="100.0" damping="100.0" />-->
   </joint>
   <gazebo reference="drive_wheel_front_right_link">
     <kp>1000000.0</kp>
@@ -293,12 +266,6 @@
     <slip2>0</slip2>
     <minDepth>0.01</minDepth>
     <maxVel>1.0</maxVel>
-  </gazebo>
-  <gazebo reference="drive_wheel_front_right_joint">
-    <joint_properties>
-      <damping>1.0</damping>
-      <friction>1.0</friction>
-    </joint_properties>
   </gazebo>
   <!-- Vision/Positioning Systems (Realsense D435 and T265) -->
   <!-- For simulation, a script places all of the realsense camera sdf information here. -->

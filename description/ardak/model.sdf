@@ -733,18 +733,6 @@
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-        </ode>
-      </physics>
-      <joint_properties>
-        <damping>1.0</damping>
-        <friction>1.0</friction>
-      </joint_properties>
     </joint>
     <link name='drive_wheel_front_left_link'>
       <pose relative_to='drive_wheel_front_left_joint'>0 0 0 0 -0 0</pose>
@@ -812,18 +800,6 @@
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-        </ode>
-      </physics>
-      <joint_properties>
-        <damping>1.0</damping>
-        <friction>1.0</friction>
-      </joint_properties>
     </joint>
     <link name='drive_wheel_front_right_link'>
       <pose relative_to='drive_wheel_front_right_joint'>0 0 0 0 -0 0</pose>
@@ -891,18 +867,6 @@
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-        </ode>
-      </physics>
-      <joint_properties>
-        <damping>1.0</damping>
-        <friction>1.0</friction>
-      </joint_properties>
     </joint>
     <link name='drive_wheel_rear_left_link'>
       <pose relative_to='drive_wheel_rear_left_joint'>0 0 0 0 -0 0</pose>
@@ -970,18 +934,6 @@
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-        </ode>
-      </physics>
-      <joint_properties>
-        <damping>1.0</damping>
-        <friction>1.0</friction>
-      </joint_properties>
     </joint>
     <link name='drive_wheel_rear_right_link'>
       <pose relative_to='drive_wheel_rear_right_joint'>0 0 0 0 -0 0</pose>

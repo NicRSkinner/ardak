@@ -3,9 +3,9 @@
  * @author Nick Skinner (nskinner@zygenrobotics.com)
  * @brief Joint state publisher for base Ardak robot.
  * @version 0.1
- * 
+ *
  * @copyright Copyright (c) 2022
- * 
+ *
  */
 #ifndef _ARDAK_JOINT_STATE_PUBLISHER_H_
 #define _ARDAK_JOINT_STATE_PUBLISHER_H_

@@ -26,6 +26,7 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(bfr_msgs REQUIRED)
 find_package(robot_state_publisher REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 include_directories(
   include
@@ -40,7 +41,7 @@ endif()
 add_library(joint_state_source STATIC
   src/joint_state_publisher.cpp)
 ament_target_dependencies(joint_state_source
-  rclcpp
+  rclcpp tf2_ros std_msgs sensor_msgs
 )
 
 add_executable(main src/main.cpp src/ardak_node.cpp src/drive_controller_node.cpp)
