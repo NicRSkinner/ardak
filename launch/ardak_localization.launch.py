@@ -17,10 +17,10 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 def generate_launch_description():
     camera_dir = get_package_share_directory('realsense2_camera')
 
-    localization_config_path = os.path.join(
+    cameras_config_path = os.path.join(
         get_package_share_directory('ardak'),
         'config',
-        'localization.yaml'
+        'Cameras.yaml'
     )
 
     pointcloud_remappings = [
@@ -60,22 +60,32 @@ def generate_launch_description():
         'wait_imu_to_init': True
     }]
 
-    camera_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            camera_dir + '/launch/rs_d400_and_t265_launch.py')
-        )
+    
 
     print ("returning launch description")
     return LaunchDescription([
         # START: Build TF Tree
-
+        #Node(
+        #    # Configure the TF of the robot
+        #    package='tf2_ros',
+        #    executable='static_transform_publisher',
+        #    output='screen',
+        #    arguments=['0.0', '0.0', '0.0', '0.0',
+        #                '0.0', '0.0', 'base_link', 'T265_link']
+        #),
         Node(
-            # Configure the TF of the robot
             package='tf2_ros',
             executable='static_transform_publisher',
             output='screen',
-            arguments=['0.0', '0.0', '0.0', '0.0',
-                        '0.0', '0.0', 'T265_link', 'base_footprint']
+            arguments=['0.0', '0.025', '0.03', '0.0', '0.0',
+                    '0.0', 'base_link', 'D400_link']
+        ),
+        Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            output='screen',
+            arguments=['0.0', '0.025', '0.03', '0.0', '0.0',
+                    '0.0', 'odom_frame', 'base_link']
         ),
         Node(
             # Configure the TF of the robot
@@ -85,18 +95,30 @@ def generate_launch_description():
             arguments=['0.0', '0.0', '0.0', '0.0',
                         '0.0', '0.0', 'base_footprint', 'base_link']
         ),
-        Node(
-            package='tf2_ros',
-            executable='static_transform_publisher',
-            output='screen',
-            arguments=['0.0', '0.025', '0.03', '0.0', '0.0',
-                    '0.0', 'base_link', 'D400_link']
-        ),
-
         # END: Build TF Tree
 
         # START: Launch D435 and T265 cammeras
-        camera_launch,
+        Node(
+            package='realsense2_camera',
+            namespace="D400",
+            name="D400",
+            executable='realsense2_camera_node',
+            parameters=[cameras_config_path],
+            output='screen',
+            arguments=['--ros-args', '--log-level', 'info'],
+            emulate_tty=True,
+        ),
+            
+        Node(
+            package='realsense2_camera',
+            namespace="T265",
+            name="T265",
+            executable='realsense2_camera_node',
+            parameters=[cameras_config_path],
+            output='screen',
+            arguments=['--ros-args', '--log-level', 'info'],
+            emulate_tty=True,
+        ),
         # END: Launch D435 and T265 cammeras
         
         # START: Align depth image to color image
