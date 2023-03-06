@@ -1,0 +1,22 @@
+<link name="gps_link">
+    <sensor name="center_gps" type="gps">
+        <always_on>true</always_on>
+        <update_rate>30</update_rate>
+        <gps>
+            <position_sensing>
+                <horizontal>
+                    <noise type="gaussian">
+                        <mean>0.0</mean>
+                        <stddev>2e-4</stddev>
+                    </noise>
+                </horizontal>
+                <vertical>
+                    <noise type="gaussian">
+                        <mean>0.0</mean>
+                        <stddev>2e-4</stddev>
+                    </noise>
+                </vertical>
+            </position_sensing>
+        </gps>
+    </sensor>
+</link>
