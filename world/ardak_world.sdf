@@ -20,7 +20,7 @@
     </light>
     <model name='ground_plane'>
       <static>1</static>
-      <link name='link'>
+      <link name='world_link'>
         <collision name='collision'>
           <geometry>
             <plane>
@@ -86,9 +86,9 @@
     <wind/>
     <spherical_coordinates>
       <surface_model>EARTH_WGS84</surface_model>
-      <latitude_deg>0</latitude_deg>
-      <longitude_deg>0</longitude_deg>
-      <elevation>0</elevation>
+      <latitude_deg>-104.95371</latitude_deg>
+      <longitude_deg>39.74523</longitude_deg>
+      <elevation>1706</elevation>
       <heading_deg>0</heading_deg>
     </spherical_coordinates>
     <model name='unit_box'>
