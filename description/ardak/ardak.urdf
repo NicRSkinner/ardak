@@ -148,6 +148,16 @@
   <!-- Vision/Positioning Systems (Realsense D435 and T265) -->
   <!-- For simulation, a script places all of the realsense camera sdf information here. -->
 
+  <!-- GPS TF links -->
+
+  <xacro:framelink prefix="gps_link" />
+  <joint name="gps_link_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="gps_link" />
+    <origin xyz="0 0 ${base_height}" rpy="0 0 0" />
+  </joint>
+  <xacro:fixedlink joint_name="gps_link_joint" />
+
   <!-- D435 TF links -->
   <xacro:framelink prefix="camera_link" />
   <joint name="camera_link_joint" type="fixed">

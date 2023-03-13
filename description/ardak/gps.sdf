@@ -1,4 +1,33 @@
-<link name="gps_link">
+<link name="gps_sensor_link">
+    <pose relative_to='gps6_link'>0 0 0 0 -0 0</pose>
+        <visual name="gps_sensor_link_visual">
+        <pose>0 0 0 -1.57 0 -1.57</pose>
+        <geometry>
+            <mesh>
+                <uri>model://ardak/meshes/d435.dae</uri>
+            </mesh>
+        </geometry>
+    </visual>
+    <collision name="gps_sensor_link_collision">
+        <pose>0 0 0 -1.57 0 -1.57</pose>
+        <geometry>
+            <box>
+                <size>0.02505 0.090 0.025</size>
+            </box>
+        </geometry>
+    </collision>
+    <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <inertia>
+        <ixx>0.001</ixx>
+        <ixy>0.000</ixy>
+        <ixz>0.000</ixz>
+        <iyy>0.001</iyy>
+        <iyz>0.000</iyz>
+        <izz>0.001</izz>
+        </inertia>
+        <mass>0.564</mass>
+    </inertial>
     <sensor name="center_gps" type="gps">
         <always_on>true</always_on>
         <update_rate>30</update_rate>
@@ -18,5 +47,18 @@
                 </vertical>
             </position_sensing>
         </gps>
+        <plugin name="gps_plugin" filename="libgazebo_ros_gps_sensor.so">
+            <prefix>gps</prefix>
+            <ros>
+                <namespace>/gps</namespace>
+                <remapping>~/out:=data</remapping>
+            </ros>
+        </plugin>
     </sensor>
 </link>
+
+<joint name="gps_joint" type="fixed">
+  <parent>base_link</parent>
+  <child>gps_sensor_link</child>
+  <pose>0.4 0 0.4 0 0 0</pose>
+</joint>

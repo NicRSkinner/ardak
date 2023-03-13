@@ -64,6 +64,8 @@
       <pointCloudCutoff>0.3</pointCloudCutoff>
     </plugin>
   </gazebo>
+  <gazebo>
+    </gazebo>
   <link name="base_link">
     <visual>
       <geometry>
@@ -269,6 +271,36 @@
   </gazebo>
   <!-- Vision/Positioning Systems (Realsense D435 and T265) -->
   <!-- For simulation, a script places all of the realsense camera sdf information here. -->
+  <!-- GPS TF links -->
+  <link name="gps_link">
+    <visual>
+      <geometry>
+        <box size="0.0 0.0 0.1"/>
+      </geometry>
+      <material name="Cyan">
+        <color rgba="0 1.0 1.0 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.0 0.0 0.0"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+  <joint name="gps_link_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="gps_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.302244"/>
+  </joint>
+  <gazebo reference="gps_link_joint">
+    <disableFixedJointLumping>true</disableFixedJointLumping>
+    <preserveFixedJoint>true</preserveFixedJoint>
+  </gazebo>
   <link name="camera_link">
     <visual>
       <geometry>

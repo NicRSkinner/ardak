@@ -1,5 +1,69 @@
 <sdf version='1.7'>
   <model name='ardak'>
+<link name="gps_sensor_link">
+    <pose relative_to='gps_link'>0 0 0 0 -0 0</pose>
+        <visual name="gps_sensor_link_visual">
+        <pose>0 0 0 -1.57 0 -1.57</pose>
+        <geometry>
+            <mesh>
+                <uri>model://ardak/meshes/d435.dae</uri>
+            </mesh>
+        </geometry>
+    </visual>
+    <collision name="gps_sensor_link_collision">
+        <pose>0 0 0 -1.57 0 -1.57</pose>
+        <geometry>
+            <box>
+                <size>0.02505 0.090 0.025</size>
+            </box>
+        </geometry>
+    </collision>
+    <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <inertia>
+        <ixx>0.001</ixx>
+        <ixy>0.000</ixy>
+        <ixz>0.000</ixz>
+        <iyy>0.001</iyy>
+        <iyz>0.000</iyz>
+        <izz>0.001</izz>
+        </inertia>
+        <mass>0.564</mass>
+    </inertial>
+    <sensor name="center_gps" type="gps">
+        <always_on>true</always_on>
+        <update_rate>30</update_rate>
+        <gps>
+            <position_sensing>
+                <horizontal>
+                    <noise type="gaussian">
+                        <mean>0.0</mean>
+                        <stddev>2e-4</stddev>
+                    </noise>
+                </horizontal>
+                <vertical>
+                    <noise type="gaussian">
+                        <mean>0.0</mean>
+                        <stddev>2e-4</stddev>
+                    </noise>
+                </vertical>
+            </position_sensing>
+        </gps>
+        <plugin name="gps_plugin" filename="libgazebo_ros_gps_sensor.so">
+            <prefix>gps</prefix>
+            <ros>
+                <namespace>/gps</namespace>
+                <remapping>~/out:=data</remapping>
+            </ros>
+        </plugin>
+    </sensor>
+</link>
+
+<joint name="gps_joint" type="fixed">
+  <parent>base_link</parent>
+  <child>gps_sensor_link</child>
+  <pose>0.4 0 0.4 0 0 0</pose>
+</joint>
 <link name="realsense_link">
   <pose relative_to='camera_link'>0 0 0 0 -0 0</pose>
   <visual name="realsense_link_visual">
@@ -986,6 +1050,61 @@
       <slip1>0.5</slip1>
       <slip2>0</slip2>
     </link>
+    <joint name='gps_link_joint' type='fixed'>
+      <pose relative_to='base_link'>0 0 0.302244 0 -0 0</pose>
+      <parent>base_link</parent>
+      <child>gps_link</child>
+      <axis>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+        </ode>
+      </physics>
+    </joint>
+    <link name='gps_link'>
+      <pose relative_to='gps_link_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0.001</izz>
+        </inertia>
+      </inertial>
+      <collision name='gps_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='gps_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0.1</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
     <plugin name='diff_drive' filename='libgazebo_ros_diff_drive.so'>
       <update_rate>1000.0</update_rate>
       <num_wheel_pairs>2</num_wheel_pairs>
@@ -1012,7 +1131,6 @@
       <covariance_y>0.001</covariance_y>
       <covariance_yaw>0.01</covariance_yaw>
     </plugin>
-    <static>0</static>
     <plugin name='camera' filename='librealsense_gazebo_plugin.so'>
       <prefix>camera</prefix>
       <depthUpdateRate>30.0</depthUpdateRate>
@@ -1036,5 +1154,6 @@
       <pointCloudTopicName>depth/color/points</pointCloudTopicName>
       <pointCloudCutoff>0.3</pointCloudCutoff>
     </plugin>
+    <static>0</static>
   </model>
 </sdf>
