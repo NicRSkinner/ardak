@@ -21,7 +21,12 @@ def generate_launch_description():
         pkg_share, 'world/facility_with_ramp.sdf'
     )
     robot_name_in_model = 'ardak'
-    navigation_dir = nav2_dir = get_package_share_directory('nav2_bringup')
+
+    # Pose where we want to spawn the robot
+    spawn_x_val = '0.0'
+    spawn_y_val = '0.0'
+    spawn_z_val = '0.0'
+    spawn_yaw_val = '0.0'
 
     drive_control_config_path = os.path.join(
         pkg_share,
@@ -34,12 +39,6 @@ def generate_launch_description():
         'config',
         'Navigation.yaml'
     )
-
-    # Pose where we want to spawn the robot
-    spawn_x_val = '0.0'
-    spawn_y_val = '0.0'
-    spawn_z_val = '0.0'
-    spawn_yaw_val = '0.0'
 
     # Set the path to different files and folders.
     pkg_gazebo_ros = FindPackageShare(package='gazebo_ros').find('gazebo_ros')
