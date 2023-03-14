@@ -29,9 +29,9 @@
             <publish_odom_tf>true</publish_odom_tf>
             <publish_wheel_tf>true</publish_wheel_tf>
             <robot_base_frame>base_link</robot_base_frame>
-            <covariance_x>0.001</covariance_x>      <!-- 0.0001 -->
-            <covariance_y>0.001</covariance_y>      <!-- 0.0001 -->
-            <covariance_yaw>0.01</covariance_yaw>      <!-- 0.01 -->
+            <covariance_x>0.001</covariance_x>            <!-- 0.0001 -->
+            <covariance_y>0.001</covariance_y>            <!-- 0.0001 -->
+            <covariance_yaw>0.01</covariance_yaw>            <!-- 0.01 -->
         </plugin>
     </gazebo>
 

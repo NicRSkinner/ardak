@@ -21,12 +21,19 @@ def generate_launch_description():
         pkg_share, 'world/facility_with_ramp.sdf'
     )
     robot_name_in_model = 'ardak'
+    nav2_dir = get_package_share_directory('nav2_bringup')
+
+    ekf_config_path = os.path.join(
+        get_package_share_directory('ardak'),
+        'config',
+        'ekf.yaml'
+    )
 
     # Pose where we want to spawn the robot
     spawn_x_val = '0.0'
     spawn_y_val = '0.0'
     spawn_z_val = '0.0'
-    spawn_yaw_val = '0.0'
+    spawn_yaw_val = '50.0'
 
     drive_control_config_path = os.path.join(
         pkg_share,
@@ -152,6 +159,27 @@ def generate_launch_description():
         condition=IfCondition(LaunchConfiguration('use_manual_drive'))
     )
 
+    ekf_node_odom = Node(
+        package="robot_localization",
+        name="ekf_filter_node_odom",
+        executable="ekf_node",
+        parameters=[ekf_config_path]
+    )
+
+    ekf_node_map = Node(
+        package="robot_localization",
+        name="ekf_filter_node_map",
+        executable="ekf_node",
+        parameters=[ekf_config_path]
+    )
+
+    navsat_transform_node = Node(
+        package="robot_localization",
+        name="navsat_transform",
+        executable="navsat_transform_node",
+        parameters=[ekf_config_path]
+    )
+
     nav2_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             nav2_dir + '/launch/navigation_launch.py'),
@@ -199,4 +227,7 @@ def generate_launch_description():
         mapping_node,
         nav2_launch,
         rviz_node,
+        ekf_node_odom,
+        ekf_node_map,
+        navsat_transform_node
     ])
