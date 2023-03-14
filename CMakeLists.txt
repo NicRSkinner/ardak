@@ -27,6 +27,8 @@ find_package(geometry_msgs REQUIRED)
 find_package(bfr_msgs REQUIRED)
 find_package(robot_state_publisher REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(tf2 REQUIRED)
 
 include_directories(
   include
@@ -49,7 +51,10 @@ ament_target_dependencies(main
   rclcpp
   bfr_base
   bfr_msgs
-  geometry_msgs)
+  geometry_msgs
+  sensor_msgs
+  tf2_ros
+  tf2)
 
 add_executable(robot_states src/robot_states.cpp)
 

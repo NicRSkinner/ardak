@@ -23,6 +23,8 @@
   <depend>bfr_base</depend>
   <depend>bfr_msgs</depend>
   <depend>odrive_ros2</depend>
+  <depend>tf2_ros</depend>
+  <depend>sensor_msgs</depend>
 
   <exec_depend>robot_localization</exec_depend>
   <exec_depend>joint_state_publisher</exec_depend>
