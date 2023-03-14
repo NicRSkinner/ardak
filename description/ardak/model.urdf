@@ -4,68 +4,6 @@
 <!-- |    EDITING THIS FILE BY HAND IS NOT RECOMMENDED                                 | -->
 <!-- =================================================================================== -->
 <robot name="ardak">
-  <gazebo>
-    <plugin filename="libgazebo_ros_diff_drive.so" name="diff_drive">
-      <update_rate>1000.0</update_rate>
-      <num_wheel_pairs>2</num_wheel_pairs>
-      <left_joint>drive_wheel_front_left_joint</left_joint>
-      <right_joint>drive_wheel_front_right_joint</right_joint>
-      <left_joint>drive_wheel_rear_left_joint</left_joint>
-      <right_joint>drive_wheel_rear_right_joint</right_joint>
-      <wheel_separation>0.43347499999999994</wheel_separation>
-      <wheel_separation>0.43347499999999994</wheel_separation>
-      <wheel_diameter>0.2032</wheel_diameter>
-      <wheel_diameter>0.2032</wheel_diameter>
-      <!-- limits -->
-      <max_wheel_torque>40</max_wheel_torque>
-      <max_wheel_acceleration>1.0</max_wheel_acceleration>
-      <torque>40</torque>
-      <ros>
-        <namespace>/</namespace>
-        <remapping>cmd_vel:=wheel_cmd</remapping>
-      </ros>
-      <publish_odom>true</publish_odom>
-      <publish_odom_tf>true</publish_odom_tf>
-      <publish_wheel_tf>true</publish_wheel_tf>
-      <robot_base_frame>base_link</robot_base_frame>
-      <covariance_x>0.001</covariance_x>
-      <!-- 0.0001 -->
-      <covariance_y>0.001</covariance_y>
-      <!-- 0.0001 -->
-      <covariance_yaw>0.01</covariance_yaw>
-      <!-- 0.01 -->
-    </plugin>
-  </gazebo>
-  <gazebo reference="base_link">
-    <material>Gazebo/White</material>
-  </gazebo>
-  <gazebo>
-    <plugin filename="librealsense_gazebo_plugin.so" name="camera">
-      <prefix>camera</prefix>
-      <depthUpdateRate>30.0</depthUpdateRate>
-      <colorUpdateRate>30.0</colorUpdateRate>
-      <infraredUpdateRate>1.0</infraredUpdateRate>
-      <depthTopicName>aligned_depth_to_color/image_raw</depthTopicName>
-      <depthCameraInfoTopicName>depth/camera_info</depthCameraInfoTopicName>
-      <colorTopicName>color/image_raw</colorTopicName>
-      <colorCameraInfoTopicName>color/camera_info</colorCameraInfoTopicName>
-      <infrared1TopicName>infra1/image_raw</infrared1TopicName>
-      <infrared1CameraInfoTopicName>infra1/camera_info</infrared1CameraInfoTopicName>
-      <infrared2TopicName>infra2/image_raw</infrared2TopicName>
-      <infrared2CameraInfoTopicName>infra2/camera_info</infrared2CameraInfoTopicName>
-      <colorOpticalframeName>camera_color_optical_frame</colorOpticalframeName>
-      <depthOpticalframeName>camera_depth_optical_frame</depthOpticalframeName>
-      <infrared1OpticalframeName>camera_left_ir_optical_frame</infrared1OpticalframeName>
-      <infrared2OpticalframeName>camera_right_ir_optical_frame</infrared2OpticalframeName>
-      <rangeMinDepth>0.3</rangeMinDepth>
-      <rangeMaxDepth>3.0</rangeMaxDepth>
-      <pointCloud>true</pointCloud>
-      <pointCloudTopicName>depth/color/points</pointCloudTopicName>
-      <pointCloudCutoff>0.3</pointCloudCutoff>
-    </plugin>
-  </gazebo>
-  <gazebo>
-    </gazebo>
   <link name="base_link">
     <visual>
       <geometry>
@@ -298,6 +236,36 @@
     <origin rpy="0 0 0" xyz="0 0 0.302244"/>
   </joint>
   <gazebo reference="gps_link_joint">
+    <disableFixedJointLumping>true</disableFixedJointLumping>
+    <preserveFixedJoint>true</preserveFixedJoint>
+  </gazebo>
+  <!-- IMU TF links -->
+  <link name="imu_sensor_link">
+    <visual>
+      <geometry>
+        <box size="0.0 0.0 0.1"/>
+      </geometry>
+      <material name="Cyan">
+        <color rgba="0 1.0 1.0 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.0 0.0 0.0"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+  <joint name="imu_link_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="imu_sensor_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.302244"/>
+  </joint>
+  <gazebo reference="imu_sensor_link_joint">
     <disableFixedJointLumping>true</disableFixedJointLumping>
     <preserveFixedJoint>true</preserveFixedJoint>
   </gazebo>
@@ -561,5 +529,65 @@
   <gazebo reference="camera_right_ir_optical_joint">
     <disableFixedJointLumping>true</disableFixedJointLumping>
     <preserveFixedJoint>true</preserveFixedJoint>
+  </gazebo>
+  <gazebo>
+    <plugin filename="libgazebo_ros_diff_drive.so" name="diff_drive">
+      <update_rate>1000.0</update_rate>
+      <num_wheel_pairs>2</num_wheel_pairs>
+      <left_joint>drive_wheel_front_left_joint</left_joint>
+      <right_joint>drive_wheel_front_right_joint</right_joint>
+      <left_joint>drive_wheel_rear_left_joint</left_joint>
+      <right_joint>drive_wheel_rear_right_joint</right_joint>
+      <wheel_separation>0.43347499999999994</wheel_separation>
+      <wheel_separation>0.43347499999999994</wheel_separation>
+      <wheel_diameter>0.2032</wheel_diameter>
+      <wheel_diameter>0.2032</wheel_diameter>
+      <!-- limits -->
+      <max_wheel_torque>40</max_wheel_torque>
+      <max_wheel_acceleration>1.0</max_wheel_acceleration>
+      <torque>40</torque>
+      <ros>
+        <namespace>/</namespace>
+        <remapping>cmd_vel:=wheel_cmd</remapping>
+      </ros>
+      <publish_odom>true</publish_odom>
+      <publish_odom_tf>true</publish_odom_tf>
+      <publish_wheel_tf>true</publish_wheel_tf>
+      <robot_base_frame>base_link</robot_base_frame>
+      <covariance_x>0.001</covariance_x>
+      <!-- 0.0001 -->
+      <covariance_y>0.001</covariance_y>
+      <!-- 0.0001 -->
+      <covariance_yaw>0.01</covariance_yaw>
+      <!-- 0.01 -->
+    </plugin>
+  </gazebo>
+  <gazebo reference="base_link">
+    <material>Gazebo/White</material>
+  </gazebo>
+  <gazebo>
+    <plugin filename="librealsense_gazebo_plugin.so" name="camera">
+      <prefix>camera</prefix>
+      <depthUpdateRate>30.0</depthUpdateRate>
+      <colorUpdateRate>30.0</colorUpdateRate>
+      <infraredUpdateRate>1.0</infraredUpdateRate>
+      <depthTopicName>aligned_depth_to_color/image_raw</depthTopicName>
+      <depthCameraInfoTopicName>depth/camera_info</depthCameraInfoTopicName>
+      <colorTopicName>color/image_raw</colorTopicName>
+      <colorCameraInfoTopicName>color/camera_info</colorCameraInfoTopicName>
+      <infrared1TopicName>infra1/image_raw</infrared1TopicName>
+      <infrared1CameraInfoTopicName>infra1/camera_info</infrared1CameraInfoTopicName>
+      <infrared2TopicName>infra2/image_raw</infrared2TopicName>
+      <infrared2CameraInfoTopicName>infra2/camera_info</infrared2CameraInfoTopicName>
+      <colorOpticalframeName>camera_color_optical_frame</colorOpticalframeName>
+      <depthOpticalframeName>camera_depth_optical_frame</depthOpticalframeName>
+      <infrared1OpticalframeName>camera_left_ir_optical_frame</infrared1OpticalframeName>
+      <infrared2OpticalframeName>camera_right_ir_optical_frame</infrared2OpticalframeName>
+      <rangeMinDepth>0.3</rangeMinDepth>
+      <rangeMaxDepth>3.0</rangeMaxDepth>
+      <pointCloud>true</pointCloud>
+      <pointCloudTopicName>depth/color/points</pointCloudTopicName>
+      <pointCloudCutoff>0.3</pointCloudCutoff>
+    </plugin>
   </gazebo>
 </robot>

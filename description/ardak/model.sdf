@@ -1,7 +1,65 @@
 <sdf version='1.7'>
   <model name='ardak'>
+<link name="imu_sensor_link">
+    <pose relative_to='imu_link'>0 0 0 0 -0 0</pose>
+        <visual name="imu_sensor_link_visual">
+        <pose>0 0 0 -1.57 0 -1.57</pose>
+        <geometry>
+            <mesh>
+                <uri>model://ardak/meshes/d435.dae</uri>
+            </mesh>
+        </geometry>
+    </visual>
+    <collision name="imu_sensor_link_collision">
+        <pose>0 0 0 -1.57 0 -1.57</pose>
+        <geometry>
+            <box>
+                <size>0.02505 0.090 0.025</size>
+            </box>
+        </geometry>
+    </collision>
+    <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <inertia>
+        <ixx>0.001</ixx>
+        <ixy>0.000</ixy>
+        <ixz>0.000</ixz>
+        <iyy>0.001</iyy>
+        <iyz>0.000</iyz>
+        <izz>0.001</izz>
+        </inertia>
+        <mass>0.564</mass>
+    </inertial>
+    <gravity>true</gravity>
+    <sensor name="imu_sensor" type="imu">
+      <always_on>true</always_on>
+      <update_rate>100</update_rate>
+      <visualize>true</visualize>
+      <topic>/imu</topic>
+      <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
+        <topicName>/imu</topicName>
+        <bodyName>imu_sensor_link</bodyName>
+        <updateRateHZ>10.0</updateRateHZ>
+        <gaussianNoise>0.0</gaussianNoise>
+        <xyzOffset>0 0 0</xyzOffset>
+        <rpyOffset>0 0 0</rpyOffset>
+        <frameName>imu_sensor_link</frameName>
+        <initialOrientationAsReference>false</initialOrientationAsReference>
+        <ros>
+            <remapping>~/out:=/imu</remapping>
+        </ros>
+      </plugin>
+      <pose>0 0 0 0 0 0</pose>
+    </sensor>
+</link>
+
+<joint name="imu_sensor_joint" type="fixed">
+  <parent>base_link</parent>
+  <child>imu_sensor_link</child>
+  <pose>0.4 0 0.4 0 0 0</pose>
+</joint>
 <link name="gps_sensor_link">
-    <pose relative_to='gps6_link'>0 0 0 0 -0 0</pose>
+    <pose relative_to='gps_link'>0 0 0 0 -0 0</pose>
         <visual name="gps_sensor_link_visual">
         <pose>0 0 0 -1.57 0 -1.57</pose>
         <geometry>
@@ -59,7 +117,7 @@
     </sensor>
 </link>
 
-<joint name="gps_joint" type="fixed">
+<joint name="gps_sensor_joint" type="fixed">
   <parent>base_link</parent>
   <child>gps_sensor_link</child>
   <pose>0.4 0 0.4 0 0 0</pose>
@@ -190,15 +248,15 @@
   <pose>0.4 0 0.4 0 0 0</pose>
 </joint>    <link name='base_link'>
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
-        <mass>18.14</mass>
+        <pose>0 0 0.001657 0 -0 0</pose>
+        <mass>18.24</mass>
         <inertia>
-          <ixx>2.66469</ixx>
+          <ixx>2.67377</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>1.75844</iyy>
+          <iyy>1.76752</iyy>
           <iyz>0</iyz>
-          <izz>3.34158</izz>
+          <izz>3.34258</izz>
         </inertia>
       </inertial>
       <collision name='base_link_collision'>
@@ -217,6 +275,14 @@
           </friction>
         </surface>
       </collision>
+      <collision name='base_link_fixed_joint_lump__imu_sensor_link_collision_1'>
+        <pose>0 0 0.302244 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0</size>
+          </box>
+        </geometry>
+      </collision>
       <visual name='base_link_visual'>
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
@@ -230,6 +296,14 @@
             <uri>file://media/materials/scripts/gazebo.material</uri>
           </script>
         </material>
+      </visual>
+      <visual name='base_link_fixed_joint_lump__imu_sensor_link_visual_1'>
+        <pose>0 0 0.302244 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0.1</size>
+          </box>
+        </geometry>
       </visual>
     </link>
     <joint name='base_footprint_joint' type='fixed'>
@@ -1131,6 +1205,7 @@
       <covariance_y>0.001</covariance_y>
       <covariance_yaw>0.01</covariance_yaw>
     </plugin>
+    <static>0</static>
     <plugin name='camera' filename='librealsense_gazebo_plugin.so'>
       <prefix>camera</prefix>
       <depthUpdateRate>30.0</depthUpdateRate>
@@ -1154,6 +1229,5 @@
       <pointCloudTopicName>depth/color/points</pointCloudTopicName>
       <pointCloudCutoff>0.3</pointCloudCutoff>
     </plugin>
-    <static>0</static>
   </model>
 </sdf>

@@ -1,233 +1,243 @@
 <?xml version="1.0"?>
 <robot name="ardak"
-  xmlns:xacro="http://ros.org/wiki/xacro">
+    xmlns:xacro="http://ros.org/wiki/xacro">
 
-  <!-- Define robot constants -->
-  <xacro:property name="base_width" value="0.35"/>
-  <xacro:property name="base_length" value="0.7112"/>
-  <xacro:property name="base_height" value="0.302244"/>
+    <!-- Define robot constants -->
+    <xacro:property name="base_width" value="0.35"/>
+    <xacro:property name="base_length" value="0.7112"/>
+    <xacro:property name="base_height" value="0.302244"/>
 
-  <xacro:property name="wheel_radius" value="0.1016"/>
-  <xacro:property name="wheel_width" value="0.10795"/>
-  <xacro:property name="wheel_ygap" value="0.0295"/>
-  <xacro:property name="wheel_zoff" value="-0.044792"/>
-  <xacro:property name="wheel_xoff" value="-0.09163"/>
+    <xacro:property name="wheel_radius" value="0.1016"/>
+    <xacro:property name="wheel_width" value="0.10795"/>
+    <xacro:property name="wheel_ygap" value="0.0295"/>
+    <xacro:property name="wheel_zoff" value="-0.044792"/>
+    <xacro:property name="wheel_xoff" value="-0.09163"/>
 
-  <xacro:property name="camera_link_zoff" value="-0.129044" />
-  <xacro:property name="camera_link_yoff" value="0.0" />
-  <xacro:property name="camera_link_xoff" value="-0.033831" />
+    <xacro:property name="camera_link_zoff" value="-0.129044" />
+    <xacro:property name="camera_link_yoff" value="0.0" />
+    <xacro:property name="camera_link_xoff" value="-0.033831" />
 
-  <xacro:property name="d435_link_zoff" value="0.0" />
-  <xacro:property name="d435_link_yoff" value="0.0" />
-  <xacro:property name="d435_link_xoff" value="0.0" />
+    <xacro:property name="d435_link_zoff" value="0.0" />
+    <xacro:property name="d435_link_yoff" value="0.0" />
+    <xacro:property name="d435_link_xoff" value="0.0" />
 
-  <xacro:property name="t265_link_zoff" value="0.0" />
-  <xacro:property name="t265_link_yoff" value="0.0" />
-  <xacro:property name="t265_link_xoff" value="0.0" />
+    <xacro:property name="t265_link_zoff" value="0.0" />
+    <xacro:property name="t265_link_yoff" value="0.0" />
+    <xacro:property name="t265_link_xoff" value="0.0" />
 
-  <!-- Include Gazebo plugins and simulation definitions -->
-  <xacro:include filename="$(find ardak)/description/ardak/ardak.gazebo" />
+    <xacro:macro name="fixedlink" params="joint_name">
+        <gazebo reference="${joint_name}">
+            <disableFixedJointLumping>true</disableFixedJointLumping>
+            <preserveFixedJoint>true</preserveFixedJoint>
+        </gazebo>
+    </xacro:macro>
 
-  <xacro:macro name="fixedlink" params="joint_name">
-    <gazebo reference="${joint_name}">
-      <disableFixedJointLumping>true</disableFixedJointLumping>
-      <preserveFixedJoint>true</preserveFixedJoint>
-    </gazebo>
-  </xacro:macro>
+    <xacro:macro name="framelink" params="prefix">
+        <link name="${prefix}">
+            <visual>
+                <geometry>
+                    <box size="0.0 0.0 0.1"/>
+                </geometry>
+                <material name="Cyan">
+                    <color rgba="0 1.0 1.0 1.0"/>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="0.0 0.0 0.0"/>
+                </geometry>
+            </collision>
+            <inertial>
+                <mass value="0.1" />
+                <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.001" />
+            </inertial>
+        </link>
+    </xacro:macro>
 
-  <xacro:macro name="framelink" params="prefix">
-    <link name="${prefix}">
-      <visual>
-        <geometry>
-          <box size="0.0 0.0 0.1"/>
-        </geometry>
-        <material name="Cyan">
-          <color rgba="0 1.0 1.0 1.0"/>
-        </material>
-      </visual>
-      <collision>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <geometry>
-          <box size="0.0 0.0 0.0"/>
-        </geometry>
-      </collision>
-      <inertial>
-        <mass value="0.1" />
-        <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.001" />
-      </inertial>
-    </link>
-  </xacro:macro>
-
-  <link name="base_link">
-    <visual>
-      <geometry>
-        <box size="${base_length} ${base_width} ${base_height}"/>
-      </geometry>
-      <material name="Cyan">
-        <color rgba="0 1.0 1.0 1.0"/>
-      </material>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <box size="${base_length} ${base_width} ${base_height}"/>
-      </geometry>
-    </collision>
-    <!-- Need to check these values -->
-    <!-- Origin needed for inertial? -->
-    <inertial>
-      <mass value="18.14" />
-      <inertia ixx="2.664688434" ixy="0.0" ixz="0.0" iyy="1.758437644" iyz="0.0" izz="3.341575268" />
-    </inertial>
-  </link>
-
-  <xacro:framelink prefix="base_footprint" />
-
-  <joint name="base_footprint_joint" type="fixed">
-    <parent link="base_link"/>
-    <child link="base_footprint"/>
-    <origin xyz="0.0 0.0 ${-(wheel_radius+(base_height/2 + wheel_zoff))}" rpy="0 0 0"/>
-  </joint>
-
-  <xacro:fixedlink joint_name="base_footprint_joint" />
-
-  <xacro:macro name="wheel" params="prefix x_reflect y_reflect">
-    <link name="${prefix}_link">
-      <visual>
-        <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
-        <geometry>
-          <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
-        </geometry>
-        <material name="Gray">
-          <color rgba="0.5 0.5 0.5 1.0"/>
-        </material>
-      </visual>
-      <collision>
-        <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
-        <geometry>
-          <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
-        </geometry>
-      </collision>
-      <inertial>
-        <mass value="1" />
-        <inertia ixx="0.0062805625" ixy="0" ixz="0" iyy="0.0062805625" iyz="0" izz="0.0062805625"/>
-      </inertial>
+    <link name="base_link">
+        <visual>
+            <geometry>
+                <box size="${base_length} ${base_width} ${base_height}"/>
+            </geometry>
+            <material name="Cyan">
+                <color rgba="0 1.0 1.0 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${base_length} ${base_width} ${base_height}"/>
+            </geometry>
+        </collision>
+        <!-- Need to check these values -->
+        <!-- Origin needed for inertial? -->
+        <inertial>
+            <mass value="18.14" />
+            <inertia ixx="2.664688434" ixy="0.0" ixz="0.0" iyy="1.758437644" iyz="0.0" izz="3.341575268" />
+        </inertial>
     </link>
 
-    <joint name="${prefix}_joint" type="continuous">
-      <parent link="base_link"/>
-      <child link="${prefix}_link"/>
-      <origin xyz="${x_reflect*(base_length/2 + wheel_xoff)} ${y_reflect*(base_width/2+wheel_ygap + wheel_width/2)} ${-(base_height/2 + wheel_zoff)}" rpy="0 0 0"/>
-      <axis xyz="0 1 0"/>
-      <!--<dynamics friction="100.0" damping="100.0" />-->
+    <xacro:framelink prefix="base_footprint" />
+
+    <joint name="base_footprint_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="base_footprint"/>
+        <origin xyz="0.0 0.0 ${-(wheel_radius+(base_height/2 + wheel_zoff))}" rpy="0 0 0"/>
     </joint>
-  </xacro:macro>
 
-  <xacro:macro name="wheel_gz" params="prefix">
-    <gazebo reference="${prefix}_link">
-      <kp>1000000.0</kp>
-      <kd>100.0</kd>
-      <mu1>1</mu1>
-      <mu2>1</mu2>
-      <slip1>0.5</slip1>
-      <slip2>0</slip2>
-      <minDepth>0.01</minDepth>
-      <maxVel>1.0</maxVel>
-    </gazebo>
-  </xacro:macro>
+    <xacro:fixedlink joint_name="base_footprint_joint" />
 
-  <xacro:wheel prefix="drive_wheel_rear_left" x_reflect="-1" y_reflect="1" />
-  <xacro:wheel_gz prefix="drive_wheel_rear_left" />
-  <xacro:wheel prefix="drive_wheel_rear_right" x_reflect="-1" y_reflect="-1" />
-  <xacro:wheel_gz prefix="drive_wheel_rear_right" />
-  <xacro:wheel prefix="drive_wheel_front_left" x_reflect="1" y_reflect="1" />
-  <xacro:wheel_gz prefix="drive_wheel_front_left" />
-  <xacro:wheel prefix="drive_wheel_front_right" x_reflect="1" y_reflect="-1" />
-  <xacro:wheel_gz prefix="drive_wheel_front_right" />
+    <xacro:macro name="wheel" params="prefix x_reflect y_reflect">
+        <link name="${prefix}_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+                <geometry>
+                    <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+                </geometry>
+                <material name="Gray">
+                    <color rgba="0.5 0.5 0.5 1.0"/>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+                <geometry>
+                    <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+                </geometry>
+            </collision>
+            <inertial>
+                <mass value="1" />
+                <inertia ixx="0.0062805625" ixy="0" ixz="0" iyy="0.0062805625" iyz="0" izz="0.0062805625"/>
+            </inertial>
+        </link>
 
-  <!-- Vision/Positioning Systems (Realsense D435 and T265) -->
-  <!-- For simulation, a script places all of the realsense camera sdf information here. -->
+        <joint name="${prefix}_joint" type="continuous">
+            <parent link="base_link"/>
+            <child link="${prefix}_link"/>
+            <origin xyz="${x_reflect*(base_length/2 + wheel_xoff)} ${y_reflect*(base_width/2+wheel_ygap + wheel_width/2)} ${-(base_height/2 + wheel_zoff)}" rpy="0 0 0"/>
+            <axis xyz="0 1 0"/>
+            <!--<dynamics friction="100.0" damping="100.0" />-->
+        </joint>
+    </xacro:macro>
 
-  <!-- GPS TF links -->
+    <xacro:macro name="wheel_gz" params="prefix">
+        <gazebo reference="${prefix}_link">
+            <kp>1000000.0</kp>
+            <kd>100.0</kd>
+            <mu1>1</mu1>
+            <mu2>1</mu2>
+            <slip1>0.5</slip1>
+            <slip2>0</slip2>
+            <minDepth>0.01</minDepth>
+            <maxVel>1.0</maxVel>
+        </gazebo>
+    </xacro:macro>
 
-  <xacro:framelink prefix="gps_link" />
-  <joint name="gps_link_joint" type="fixed">
-    <parent link="base_link" />
-    <child link="gps_link" />
-    <origin xyz="0 0 ${base_height}" rpy="0 0 0" />
-  </joint>
-  <xacro:fixedlink joint_name="gps_link_joint" />
+    <xacro:wheel prefix="drive_wheel_rear_left" x_reflect="-1" y_reflect="1" />
+    <xacro:wheel_gz prefix="drive_wheel_rear_left" />
+    <xacro:wheel prefix="drive_wheel_rear_right" x_reflect="-1" y_reflect="-1" />
+    <xacro:wheel_gz prefix="drive_wheel_rear_right" />
+    <xacro:wheel prefix="drive_wheel_front_left" x_reflect="1" y_reflect="1" />
+    <xacro:wheel_gz prefix="drive_wheel_front_left" />
+    <xacro:wheel prefix="drive_wheel_front_right" x_reflect="1" y_reflect="-1" />
+    <xacro:wheel_gz prefix="drive_wheel_front_right" />
 
-  <!-- D435 TF links -->
-  <xacro:framelink prefix="camera_link" />
-  <joint name="camera_link_joint" type="fixed">
-    <parent link="base_link" />
-    <child link="camera_link" />
-    <origin xyz="${(base_length / 2) - 0.032} 0 ${(base_height / 2) - 0.129}" rpy="0 0 0" />
-  </joint>
-  <xacro:fixedlink joint_name="camera_link_joint" />
+    <!-- Vision/Positioning Systems (Realsense D435 and T265) -->
+    <!-- For simulation, a script places all of the realsense camera sdf information here. -->
 
-  <xacro:framelink prefix="camera_depth_frame" />
-  <joint name="camera_depth_joint" type="fixed">
-    <parent link="camera_link" />
-    <child link="camera_depth_frame" />
-    <origin xyz="0 0 0.01" rpy="0 0 0" />
-  </joint>
-  <xacro:fixedlink joint_name="camera_depth_joint" />
+    <!-- GPS TF links -->
 
-  <xacro:framelink prefix="camera_depth_optical_frame" />
-  <joint name="camera_depth_optical_joint" type="fixed">
-    <parent link="camera_depth_frame" />
-    <child link="camera_depth_optical_frame" />
-    <origin xyz="0 0 0 " rpy="-1.57 0 -1.57" />
-  </joint>
-  <xacro:fixedlink joint_name="camera_depth_optical_joint" />
+    <xacro:framelink prefix="gps_link" />
+    <joint name="gps_link_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="gps_link" />
+        <origin xyz="0 0 ${base_height}" rpy="0 0 0" />
+    </joint>
+    <xacro:fixedlink joint_name="gps_link_joint" />
 
-  <xacro:framelink prefix="camera_color_frame" />
-  <joint name="camera_color_joint" type="fixed">
-    <parent link="camera_link" />
-    <child link="camera_color_frame" />
-    <origin xyz="0 0 0.01" rpy="0 0 0" />
-  </joint>
-  <xacro:fixedlink joint_name="camera_color_joint" />
+    <!-- IMU TF links -->
 
-  <xacro:framelink prefix="camera_color_optical_frame" />
-  <joint name="camera_color_optical_joint" type="fixed">
-    <parent link="camera_color_frame" />
-    <child link="camera_color_optical_frame" />
-    <origin xyz="0 0 0 " rpy="-1.57 0 -1.57" />
-  </joint>
-  <xacro:fixedlink joint_name="camera_color_optical_joint" />
+    <xacro:framelink prefix="imu_sensor_link" />
+    <joint name="imu_link_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="imu_sensor_link" />
+        <origin xyz="0 0 ${base_height}" rpy="0 0 0" />
+    </joint>
+    <xacro:fixedlink joint_name="imu_sensor_link_joint" />
 
-  <xacro:framelink prefix="camera_left_ir_frame" />
-  <joint name="camera_left_ir_joint" type="fixed">
-    <parent link="camera_depth_frame" />
-    <child link="camera_left_ir_frame" />
-    <origin xyz="0 0 0 " rpy="0 0 0 " />
-  </joint>
-  <xacro:fixedlink joint_name="camera_left_ir_joint" />
+    <!-- D435 TF links -->
+    <xacro:framelink prefix="camera_link" />
+    <joint name="camera_link_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="camera_link" />
+        <origin xyz="${(base_length / 2) - 0.032} 0 ${(base_height / 2) - 0.129}" rpy="0 0 0" />
+    </joint>
+    <xacro:fixedlink joint_name="camera_link_joint" />
 
-  <xacro:framelink prefix="camera_left_ir_optical_frame" />
-  <joint name="camera_left_ir_optical_joint" type="fixed">
-    <parent link="camera_left_ir_frame" />
-    <child link="camera_left_ir_optical_frame" />
-    <origin xyz="0 0 0 " rpy="-1.57 0 -1.57" />
-  </joint>
-  <xacro:fixedlink joint_name="camera_left_ir_optical_joint" />
+    <xacro:framelink prefix="camera_depth_frame" />
+    <joint name="camera_depth_joint" type="fixed">
+        <parent link="camera_link" />
+        <child link="camera_depth_frame" />
+        <origin xyz="0 0 0.01" rpy="0 0 0" />
+    </joint>
+    <xacro:fixedlink joint_name="camera_depth_joint" />
 
-  <xacro:framelink prefix="camera_right_ir_frame" />
-  <joint name="camera_right_ir_joint" type="fixed">
-    <parent link="camera_depth_frame" />
-    <child link="camera_right_ir_frame" />
-    <origin xyz="0 -0.050 0 " rpy="0 0 0" />
-  </joint>
-  <xacro:fixedlink joint_name="camera_right_ir_joint" />
+    <xacro:framelink prefix="camera_depth_optical_frame" />
+    <joint name="camera_depth_optical_joint" type="fixed">
+        <parent link="camera_depth_frame" />
+        <child link="camera_depth_optical_frame" />
+        <origin xyz="0 0 0 " rpy="-1.57 0 -1.57" />
+    </joint>
+    <xacro:fixedlink joint_name="camera_depth_optical_joint" />
 
-  <xacro:framelink prefix="camera_right_ir_optical_frame" />
-  <joint name="camera_right_ir_optical_joint" type="fixed">
-    <parent link="camera_right_ir_frame" />
-    <child link="camera_right_ir_optical_frame" />
-    <origin xyz="0 0 0 " rpy="-1.57 0 -1.57" />
-  </joint>
-  <xacro:fixedlink joint_name="camera_right_ir_optical_joint" />
+    <xacro:framelink prefix="camera_color_frame" />
+    <joint name="camera_color_joint" type="fixed">
+        <parent link="camera_link" />
+        <child link="camera_color_frame" />
+        <origin xyz="0 0 0.01" rpy="0 0 0" />
+    </joint>
+    <xacro:fixedlink joint_name="camera_color_joint" />
+
+    <xacro:framelink prefix="camera_color_optical_frame" />
+    <joint name="camera_color_optical_joint" type="fixed">
+        <parent link="camera_color_frame" />
+        <child link="camera_color_optical_frame" />
+        <origin xyz="0 0 0 " rpy="-1.57 0 -1.57" />
+    </joint>
+    <xacro:fixedlink joint_name="camera_color_optical_joint" />
+
+    <xacro:framelink prefix="camera_left_ir_frame" />
+    <joint name="camera_left_ir_joint" type="fixed">
+        <parent link="camera_depth_frame" />
+        <child link="camera_left_ir_frame" />
+        <origin xyz="0 0 0 " rpy="0 0 0 " />
+    </joint>
+    <xacro:fixedlink joint_name="camera_left_ir_joint" />
+
+    <xacro:framelink prefix="camera_left_ir_optical_frame" />
+    <joint name="camera_left_ir_optical_joint" type="fixed">
+        <parent link="camera_left_ir_frame" />
+        <child link="camera_left_ir_optical_frame" />
+        <origin xyz="0 0 0 " rpy="-1.57 0 -1.57" />
+    </joint>
+    <xacro:fixedlink joint_name="camera_left_ir_optical_joint" />
+
+    <xacro:framelink prefix="camera_right_ir_frame" />
+    <joint name="camera_right_ir_joint" type="fixed">
+        <parent link="camera_depth_frame" />
+        <child link="camera_right_ir_frame" />
+        <origin xyz="0 -0.050 0 " rpy="0 0 0" />
+    </joint>
+    <xacro:fixedlink joint_name="camera_right_ir_joint" />
+
+    <xacro:framelink prefix="camera_right_ir_optical_frame" />
+    <joint name="camera_right_ir_optical_joint" type="fixed">
+        <parent link="camera_right_ir_frame" />
+        <child link="camera_right_ir_optical_frame" />
+        <origin xyz="0 0 0 " rpy="-1.57 0 -1.57" />
+    </joint>
+    <xacro:fixedlink joint_name="camera_right_ir_optical_joint" />
+
+    <!-- Include Gazebo plugins and simulation definitions -->
+    <xacro:include filename="$(find ardak)/description/ardak/ardak.gazebo" />
 </robot>

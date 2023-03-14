@@ -1,5 +1,5 @@
 <link name="gps_sensor_link">
-    <pose relative_to='gps6_link'>0 0 0 0 -0 0</pose>
+    <pose relative_to='gps_link'>0 0 0 0 -0 0</pose>
         <visual name="gps_sensor_link_visual">
         <pose>0 0 0 -1.57 0 -1.57</pose>
         <geometry>
@@ -57,7 +57,7 @@
     </sensor>
 </link>
 
-<joint name="gps_joint" type="fixed">
+<joint name="gps_sensor_joint" type="fixed">
   <parent>base_link</parent>
   <child>gps_sensor_link</child>
   <pose>0.4 0 0.4 0 0 0</pose>
