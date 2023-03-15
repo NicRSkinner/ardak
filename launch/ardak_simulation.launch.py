@@ -9,7 +9,6 @@ from launch.substitutions import Command, LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
-
 def generate_launch_description():
     pkg_share = FindPackageShare(package='ardak').find('ardak')
     default_rviz_config_path = os.path.join(pkg_share, 'rviz/nav_config.rviz')
@@ -67,7 +66,8 @@ def generate_launch_description():
         ('odom', '/odom'),
         ('rgb/image', '/color/image_raw'),
         ('rgb/camera_info', '/color/camera_info'),
-        ('depth/image', '/aligned_depth_to_color/image_raw')
+        ('depth/image', '/aligned_depth_to_color/image_raw'),
+        ('map', '/unfenced_map')
     ]
 
     mapping_parameters = [{
@@ -180,6 +180,11 @@ def generate_launch_description():
         parameters=[ekf_config_path]
     )
 
+    geofencer_node = Node(
+        package="zyg_ai",
+        executable="geofencer_node"
+    )
+
     nav2_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             nav2_dir + '/launch/navigation_launch.py'),
@@ -218,6 +223,7 @@ def generate_launch_description():
         DeclareLaunchArgument(name='use_manual_drive', default_value='False',
                               description='Use manual driving rather than nav2 input points.'),
 
+        geofencer_node,
         simulation_launch,
         simulation_client_launch,
         entity_node,
@@ -229,5 +235,5 @@ def generate_launch_description():
         rviz_node,
         ekf_node_odom,
         ekf_node_map,
-        navsat_transform_node
+        navsat_transform_node,
     ])
