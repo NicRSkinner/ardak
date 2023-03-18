@@ -1,127 +1,5 @@
 <sdf version='1.7'>
   <model name='ardak'>
-<link name="imu_sensor_link">
-    <pose relative_to='imu_link'>0 0 0 0 -0 0</pose>
-        <visual name="imu_sensor_link_visual">
-        <pose>0 0 0 -1.57 0 -1.57</pose>
-        <geometry>
-            <mesh>
-                <uri>model://ardak/meshes/d435.dae</uri>
-            </mesh>
-        </geometry>
-    </visual>
-    <collision name="imu_sensor_link_collision">
-        <pose>0 0 0 -1.57 0 -1.57</pose>
-        <geometry>
-            <box>
-                <size>0.02505 0.090 0.025</size>
-            </box>
-        </geometry>
-    </collision>
-    <inertial>
-        <pose>0 0 0 0 0 0</pose>
-        <inertia>
-        <ixx>0.001</ixx>
-        <ixy>0.000</ixy>
-        <ixz>0.000</ixz>
-        <iyy>0.001</iyy>
-        <iyz>0.000</iyz>
-        <izz>0.001</izz>
-        </inertia>
-        <mass>0.564</mass>
-    </inertial>
-    <gravity>true</gravity>
-    <sensor name="imu_sensor" type="imu">
-      <always_on>true</always_on>
-      <update_rate>100</update_rate>
-      <visualize>true</visualize>
-      <topic>/imu</topic>
-      <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
-        <topicName>/imu</topicName>
-        <bodyName>imu_sensor_link</bodyName>
-        <updateRateHZ>10.0</updateRateHZ>
-        <gaussianNoise>0.0</gaussianNoise>
-        <xyzOffset>0 0 0</xyzOffset>
-        <rpyOffset>0 0 0</rpyOffset>
-        <frameName>imu_sensor_link</frameName>
-        <initialOrientationAsReference>false</initialOrientationAsReference>
-        <ros>
-            <remapping>~/out:=/imu</remapping>
-        </ros>
-      </plugin>
-      <pose>0 0 0 0 0 0</pose>
-    </sensor>
-</link>
-
-<joint name="imu_sensor_joint" type="fixed">
-  <parent>base_link</parent>
-  <child>imu_sensor_link</child>
-  <pose>0.4 0 0.4 0 0 0</pose>
-</joint>
-<link name="gps_sensor_link">
-    <pose relative_to='gps_link'>0 0 0 0 -0 0</pose>
-        <visual name="gps_sensor_link_visual">
-        <pose>0 0 0 -1.57 0 -1.57</pose>
-        <geometry>
-            <mesh>
-                <uri>model://ardak/meshes/d435.dae</uri>
-            </mesh>
-        </geometry>
-    </visual>
-    <collision name="gps_sensor_link_collision">
-        <pose>0 0 0 -1.57 0 -1.57</pose>
-        <geometry>
-            <box>
-                <size>0.02505 0.090 0.025</size>
-            </box>
-        </geometry>
-    </collision>
-    <inertial>
-        <pose>0 0 0 0 0 0</pose>
-        <inertia>
-        <ixx>0.001</ixx>
-        <ixy>0.000</ixy>
-        <ixz>0.000</ixz>
-        <iyy>0.001</iyy>
-        <iyz>0.000</iyz>
-        <izz>0.001</izz>
-        </inertia>
-        <mass>0.564</mass>
-    </inertial>
-    <sensor name="center_gps" type="gps">
-        <always_on>true</always_on>
-        <update_rate>30</update_rate>
-        <gps>
-            <position_sensing>
-                <horizontal>
-                    <noise type="gaussian">
-                        <mean>0.0</mean>
-                        <stddev>2e-4</stddev>
-                    </noise>
-                </horizontal>
-                <vertical>
-                    <noise type="gaussian">
-                        <mean>0.0</mean>
-                        <stddev>2e-4</stddev>
-                    </noise>
-                </vertical>
-            </position_sensing>
-        </gps>
-        <plugin name="gps_plugin" filename="libgazebo_ros_gps_sensor.so">
-            <prefix>gps</prefix>
-            <ros>
-                <namespace>/gps</namespace>
-                <remapping>~/out:=data</remapping>
-            </ros>
-        </plugin>
-    </sensor>
-</link>
-
-<joint name="gps_sensor_joint" type="fixed">
-  <parent>base_link</parent>
-  <child>gps_sensor_link</child>
-  <pose>0.4 0 0.4 0 0 0</pose>
-</joint>
 <link name="realsense_link">
   <pose relative_to='camera_link'>0 0 0 0 -0 0</pose>
   <visual name="realsense_link_visual">
@@ -248,15 +126,15 @@
   <pose>0.4 0 0.4 0 0 0</pose>
 </joint>    <link name='base_link'>
       <inertial>
-        <pose>0 0 0.001657 0 -0 0</pose>
-        <mass>18.24</mass>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>18.14</mass>
         <inertia>
-          <ixx>2.67377</ixx>
+          <ixx>2.66469</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>1.76752</iyy>
+          <iyy>1.75844</iyy>
           <iyz>0</iyz>
-          <izz>3.34258</izz>
+          <izz>3.34158</izz>
         </inertia>
       </inertial>
       <collision name='base_link_collision'>
@@ -275,14 +153,6 @@
           </friction>
         </surface>
       </collision>
-      <collision name='base_link_fixed_joint_lump__imu_sensor_link_collision_1'>
-        <pose>0 0 0.302244 0 -0 0</pose>
-        <geometry>
-          <box>
-            <size>0 0 0</size>
-          </box>
-        </geometry>
-      </collision>
       <visual name='base_link_visual'>
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
@@ -296,14 +166,6 @@
             <uri>file://media/materials/scripts/gazebo.material</uri>
           </script>
         </material>
-      </visual>
-      <visual name='base_link_fixed_joint_lump__imu_sensor_link_visual_1'>
-        <pose>0 0 0.302244 0 -0 0</pose>
-        <geometry>
-          <box>
-            <size>0 0 0.1</size>
-          </box>
-        </geometry>
       </visual>
     </link>
     <joint name='base_footprint_joint' type='fixed'>
@@ -1124,10 +986,10 @@
       <slip1>0.5</slip1>
       <slip2>0</slip2>
     </link>
-    <joint name='gps_link_joint' type='fixed'>
+    <joint name='gps_sensor_link_joint' type='fixed'>
       <pose relative_to='base_link'>0 0 0.302244 0 -0 0</pose>
       <parent>base_link</parent>
-      <child>gps_link</child>
+      <child>gps_sensor_link</child>
       <axis>
         <dynamics>
           <spring_reference>0</spring_reference>
@@ -1148,8 +1010,8 @@
         </ode>
       </physics>
     </joint>
-    <link name='gps_link'>
-      <pose relative_to='gps_link_joint'>0 0 0 0 -0 0</pose>
+    <link name='gps_sensor_link'>
+      <pose relative_to='gps_sensor_link_joint'>0 0 0 0 -0 0</pose>
       <inertial>
         <pose>0 0 0 0 -0 0</pose>
         <mass>0.1</mass>
@@ -1162,15 +1024,23 @@
           <izz>0.001</izz>
         </inertia>
       </inertial>
-      <collision name='gps_link_collision'>
+      <collision name='gps_sensor_link_collision'>
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
             <size>0 0 0</size>
           </box>
         </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
       </collision>
-      <visual name='gps_link_visual'>
+      <visual name='gps_sensor_link_visual'>
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
@@ -1178,6 +1048,117 @@
           </box>
         </geometry>
       </visual>
+      <sensor name='center_gps' type='gps'>
+        <always_on>1</always_on>
+        <update_rate>30</update_rate>
+        <gps>
+          <position_sensing>
+            <horizontal>
+              <noise type='gaussian'>
+                <mean>0</mean>
+                <stddev>0.0002</stddev>
+              </noise>
+            </horizontal>
+            <vertical>
+              <noise type='gaussian'>
+                <mean>0</mean>
+                <stddev>0.0002</stddev>
+              </noise>
+            </vertical>
+          </position_sensing>
+        </gps>
+        <plugin name='gps_plugin' filename='libgazebo_ros_gps_sensor.so'>
+          <prefix>gps</prefix>
+          <ros>
+            <namespace>/gps</namespace>
+            <remapping>~/out:=fix</remapping>
+          </ros>
+        </plugin>
+      </sensor>
+    </link>
+    <joint name='imu_sensor_link_joint' type='fixed'>
+      <pose relative_to='base_link'>0 0 0.302244 0 -0 0</pose>
+      <parent>base_link</parent>
+      <child>imu_sensor_link</child>
+      <axis>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+        </ode>
+      </physics>
+    </joint>
+    <link name='imu_sensor_link'>
+      <pose relative_to='imu_sensor_link_joint'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0.001</izz>
+        </inertia>
+      </inertial>
+      <collision name='imu_sensor_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='imu_sensor_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0 0 0.1</size>
+          </box>
+        </geometry>
+      </visual>
+      <gravity>1</gravity>
+      <sensor name='imu_sensor' type='imu'>
+        <always_on>1</always_on>
+        <update_rate>100</update_rate>
+        <visualize>1</visualize>
+        <topic>/imu</topic>
+        <pose>0 0 0 0 -0 0</pose>
+        <plugin name='imu_plugin' filename='libgazebo_ros_imu_sensor.so'>
+          <topicName>imu</topicName>
+          <bodyName>imu_sensor_link</bodyName>
+          <updateRateHZ>10.0</updateRateHZ>
+          <gaussianNoise>0.0</gaussianNoise>
+          <xyzOffset>0 0 0</xyzOffset>
+          <rpyOffset>0 0 0</rpyOffset>
+          <frameName>imu_sensor_link</frameName>
+          <initialOrientationAsReference>0</initialOrientationAsReference>
+          <ros>
+            <remapping>~/out:=/imu</remapping>
+          </ros>
+        </plugin>
+      </sensor>
     </link>
     <plugin name='diff_drive' filename='libgazebo_ros_diff_drive.so'>
       <update_rate>1000.0</update_rate>

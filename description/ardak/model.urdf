@@ -209,8 +209,7 @@
   </gazebo>
   <!-- Vision/Positioning Systems (Realsense D435 and T265) -->
   <!-- For simulation, a script places all of the realsense camera sdf information here. -->
-  <!-- GPS TF links -->
-  <link name="gps_link">
+  <link name="gps_sensor_link">
     <visual>
       <geometry>
         <box size="0.0 0.0 0.1"/>
@@ -230,16 +229,15 @@
       <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.001"/>
     </inertial>
   </link>
-  <joint name="gps_link_joint" type="fixed">
+  <joint name="gps_sensor_link_joint" type="fixed">
     <parent link="base_link"/>
-    <child link="gps_link"/>
+    <child link="gps_sensor_link"/>
     <origin rpy="0 0 0" xyz="0 0 0.302244"/>
   </joint>
-  <gazebo reference="gps_link_joint">
+  <gazebo reference="gps_sensor_link_joint">
     <disableFixedJointLumping>true</disableFixedJointLumping>
     <preserveFixedJoint>true</preserveFixedJoint>
   </gazebo>
-  <!-- IMU TF links -->
   <link name="imu_sensor_link">
     <visual>
       <geometry>
@@ -260,7 +258,7 @@
       <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.001"/>
     </inertial>
   </link>
-  <joint name="imu_link_joint" type="fixed">
+  <joint name="imu_sensor_link_joint" type="fixed">
     <parent link="base_link"/>
     <child link="imu_sensor_link"/>
     <origin rpy="0 0 0" xyz="0 0 0.302244"/>
@@ -589,5 +587,57 @@
       <pointCloudTopicName>depth/color/points</pointCloudTopicName>
       <pointCloudCutoff>0.3</pointCloudCutoff>
     </plugin>
+  </gazebo>
+  <gazebo reference="imu_sensor_link">
+    <gravity>true</gravity>
+    <sensor name="imu_sensor" type="imu">
+      <always_on>true</always_on>
+      <update_rate>100</update_rate>
+      <visualize>true</visualize>
+      <topic>/imu</topic>
+      <pose>0 0 0 0 0 0</pose>
+      <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
+        <topicName>imu</topicName>
+        <bodyName>imu_sensor_link</bodyName>
+        <updateRateHZ>10.0</updateRateHZ>
+        <gaussianNoise>0.0</gaussianNoise>
+        <xyzOffset>0 0 0</xyzOffset>
+        <rpyOffset>0 0 0</rpyOffset>
+        <frameName>imu_sensor_link</frameName>
+        <initialOrientationAsReference>false</initialOrientationAsReference>
+        <ros>
+          <remapping>~/out:=/imu</remapping>
+        </ros>
+      </plugin>
+    </sensor>
+  </gazebo>
+  <gazebo reference="gps_sensor_link">
+    <sensor name="center_gps" type="gps">
+      <always_on>true</always_on>
+      <update_rate>30</update_rate>
+      <gps>
+        <position_sensing>
+          <horizontal>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>2e-4</stddev>
+            </noise>
+          </horizontal>
+          <vertical>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>2e-4</stddev>
+            </noise>
+          </vertical>
+        </position_sensing>
+      </gps>
+      <plugin filename="libgazebo_ros_gps_sensor.so" name="gps_plugin">
+        <prefix>gps</prefix>
+        <ros>
+          <namespace>/gps</namespace>
+          <remapping>~/out:=fix</remapping>
+        </ros>
+      </plugin>
+    </sensor>
   </gazebo>
 </robot>
