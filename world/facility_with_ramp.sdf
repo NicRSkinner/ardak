@@ -96,10 +96,12 @@
     <wind/>
     <spherical_coordinates>
       <surface_model>EARTH_WGS84</surface_model>
-      <latitude_deg>-104.95371</latitude_deg>
-      <longitude_deg>39.74523</longitude_deg>
-      <elevation>0</elevation>
-      <heading_deg>0</heading_deg>
+      <!-- 39°44'42.8"N 104°57'13.4"W -->
+      <!-- Magnetic Declination (WMM) of 7.7176° as of 2023/3/07 -->
+      <latitude_deg>39.74523</latitude_deg>
+      <longitude_deg>-104.95393</longitude_deg>
+      <elevation>5800</elevation>
+      <heading_deg>0.0</heading_deg>
     </spherical_coordinates>
     <model name='nist_simple_ramp_120'>
       <static>1</static>
