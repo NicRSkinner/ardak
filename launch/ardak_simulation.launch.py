@@ -32,7 +32,7 @@ def generate_launch_description():
     spawn_x_val = '0.0'
     spawn_y_val = '0.0'
     spawn_z_val = '0.0'
-    spawn_yaw_val = '50.0'
+    spawn_yaw_val = '0.0'
 
     drive_control_config_path = os.path.join(
         pkg_share,
@@ -63,7 +63,7 @@ def generate_launch_description():
     urdf_model = LaunchConfiguration('urdf_model')
 
     mapping_remappings = [
-        ('odom', '/odom'),
+        ('odom', '/odometry/local'),
         ('rgb/image', '/color/image_raw'),
         ('rgb/camera_info', '/color/camera_info'),
         ('depth/image', '/aligned_depth_to_color/image_raw'),
@@ -93,11 +93,15 @@ def generate_launch_description():
     robot_state_publisher_node = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
+        namespace=namespace,
         parameters=[
             {
                 'robot_description': Command(['xacro ', LaunchConfiguration('urdf_model')]),
                 'use_sim_time': use_sim_time
-            }]
+            }],
+        remappings=[('/tf', 'tf'),
+                    ('/tf_static', 'tf_static')],
+        arguments=[LaunchConfiguration('urdf_model')]
     )
 
     mapping_node = Node(
@@ -163,21 +167,35 @@ def generate_launch_description():
         package="robot_localization",
         name="ekf_filter_node_odom",
         executable="ekf_node",
-        parameters=[ekf_config_path]
+        parameters=[ekf_config_path,
+                    {'use_sim_time': use_sim_time}],
+        remappings=[('odometry/filtered', 'odometry/local'),
+                    ('/set_pose', '/initialpose')]
     )
 
+    # Make this not give odometry filtered. Fix.
     ekf_node_map = Node(
         package="robot_localization",
         name="ekf_filter_node_map",
         executable="ekf_node",
-        parameters=[ekf_config_path]
+        parameters=[ekf_config_path,
+                    {'use_sim_time': use_sim_time}],
+        remappings=[('odometry/filtered', 'odometry/global'),
+                     ('/set_pose', '/initialpose')]
     )
 
     navsat_transform_node = Node(
-        package="robot_localization",
-        name="navsat_transform",
-        executable="navsat_transform_node",
-        parameters=[ekf_config_path]
+        package='robot_localization',
+        executable='navsat_transform_node',
+        name='navsat_transform',
+        output='screen',
+        parameters=[ekf_config_path,
+        {'use_sim_time': use_sim_time}],
+        remappings=[('imu', 'imu/data'),
+                    ('gps/fix', 'gps/fix'),
+                    ('gps/filtered', 'gps/filtered'),
+                    ('odometry/gps', 'odometry/gps'),
+                    ('odometry/filtered', 'odometry/global')]
     )
 
     geofencer_node = Node(
@@ -223,7 +241,7 @@ def generate_launch_description():
         DeclareLaunchArgument(name='use_manual_drive', default_value='False',
                               description='Use manual driving rather than nav2 input points.'),
 
-        geofencer_node,
+
         simulation_launch,
         simulation_client_launch,
         entity_node,
@@ -231,6 +249,7 @@ def generate_launch_description():
         gamepad_node,
         ardak_nodes,
         mapping_node,
+        geofencer_node,
         nav2_launch,
         rviz_node,
         ekf_node_odom,

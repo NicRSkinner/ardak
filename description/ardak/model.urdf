@@ -530,7 +530,7 @@
   </gazebo>
   <gazebo>
     <plugin filename="libgazebo_ros_diff_drive.so" name="diff_drive">
-      <update_rate>1000.0</update_rate>
+      <update_rate>30</update_rate>
       <num_wheel_pairs>2</num_wheel_pairs>
       <left_joint>drive_wheel_front_left_joint</left_joint>
       <right_joint>drive_wheel_front_right_joint</right_joint>
@@ -543,15 +543,20 @@
       <!-- limits -->
       <max_wheel_torque>40</max_wheel_torque>
       <max_wheel_acceleration>1.0</max_wheel_acceleration>
+      <publish_odom>true</publish_odom>
+      <publish_odom_tf>false</publish_odom_tf>
+      <publish_wheel_tf>true</publish_wheel_tf>
+      <!-- Odometry source, 0 for ENCODER, 1 for WORLD, defaults to WORLD -->
+      <odometry_source>1</odometry_source>
+      <odometry_topic>odom</odometry_topic>
+      <odometry_frame>odom</odometry_frame>
+      <robot_base_frame>base_link</robot_base_frame>
       <torque>40</torque>
       <ros>
         <namespace>/</namespace>
         <remapping>cmd_vel:=wheel_cmd</remapping>
+        <remapping>odom:=wheel/odometry</remapping>
       </ros>
-      <publish_odom>true</publish_odom>
-      <publish_odom_tf>true</publish_odom_tf>
-      <publish_wheel_tf>true</publish_wheel_tf>
-      <robot_base_frame>base_link</robot_base_frame>
       <covariance_x>0.001</covariance_x>
       <!-- 0.0001 -->
       <covariance_y>0.001</covariance_y>
@@ -594,19 +599,74 @@
       <always_on>true</always_on>
       <update_rate>100</update_rate>
       <visualize>true</visualize>
-      <topic>/imu</topic>
-      <pose>0 0 0 0 0 0</pose>
+      <imu>
+        <orientation>
+          <x>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>2e-3</stddev>
+            </noise>
+          </x>
+          <y>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>2e-3</stddev>
+            </noise>
+          </y>
+          <z>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>2e-3</stddev>
+            </noise>
+          </z>
+        </orientation>
+        <angular_velocity>
+          <x>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>2e-4</stddev>
+            </noise>
+          </x>
+          <y>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>2e-4</stddev>
+            </noise>
+          </y>
+          <z>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>2e-4</stddev>
+            </noise>
+          </z>
+        </angular_velocity>
+        <linear_acceleration>
+          <x>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>1.7e-2</stddev>
+            </noise>
+          </x>
+          <y>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>1.7e-2</stddev>
+            </noise>
+          </y>
+          <z>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>1.7e-2</stddev>
+            </noise>
+          </z>
+        </linear_acceleration>
+      </imu>
       <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
-        <topicName>imu</topicName>
-        <bodyName>imu_sensor_link</bodyName>
-        <updateRateHZ>10.0</updateRateHZ>
-        <gaussianNoise>0.0</gaussianNoise>
-        <xyzOffset>0 0 0</xyzOffset>
-        <rpyOffset>0 0 0</rpyOffset>
         <frameName>imu_sensor_link</frameName>
         <initialOrientationAsReference>false</initialOrientationAsReference>
         <ros>
-          <remapping>~/out:=/imu</remapping>
+          <namespace>/imu</namespace>
+          <remapping>~/out:=imu/data</remapping>
         </ros>
       </plugin>
     </sensor>
@@ -614,28 +674,26 @@
   <gazebo reference="gps_sensor_link">
     <sensor name="center_gps" type="gps">
       <always_on>true</always_on>
-      <update_rate>30</update_rate>
+      <update_rate>10.0</update_rate>
       <gps>
         <position_sensing>
           <horizontal>
             <noise type="gaussian">
               <mean>0.0</mean>
-              <stddev>2e-4</stddev>
+              <stddev>1e-2</stddev>
             </noise>
           </horizontal>
           <vertical>
             <noise type="gaussian">
               <mean>0.0</mean>
-              <stddev>2e-4</stddev>
+              <stddev>1</stddev>
             </noise>
           </vertical>
         </position_sensing>
       </gps>
       <plugin filename="libgazebo_ros_gps_sensor.so" name="gps_plugin">
-        <prefix>gps</prefix>
         <ros>
-          <namespace>/gps</namespace>
-          <remapping>~/out:=fix</remapping>
+          <remapping>~/out:=gps/fix</remapping>
         </ros>
       </plugin>
     </sensor>
