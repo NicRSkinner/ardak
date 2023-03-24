@@ -17,7 +17,7 @@ def generate_launch_description():
     default_urdf_model_path = os.path.join(
         pkg_share, 'description/ardak/ardak.urdf')
     default_world_path = os.path.join(
-        pkg_share, 'world/facility_with_ramp.sdf'
+        pkg_share, 'world/smalltown.world'
     )
     robot_name_in_model = 'ardak'
     nav2_dir = get_package_share_directory('nav2_bringup')
@@ -31,8 +31,8 @@ def generate_launch_description():
     # Pose where we want to spawn the robot
     spawn_x_val = '0.0'
     spawn_y_val = '0.0'
-    spawn_z_val = '0.0'
-    spawn_yaw_val = '0.0'
+    spawn_z_val = '0.3'
+    spawn_yaw_val = '3.14' # Bug with IMU/Steer plugins, setting to non zero can cause issues with robot travelling in the "imcorrect" X and Y directions, but correct Z orientation.
 
     drive_control_config_path = os.path.join(
         pkg_share,

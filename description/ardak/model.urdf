@@ -546,6 +546,7 @@
       <publish_odom>true</publish_odom>
       <publish_odom_tf>false</publish_odom_tf>
       <publish_wheel_tf>true</publish_wheel_tf>
+      <!-- Due to large slip on the model->ground, using encoder is extremely unreliable. Either remove slip enough on the model or keep to world-->
       <!-- Odometry source, 0 for ENCODER, 1 for WORLD, defaults to WORLD -->
       <odometry_source>1</odometry_source>
       <odometry_topic>odom</odometry_topic>
@@ -666,7 +667,7 @@
         <initialOrientationAsReference>false</initialOrientationAsReference>
         <ros>
           <namespace>/imu</namespace>
-          <remapping>~/out:=imu/data</remapping>
+          <remapping>~/out:=data</remapping>
         </ros>
       </plugin>
     </sensor>

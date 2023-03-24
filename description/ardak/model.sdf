@@ -1208,7 +1208,7 @@
           <initialOrientationAsReference>0</initialOrientationAsReference>
           <ros>
             <namespace>/imu</namespace>
-            <remapping>~/out:=imu/data</remapping>
+            <remapping>~/out:=data</remapping>
           </ros>
         </plugin>
       </sensor>
