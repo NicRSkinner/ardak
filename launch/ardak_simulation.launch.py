@@ -32,7 +32,7 @@ def generate_launch_description():
     spawn_x_val = '0.0'
     spawn_y_val = '0.0'
     spawn_z_val = '0.3'
-    spawn_yaw_val = '3.14' # Bug with IMU/Steer plugins, setting to non zero can cause issues with robot travelling in the "imcorrect" X and Y directions, but correct Z orientation.
+    spawn_yaw_val = '0.0'
 
     drive_control_config_path = os.path.join(
         pkg_share,
@@ -70,6 +70,7 @@ def generate_launch_description():
         ('map', '/unfenced_map')
     ]
 
+    # Make this not publish TF and have a different program set it to 0,0,0?
     mapping_parameters = [{
         'queue_size': 200,
         'frame_id': 'base_link',
@@ -77,6 +78,8 @@ def generate_launch_description():
         'approx_sync': True,
         'wait_imu_to_init': True,
         'wait_for_transform': 2.0,
+        'odom_frame_id': "odom",
+        #publish_tf: False
     }]
 
     ardak_parameters = [{
