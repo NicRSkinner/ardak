@@ -57,6 +57,11 @@ def generate_launch_description():
         'config',
         'Navigation.yaml'
     )
+    cameras_config_path = os.path.join(
+        get_package_share_directory('ardak'),
+        'config',
+        'Cameras.yaml'
+    )
 
     # Set the path to different files and folders.
     pkg_gazebo_ros = FindPackageShare(package='gazebo_ros').find('gazebo_ros')
@@ -156,6 +161,28 @@ def generate_launch_description():
         'wheelbase': 0.433,
     }]
 
+    pointcloud_remappings = [
+        ('depth/image', '/D400/depth/image_rect_raw'),
+        ('depth/camera_info', '/D400/depth/camera_info'),
+        ('cloud', '/D400/cloud_from_depth')
+    ]
+
+    pointcloud_parameters = [{
+        'approx_sync': True
+    }]
+
+    alignment_remappings = [
+        ('camera_info' , '/D400/color/camera_info'),
+        ('cloud', '/D400/cloud_from_depth'),
+        ('image_raw', '/D400/aligned_depth_to_color/image_raw'),
+    ]
+
+    alignment_parameters = [{
+        'decimation': 2,
+        'fixed_frame_id': 'base_link',
+        'fill_holes_size': 1
+    }]
+
     # -- REMAPPINGS/PARAMETERS
     robot_state_publisher_node = Node(
         package='robot_state_publisher',
@@ -169,6 +196,12 @@ def generate_launch_description():
         remappings=[('/tf', 'tf'),
                     ('/tf_static', 'tf_static')],
         arguments=[urdf_model]
+    )
+
+    joint_state_publisher_node = Node(
+        package='joint_state_publisher',
+        executable='joint_state_publisher',
+        name='joint_state_publisher',
     )
 
     mapping_node = Node(
@@ -317,22 +350,56 @@ def generate_launch_description():
             nav2_dir + '/launch/rviz_launch.py')
     )
 
+    # HARDWARE NODES
+    d400_node = Node(
+        package='realsense2_camera',
+        namespace="D400",
+        name="D400",
+        executable='realsense2_camera_node',
+        parameters=[cameras_config_path],
+        output='screen',
+        arguments=['--ros-args', '--log-level', 'info'],
+        emulate_tty=True,
+        condition=IfCondition(
+            PythonExpression(['not ', use_simulator])
+        )
+    )
+
+    t265_node = Node(
+        package='realsense2_camera',
+        namespace="T265",
+        name="T265",
+        executable='realsense2_camera_node',
+        parameters=[cameras_config_path],
+        output='screen',
+        arguments=['--ros-args', '--log-level', 'info'],
+        emulate_tty=True,
+        condition=IfCondition(
+            PythonExpression(['not ', use_simulator])
+        )
+    )
+
     return LaunchDescription(launch_args + [
 
         # ROBOT NODES
         ardak_nodes,
-        gamepad_node,
         geofencer_node,
         robot_state_publisher_node,
+        joint_state_publisher_node,
+
+        # HARDWARE NODES
+        gamepad_node,
+        d400_node,
+        t265_node,
 
         # LOCALIZATION NODES
-        ekf_node_odom,
-        ekf_node_map,
-        navsat_transform_node,
-        mapping_node,
+        #ekf_node_odom,
+        #ekf_node_map,
+        #navsat_transform_node,
+        #mapping_node,
 
         # NAVIGATION NODES
-        nav2_launch,
+        #nav2_launch,
 
         # SIMULATION NODES
         simulation_launch,

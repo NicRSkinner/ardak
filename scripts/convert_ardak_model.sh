@@ -4,7 +4,7 @@ if [ -z "$MDIR" ]; then
 fi
 
 
-xacro $MDIR/ardak.urdf > $MDIR/model.urdf
+xacro $MDIR/ardak.urdf use_simulation:=true > $MDIR/model.urdf
 gz sdf -p $MDIR/model.urdf > $MDIR/model.sdf
 
 sed -i -e "/<model name='ardak'>/r $MDIR/realsense_camera.sdf" $MDIR/model.sdf
