@@ -73,7 +73,6 @@ def generate_launch_description():
     namespace = LaunchConfiguration('namespace')
     sdf_model = LaunchConfiguration('sdf_model')
     use_namespace = LaunchConfiguration('use_namespace')
-    use_sim_time = LaunchConfiguration('use_sim_time')
     use_simulator = LaunchConfiguration('use_simulator')
     world = LaunchConfiguration('world')
     use_manual_drive = LaunchConfiguration('use_manual_drive')
@@ -112,8 +111,6 @@ def generate_launch_description():
                               description='Whether to execute gzclient'),
         DeclareLaunchArgument(name='use_simulator', default_value='True',
                               description='Whether to start the simulator'),
-        DeclareLaunchArgument(name='use_sim_time', default_value='True',
-                              description='Use simulation (Gazebo) clock if true'),
         DeclareLaunchArgument(name='world', default_value=default_world_path,
                               description='Full path to the world model file to load'),
         DeclareLaunchArgument(name='urdf_model', default_value=default_urdf_model_path,
@@ -132,6 +129,11 @@ def generate_launch_description():
     # -- LAUNCH ARGUMENTS
 
     # -- REMAPPINGS/PARAMETERS
+    camera_remappings = [
+        ('/T265/odom', '/camera/odometry'),
+        ('/T265/imu', '/camera/imu/data')
+    ]
+
     mapping_remappings = [
         ('odom', '/odometry/local'),
         ('rgb/image', '/color/image_raw'),
@@ -143,7 +145,7 @@ def generate_launch_description():
     mapping_parameters = [{
         'queue_size': 200,
         'frame_id': 'base_link',
-        'use_sim_time': use_sim_time,
+        'use_sim_time': use_simulator,
         'approx_sync': True,
         'wait_imu_to_init': True,
         'wait_for_transform': 2.0,
@@ -191,7 +193,7 @@ def generate_launch_description():
         parameters=[
             {
                 'robot_description': Command(['xacro ', urdf_model]),
-                'use_sim_time': use_sim_time
+                'use_sim_time': use_simulator
             }],
         remappings=[('/tf', 'tf'),
                     ('/tf_static', 'tf_static')],
@@ -202,6 +204,9 @@ def generate_launch_description():
         package='joint_state_publisher',
         executable='joint_state_publisher',
         name='joint_state_publisher',
+        condition=IfCondition(
+            PythonExpression(['not ', use_simulator])
+        )
     )
 
     mapping_node = Node(
@@ -284,7 +289,7 @@ def generate_launch_description():
         executable="ekf_node",
         parameters=[
                     ekf_config_path,
-                    {'use_sim_time': use_sim_time}
+                    {'use_sim_time': use_simulator}
                     ],
         remappings=[
                     ('odometry/filtered', 'odometry/local'),
@@ -293,14 +298,14 @@ def generate_launch_description():
         condition=IfCondition(localization)
     )
 
-    # Make this not give odometry filtered. Fix.
+
     ekf_node_map = Node(
         package="robot_localization",
         name="ekf_filter_node_map",
         executable="ekf_node",
         parameters=[
                     ekf_config_path,
-                    {'use_sim_time': use_sim_time}
+                    {'use_sim_time': use_simulator}
                     ],
         remappings=[
                     ('odometry/filtered', 'odometry/global'),
@@ -316,7 +321,7 @@ def generate_launch_description():
         output='screen',
         parameters=[
                     ekf_config_path,
-                    {'use_sim_time': use_sim_time}
+                    {'use_sim_time': use_simulator}
                     ],
         remappings=[
                     ('imu', 'imu/data'),
@@ -337,7 +342,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             nav2_dir + '/launch/navigation_launch.py'),
         launch_arguments={
-            'use_sim_time': use_sim_time,
+            'use_sim_time': use_simulator,
             'params_file': nav_control_config_path
         }.items(),
         condition=IfCondition(
@@ -366,17 +371,26 @@ def generate_launch_description():
     )
 
     t265_node = Node(
-        package='realsense2_camera',
-        namespace="T265",
-        name="T265",
-        executable='realsense2_camera_node',
-        parameters=[cameras_config_path],
-        output='screen',
-        arguments=['--ros-args', '--log-level', 'info'],
-        emulate_tty=True,
+        package='bfr_hal',
+        name='T265',
+        executable='t265_node',
+        parameters=[
+            {
+                'base_frame_id': 'base_link',
+                'odom_frame_id': 'odom',
+                'publish_tf': False
+            }
+        ],
+        remappings=camera_remappings,
         condition=IfCondition(
             PythonExpression(['not ', use_simulator])
         )
+    )
+
+    # AI Algorithms
+    beanbagdetector_node = Node(
+        package="zyg_ai",
+        executable="beanbagdetector"
     )
 
     return LaunchDescription(launch_args + [
@@ -389,17 +403,17 @@ def generate_launch_description():
 
         # HARDWARE NODES
         gamepad_node,
-        d400_node,
         t265_node,
+        d400_node,
 
         # LOCALIZATION NODES
-        #ekf_node_odom,
-        #ekf_node_map,
-        #navsat_transform_node,
-        #mapping_node,
+        ekf_node_odom,
+        ekf_node_map,
+        navsat_transform_node,
+        mapping_node,
 
         # NAVIGATION NODES
-        #nav2_launch,
+        nav2_launch,
 
         # SIMULATION NODES
         simulation_launch,
@@ -408,4 +422,7 @@ def generate_launch_description():
 
         # VISUALIZATION NODES
         rviz_node,
+
+        # AI Algorithms
+        beanbagdetector_node,
     ])

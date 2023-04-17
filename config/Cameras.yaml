@@ -1,6 +1,6 @@
 /D400/D400:
   ros__parameters:
-    camera_name: "D400"
+    camera_name: "camera"
     serial_no: ""
     usb_port_id: ""
     device_type: "d4."
@@ -50,14 +50,15 @@
     depth_module.gain.2: 16
     wait_for_device_timeout: -1.
     reconnect_timeout: 6.
+    publish_tf: true
 /T265/T265:
   ros__parameters:
-    camera_name: "T265"
+    camera_name: "t265"
     serial_no: ""
     usb_port_id: ""
     device_type: "t265"
     config_file: ""
-    unite_imu_method: 2
+    unite_imu_method: 1
     json_file_path: ""
     log_level: "info"
     output: "screen"
@@ -72,10 +73,10 @@
     enable_fisheye1: true
     enable_fisheye2: true
     enable_confidence: true
-    gyro_fps: 0
-    accel_fps: 0
-    enable_gyro: false
-    enable_accel: false
+    gyro_fps: 200
+    accel_fps: 62
+    enable_gyro: true
+    enable_accel: true
     enable_pose: true
     pose_fps: 200
     pose_qos: "SYSTEM_DEFAULT"
@@ -102,3 +103,5 @@
     depth_module.gain.2: 16
     wait_for_device_timeout: -1.
     reconnect_timeout: 6.
+    publish_odom_tf: false
+    publish_tf: true
