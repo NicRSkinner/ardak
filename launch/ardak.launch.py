@@ -401,24 +401,24 @@ def generate_launch_description():
         SetParameter(name='use_sim_time', value=use_simulator),
 
         # ROBOT NODES
-        #ardak_nodes,
-        #geofencer_node,
+        ardak_nodes,
+        geofencer_node,
         robot_state_publisher_node,
-        #joint_state_publisher_node,
+        joint_state_publisher_node,
 
         # HARDWARE NODES
-        #gamepad_node,
-        #t265_node,
-        #d400_node,
+        gamepad_node,
+        t265_node,
+        d400_node,
 
         # LOCALIZATION NODES
-        #ekf_node_odom,
-        #ekf_node_map,
-        #navsat_transform_node,
-        #mapping_node,
+        ekf_node_odom,
+        ekf_node_map,
+        navsat_transform_node,
+        mapping_node,
 
         # NAVIGATION NODES
-        #nav2_launch,
+        nav2_launch,
 
         # SIMULATION NODES
         simulation_launch,
@@ -429,5 +429,5 @@ def generate_launch_description():
         rviz_node,
 
         # AI Algorithms
-        #beanbagdetector_node,
+        beanbagdetector_node,
     ])
