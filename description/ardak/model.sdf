@@ -1224,6 +1224,7 @@
       <wheel_separation>0.43347499999999994</wheel_separation>
       <wheel_diameter>0.2032</wheel_diameter>
       <wheel_diameter>0.2032</wheel_diameter>
+      <publishWheelJointState>1</publishWheelJointState>
       <max_wheel_torque>40</max_wheel_torque>
       <max_wheel_acceleration>1.0</max_wheel_acceleration>
       <publish_odom>1</publish_odom>
@@ -1242,6 +1243,7 @@
       <covariance_x>0.001</covariance_x>
       <covariance_y>0.001</covariance_y>
       <covariance_yaw>0.01</covariance_yaw>
+      <use_sim_time>1</use_sim_time>
     </plugin>
     <static>0</static>
     <plugin name='camera' filename='librealsense_gazebo_plugin.so'>

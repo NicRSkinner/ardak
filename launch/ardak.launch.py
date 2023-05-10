@@ -12,6 +12,7 @@ from launch_ros.substitutions import FindPackageShare
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch_ros.actions import Node
+from launch_ros.actions import SetParameter
 from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch.conditions import IfCondition
 from launch_ros.actions import ComposableNodeContainer
@@ -79,8 +80,6 @@ def generate_launch_description():
     urdf_model = LaunchConfiguration('urdf_model')
     rviz = LaunchConfiguration('rviz')
     rvizconfig = LaunchConfiguration('rvizconfig')
-    use_hardware_camera = LaunchConfiguration('use_hardware_camera')
-    use_hardware_drive = LaunchConfiguration('use_hardware_drive')
     localization = LaunchConfiguration('localization')
     spawnX = LaunchConfiguration('SimSpawnX')
     spawnY = LaunchConfiguration('SimSpawnY')
@@ -91,10 +90,6 @@ def generate_launch_description():
 
     # -- LAUNCH ARGUMENTS
     launch_args = [
-        DeclareLaunchArgument(name="use_hardware_camera", default_value="False",
-                              description="Whether to use hardware input depth cameras."),
-        DeclareLaunchArgument(name="use_hardware_drive", default_value="False",
-                              description="Whether to use hardware output drives."),
         DeclareLaunchArgument(name="localization", default_value="True",
                               description='Whether to start localization nodes.'),
         DeclareLaunchArgument(name='rviz', default_value='True',
@@ -210,7 +205,7 @@ def generate_launch_description():
     )
 
     mapping_node = Node(
-        package='rtabmap_ros',
+        package='rtabmap_slam',
         executable='rtabmap',
         output='screen',
         parameters=mapping_parameters,
@@ -225,6 +220,9 @@ def generate_launch_description():
         name='rviz2',
         output='screen',
         arguments=['-d', rvizconfig],
+        parameters=[
+                    {'use_sim_time': use_simulator}
+                    ],
         condition=launch.conditions.IfCondition(rviz)
     )
 
@@ -378,7 +376,8 @@ def generate_launch_description():
             {
                 'base_frame_id': 'base_link',
                 'odom_frame_id': 'odom',
-                'publish_tf': False
+                'publish_tf': False,
+                'use_sim_time': use_simulator
             }
         ],
         remappings=camera_remappings,
@@ -390,30 +389,36 @@ def generate_launch_description():
     # AI Algorithms
     beanbagdetector_node = Node(
         package="zyg_ai",
-        executable="beanbagdetector"
+        executable="beanbagdetector",
+        parameters=[
+            {
+                'use_sim_time': use_simulator
+            }
+        ]
     )
 
     return LaunchDescription(launch_args + [
+        SetParameter(name='use_sim_time', value=use_simulator),
 
         # ROBOT NODES
-        ardak_nodes,
-        geofencer_node,
+        #ardak_nodes,
+        #geofencer_node,
         robot_state_publisher_node,
-        joint_state_publisher_node,
+        #joint_state_publisher_node,
 
         # HARDWARE NODES
-        gamepad_node,
-        t265_node,
-        d400_node,
+        #gamepad_node,
+        #t265_node,
+        #d400_node,
 
         # LOCALIZATION NODES
-        ekf_node_odom,
-        ekf_node_map,
-        navsat_transform_node,
-        mapping_node,
+        #ekf_node_odom,
+        #ekf_node_map,
+        #navsat_transform_node,
+        #mapping_node,
 
         # NAVIGATION NODES
-        nav2_launch,
+        #nav2_launch,
 
         # SIMULATION NODES
         simulation_launch,
@@ -424,5 +429,5 @@ def generate_launch_description():
         rviz_node,
 
         # AI Algorithms
-        beanbagdetector_node,
+        #beanbagdetector_node,
     ])
