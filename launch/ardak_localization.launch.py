@@ -60,7 +60,7 @@ def generate_launch_description():
         'wait_imu_to_init': True
     }]
 
-    
+
 
     print ("returning launch description")
     return LaunchDescription([
@@ -108,7 +108,7 @@ def generate_launch_description():
             arguments=['--ros-args', '--log-level', 'info'],
             emulate_tty=True,
         ),
-            
+
         Node(
             package='realsense2_camera',
             namespace="T265",
@@ -120,17 +120,17 @@ def generate_launch_description():
             emulate_tty=True,
         ),
         # END: Launch D435 and T265 cammeras
-        
+
         # START: Align depth image to color image
         Node(
-            package='rtabmap_ros',
+            package='rtabmap_util',
             executable='point_cloud_xyz',
             parameters=pointcloud_parameters,
             remappings=pointcloud_remappings,
             output='screen'
         ),
         Node(
-            package='rtabmap_ros',
+            package='rtabmap_util',
             executable='pointcloud_to_depthimage',
             parameters=alignment_parameters,
             remappings=alignment_remappings
@@ -139,7 +139,7 @@ def generate_launch_description():
 
         # START: Mapping
         Node(
-            package='rtabmap_ros',
+            package='rtabmap_slam',
             executable='rtabmap',
             output='screen',
             parameters=mapping_parameters,

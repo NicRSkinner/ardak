@@ -126,7 +126,9 @@ def generate_launch_description():
     # -- REMAPPINGS/PARAMETERS
     camera_remappings = [
         ('/T265/odom', '/camera/odometry'),
-        ('/T265/imu', '/camera/imu/data')
+        ('/T265/imu', '/camera/imu/data'),
+        ('/D400/color/camera_info', '/color/camera_info'),
+        ('/D400/color/image_raw', '/color/image_raw'),
     ]
 
     mapping_remappings = [
@@ -139,7 +141,7 @@ def generate_launch_description():
 
     mapping_parameters = [{
         'queue_size': 200,
-        'frame_id': 'base_link',
+        'frame_id': 'base_footprint',
         'use_sim_time': use_simulator,
         'approx_sync': True,
         'wait_imu_to_init': True,
@@ -169,9 +171,9 @@ def generate_launch_description():
     }]
 
     alignment_remappings = [
-        ('camera_info' , '/D400/color/camera_info'),
+        ('camera_info' , '/color/camera_info'),
         ('cloud', '/D400/cloud_from_depth'),
-        ('image_raw', '/D400/aligned_depth_to_color/image_raw'),
+        ('image_raw', '/aligned_depth_to_color/image_raw'),
     ]
 
     alignment_parameters = [{
@@ -281,6 +283,14 @@ def generate_launch_description():
         condition=IfCondition(use_manual_drive)
     )
 
+    odrive_node = Node(
+        package="odrive_ros2",
+        executable="odrive",
+        condition=IfCondition(
+            PythonExpression(['not ', use_simulator])
+        )
+    )
+
     ekf_node_odom = Node(
         package="robot_localization",
         name="ekf_filter_node_odom",
@@ -363,6 +373,28 @@ def generate_launch_description():
         output='screen',
         arguments=['--ros-args', '--log-level', 'info'],
         emulate_tty=True,
+        remappings=camera_remappings,
+        condition=IfCondition(
+            PythonExpression(['not ', use_simulator])
+        )
+    )
+
+    rtab_alignment_pointcloud = Node(
+            package='rtabmap_util',
+            executable='point_cloud_xyz',
+            parameters=pointcloud_parameters,
+            remappings=pointcloud_remappings,
+            output='screen',
+            condition=IfCondition(
+                PythonExpression(['not ', use_simulator])
+            )
+        )
+
+    rtab_alignment_aligner = Node(
+        package='rtabmap_util',
+        executable='pointcloud_to_depthimage',
+        parameters=alignment_parameters,
+        remappings=alignment_remappings,
         condition=IfCondition(
             PythonExpression(['not ', use_simulator])
         )
@@ -405,11 +437,14 @@ def generate_launch_description():
         geofencer_node,
         robot_state_publisher_node,
         joint_state_publisher_node,
+        odrive_node,
 
         # HARDWARE NODES
         gamepad_node,
         t265_node,
         d400_node,
+        rtab_alignment_pointcloud,
+        rtab_alignment_aligner,
 
         # LOCALIZATION NODES
         ekf_node_odom,
