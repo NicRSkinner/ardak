@@ -35,14 +35,6 @@
     <xacro:property name="imu_link_yoff" value="0.0" />
     <xacro:property name="imu_link_xoff" value="0.0" />
 
-    <xacro:if value="$(arg use_simulation)">
-        <xacro:property name="robot_center_link" value="base_link" />
-    </xacro:if>
-
-    <xacro:unless value="$(arg use_simulation)">
-        <xacro:property name="robot_center_link" value="center_link" />
-    </xacro:unless>
-
     <xacro:macro name="fixedlink" params="joint_name">
         <gazebo reference="${joint_name}">
             <disableFixedJointLumping>true</disableFixedJointLumping>
@@ -73,7 +65,7 @@
         </link>
     </xacro:macro>
 
-    <link name="${robot_center_link}">
+    <link name="center_link">
         <visual>
             <geometry>
                 <box size="${base_length} ${base_width} ${base_height}"/>
@@ -96,12 +88,12 @@
         </inertial>
     </link>
 
-    <xacro:framelink prefix="base_footprint" />
+    <xacro:framelink prefix="base_link" />
 
     <joint name="base_footprint_joint" type="fixed">
-        <parent link="${robot_center_link}"/>
-        <child link="base_footprint"/>
-        <origin xyz="0.0 0.0 ${-(wheel_radius+(base_height/2 + wheel_zoff))}" rpy="0 0 0"/>
+        <parent link="base_link"/>
+        <child link="center_link"/>
+        <origin xyz="0.0 0.0 ${(wheel_radius+(base_height/2 + wheel_zoff))}" rpy="0 0 0"/>
     </joint>
 
     <xacro:fixedlink joint_name="base_footprint_joint" />
@@ -130,9 +122,10 @@
         </link>
 
         <joint name="${prefix}_joint" type="continuous">
-            <parent link="${robot_center_link}"/>
+            <!-- This should really be based off the center of the robot, but that breaks the Gazebo plugin for some reason. -->
+            <parent link="base_link"/>
             <child link="${prefix}_link"/>
-            <origin xyz="${x_reflect*(base_length/2 + wheel_xoff)} ${y_reflect*(base_width/2+wheel_ygap + wheel_width/2)} ${-(base_height/2 + wheel_zoff)}" rpy="0 0 0"/>
+            <origin xyz="${x_reflect*(base_length/2 + wheel_xoff)} ${y_reflect*(base_width/2+wheel_ygap + wheel_width/2)} ${wheel_radius}" rpy="0 0 0"/>
             <axis xyz="0 1 0"/>
             <!--<dynamics friction="100.0" damping="100.0" />-->
         </joint>
@@ -170,7 +163,7 @@
     <!-- GPS TF links -->
     <xacro:framelink prefix="gps_sensor_link"/>
     <joint name="gps_sensor_link_joint" type="fixed">
-        <parent link="${robot_center_link}" />
+        <parent link="center_link" />
         <child link="gps_sensor_link" />
         <origin xyz="0 0 ${base_height}" rpy="0 0 0" />
     </joint>
@@ -179,7 +172,7 @@
     <!-- IMU TF links -->
     <xacro:framelink prefix="imu_sensor_link" />
     <joint name="imu_sensor_link_joint" type="fixed">
-        <parent link="${robot_center_link}" />
+        <parent link="center_link" />
         <child link="imu_sensor_link" />
         <origin xyz="0 0 ${base_height}" rpy="0 0 0" />
     </joint>
@@ -188,7 +181,7 @@
     <!-- D435 TF links -->
     <xacro:framelink prefix="camera_link" />
     <joint name="camera_link_joint" type="fixed">
-        <parent link="${robot_center_link}" />
+        <parent link="center_link" />
         <child link="camera_link" />
         <origin xyz="${(base_length / 2) - 0.032} 0 ${(base_height / 2) - 0.129}" rpy="0 0 0" />
     </joint>
@@ -258,7 +251,7 @@
     </joint>
     <xacro:fixedlink joint_name="camera_right_ir_optical_joint" />
 
-    <!-- T265 TF Links -->
+    <!-- T265 TF Links
     <xacro:unless value="$(arg use_simulation)">
         <xacro:framelink prefix="base_link" />
         <joint name="base_to_center_joint" type="fixed">
@@ -267,7 +260,7 @@
             <origin xyz="-${(base_length / 2) - 0.032} 0 -${(base_height / 2) - 0.129}" rpy="0 0 0" />
         </joint>
         <xacro:fixedlink joint_name="base_to_center_joint" />
-    </xacro:unless>
+    </xacro:unless>-->
 
     <!-- Include Gazebo plugins and simulation definitions -->
     <xacro:if value="$(arg use_simulation)">

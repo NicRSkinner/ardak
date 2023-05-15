@@ -4,7 +4,7 @@
 <!-- |    EDITING THIS FILE BY HAND IS NOT RECOMMENDED                                 | -->
 <!-- =================================================================================== -->
 <robot name="ardak">
-  <link name="base_link">
+  <link name="center_link">
     <visual>
       <geometry>
         <box size="0.7112 0.35 0.302244"/>
@@ -26,7 +26,7 @@
       <inertia ixx="2.664688434" ixy="0.0" ixz="0.0" iyy="1.758437644" iyz="0.0" izz="3.341575268"/>
     </inertial>
   </link>
-  <link name="base_footprint">
+  <link name="base_link">
     <visual>
       <geometry>
         <box size="0.0 0.0 0.1"/>
@@ -48,8 +48,8 @@
   </link>
   <joint name="base_footprint_joint" type="fixed">
     <parent link="base_link"/>
-    <child link="base_footprint"/>
-    <origin rpy="0 0 0" xyz="0.0 0.0 -0.20793"/>
+    <child link="center_link"/>
+    <origin rpy="0 0 0" xyz="0.0 0.0 0.20793"/>
   </joint>
   <gazebo reference="base_footprint_joint">
     <disableFixedJointLumping>true</disableFixedJointLumping>
@@ -79,7 +79,7 @@
   <joint name="drive_wheel_rear_left_joint" type="continuous">
     <parent link="base_link"/>
     <child link="drive_wheel_rear_left_link"/>
-    <origin rpy="0 0 0" xyz="-0.26397000000000004 0.258475 -0.10633000000000001"/>
+    <origin rpy="0 0 0" xyz="-0.26397000000000004 0.258475 0.1016"/>
     <axis xyz="0 1 0"/>
     <!--<dynamics friction="100.0" damping="100.0" />-->
   </joint>
@@ -117,7 +117,7 @@
   <joint name="drive_wheel_rear_right_joint" type="continuous">
     <parent link="base_link"/>
     <child link="drive_wheel_rear_right_link"/>
-    <origin rpy="0 0 0" xyz="-0.26397000000000004 -0.258475 -0.10633000000000001"/>
+    <origin rpy="0 0 0" xyz="-0.26397000000000004 -0.258475 0.1016"/>
     <axis xyz="0 1 0"/>
     <!--<dynamics friction="100.0" damping="100.0" />-->
   </joint>
@@ -155,7 +155,7 @@
   <joint name="drive_wheel_front_left_joint" type="continuous">
     <parent link="base_link"/>
     <child link="drive_wheel_front_left_link"/>
-    <origin rpy="0 0 0" xyz="0.26397000000000004 0.258475 -0.10633000000000001"/>
+    <origin rpy="0 0 0" xyz="0.26397000000000004 0.258475 0.1016"/>
     <axis xyz="0 1 0"/>
     <!--<dynamics friction="100.0" damping="100.0" />-->
   </joint>
@@ -193,7 +193,7 @@
   <joint name="drive_wheel_front_right_joint" type="continuous">
     <parent link="base_link"/>
     <child link="drive_wheel_front_right_link"/>
-    <origin rpy="0 0 0" xyz="0.26397000000000004 -0.258475 -0.10633000000000001"/>
+    <origin rpy="0 0 0" xyz="0.26397000000000004 -0.258475 0.1016"/>
     <axis xyz="0 1 0"/>
     <!--<dynamics friction="100.0" damping="100.0" />-->
   </joint>
@@ -230,7 +230,7 @@
     </inertial>
   </link>
   <joint name="gps_sensor_link_joint" type="fixed">
-    <parent link="base_link"/>
+    <parent link="center_link"/>
     <child link="gps_sensor_link"/>
     <origin rpy="0 0 0" xyz="0 0 0.302244"/>
   </joint>
@@ -259,7 +259,7 @@
     </inertial>
   </link>
   <joint name="imu_sensor_link_joint" type="fixed">
-    <parent link="base_link"/>
+    <parent link="center_link"/>
     <child link="imu_sensor_link"/>
     <origin rpy="0 0 0" xyz="0 0 0.302244"/>
   </joint>
@@ -288,7 +288,7 @@
     </inertial>
   </link>
   <joint name="camera_link_joint" type="fixed">
-    <parent link="base_link"/>
+    <parent link="center_link"/>
     <child link="camera_link"/>
     <origin rpy="0 0 0" xyz="0.3236 0 0.022122000000000003"/>
   </joint>
@@ -528,7 +528,18 @@
     <disableFixedJointLumping>true</disableFixedJointLumping>
     <preserveFixedJoint>true</preserveFixedJoint>
   </gazebo>
+  <!-- T265 TF Links
+    <xacro:unless value="$(arg use_simulation)">
+        <xacro:framelink prefix="base_link" />
+        <joint name="base_to_center_joint" type="fixed">
+            <parent link="base_link" />
+            <child link="center_link" />
+            <origin xyz="-${(base_length / 2) - 0.032} 0 -${(base_height / 2) - 0.129}" rpy="0 0 0" />
+        </joint>
+        <xacro:fixedlink joint_name="base_to_center_joint" />
+    </xacro:unless>-->
   <gazebo>
+    <!-- For some unknown reason, this joint state publisher (and only this plugin!!!) give a positive Z number when the SDF is acually negative. -->
     <plugin filename="libgazebo_ros_diff_drive.so" name="diff_drive">
       <update_rate>30</update_rate>
       <num_wheel_pairs>2</num_wheel_pairs>
@@ -552,7 +563,7 @@
       <odometry_source>1</odometry_source>
       <odometry_topic>odom</odometry_topic>
       <odometry_frame>odom</odometry_frame>
-      <robot_base_frame>base_link</robot_base_frame>
+      <robot_base_frame>center_link</robot_base_frame>
       <torque>40</torque>
       <ros>
         <namespace>/</namespace>

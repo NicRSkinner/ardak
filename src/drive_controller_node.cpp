@@ -353,13 +353,13 @@ namespace bfr
 
         // Left wheel rotates "backward" from the right wheel
         leftMsg.data = (left_rpm / 60. / this->driveGearRatio) * -1;
-        rightMsg.data = right_rpm / 60. / this->driveGearRatio;
+        rightMsg.data = (right_rpm / 60. / this->driveGearRatio) * -1;
 
         RCLCPP_INFO_STREAM(
             this->get_logger(),
             "linear: " << input.linear.x << " angular: " << input.angular.z
                        << "\n leftRPM: " << left_rpm << " rightRPM: " << right_rpm
-                       << "\n leftTPS: " << left_rpm / 60. << " rightTPS: " << right_rpm / 60.
+                       << "\n leftTPS: " << leftMsg.data << " rightTPS: " << rightMsg.data
         );
 
         this->leftDrivePublisher->publish(leftMsg);

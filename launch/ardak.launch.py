@@ -141,7 +141,7 @@ def generate_launch_description():
 
     mapping_parameters = [{
         'queue_size': 200,
-        'frame_id': 'base_footprint',
+        'frame_id': 'base_link',
         'use_sim_time': use_simulator,
         'approx_sync': True,
         'wait_imu_to_init': True,
@@ -349,7 +349,7 @@ def generate_launch_description():
     nav2_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             nav2_dir + '/launch/navigation_launch.py'),
-        launch_arguments={
+        launch_arguments= {
             'use_sim_time': use_simulator,
             'params_file': nav_control_config_path
         }.items(),
