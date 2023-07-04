@@ -345,15 +345,14 @@ namespace bfr
         double RPMInRads = 0.1047;
         double DistPerRad = (this->wheelCircumference.value / 100) / (2 * M_PI);
 
-        double left_rpm =
-            (input.linear.x - (0.5f * input.angular.z * this->wheelbase)) / (RPMInRads * DistPerRad);
+        double left_vel = input.linear.x - input.angular.z * this->wheelbase / 2.0;
+        double right_vel = input.linear.x + input.angular.z * this->wheelbase / 2.0;
 
-        double right_rpm =
-            (input.linear.x + (0.5f * input.angular.z * this->wheelbase)) / (RPMInRads * DistPerRad);
+        double left_rpm = left_vel / (RPMInRads * DistPerRad);
+        double right_rpm = right_vel / (RPMInRads * DistPerRad);
 
-        // Left wheel rotates "backward" from the right wheel
-        leftMsg.data = (left_rpm / 60. / this->driveGearRatio) * -1;
-        rightMsg.data = (right_rpm / 60. / this->driveGearRatio) * -1;
+        leftMsg.data = (left_rpm / 60. / this->driveGearRatio);
+        rightMsg.data = (right_rpm / 60. / this->driveGearRatio);
 
         RCLCPP_INFO_STREAM(
             this->get_logger(),
