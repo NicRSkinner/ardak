@@ -193,17 +193,27 @@ local_costmap:
         z_voxels: 16
         max_obstacle_height: 2.0
         mark_threshold: 0
-        observation_sources: pointcloud
-        pointcloud:
-          topic: /D400/cloud_from_depth
+        scan:
+          topic: /scan
           max_obstacle_height: 2.0
           clearing: True
           marking: True
-          data_type: "PointCloud2"
+          data_type: "LaserScan"
           raytrace_max_range: 3.0
           raytrace_min_range: 0.0
           obstacle_max_range: 2.5
           obstacle_min_range: 0.0
+        #observation_sources: pointcloud
+        #pointcloud:
+        #  topic: /D400/cloud_from_depth
+        #  max_obstacle_height: 2.0
+        #  clearing: True
+        #  marking: True
+        #  data_type: "PointCloud2"
+        #  raytrace_max_range: 3.0
+        #  raytrace_min_range: 0.0
+        #  obstacle_max_range: 2.5
+        #  obstacle_min_range: 0.0
       static_layer:
         plugin: "nav2_costmap_2d::StaticLayer"
         map_subscribe_transient_local: True
@@ -302,11 +312,12 @@ behavior_server:
       plugin: "nav2_behaviors/Wait"
     assisted_teleop:
       plugin: "nav2_behaviors/AssistedTeleop"
-    global_frame: odom
+    local_frame: odom
+    global_frame: map
     robot_base_frame: base_link
     transform_tolerance: 0.1
     simulate_ahead_time: 2.0
-    max_rotational_vel: 1.0
+    max_rotational_vel: 3.14
     min_rotational_vel: 0.4
     rotational_acc_lim: 3.2
 
@@ -325,8 +336,8 @@ velocity_smoother:
     smoothing_frequency: 20.0
     scale_velocities: False
     feedback: "OPEN_LOOP"
-    max_velocity: [0.26, 0.0, 1.0]
-    min_velocity: [-0.26, 0.0, -1.0]
+    max_velocity: [1.0, 0.0, 1.5]
+    min_velocity: [-1.0, 0.0, -1.5]
     max_accel: [2.5, 0.0, 3.2]
     max_decel: [-2.5, 0.0, -3.2]
     odom_topic: "odom"
