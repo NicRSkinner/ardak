@@ -108,7 +108,7 @@ def generate_launch_description():
     )
 
     mapping_node = Node(
-        package='rtabmap_ros',
+        package='rtabmap_slam',
         executable='rtabmap',
         output='screen',
         parameters=mapping_parameters,

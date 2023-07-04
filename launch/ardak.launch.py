@@ -154,9 +154,9 @@ def generate_launch_description():
         'manualControlAllowed': use_manual_drive,
         'maxVelocity': 4828.0,  # 3mph
         'minVelocity': -4828.0,  # -3mph
-        'driveGearRatio': 0.111,
+        'driveGearRatio': 0.037037, # 1/27 gear ratio
         'wheelCircumference': 63.837,
-        'maxSteeringVelocity': 0.0,
+        'maxSteeringVelocity': 0.0, # 0.0 rad/s, not currently used.
         'wheelbase': 0.433,
     }]
 
