@@ -210,7 +210,7 @@
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.7112 0.35 0.302244</size>
+            <size>0.55 0.35 0.302244</size>
           </box>
         </geometry>
       </collision>
@@ -218,13 +218,13 @@
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.7112 0.35 0.302244</size>
+            <size>0.6 0.35 0.302244</size>
           </box>
         </geometry>
       </visual>
     </link>
     <joint name='camera_link_joint' type='fixed'>
-      <pose relative_to='center_link'>0.3236 0 0.022122 0 -0 0</pose>
+      <pose relative_to='center_link'>0.268 0 0.022122 0 -0 0</pose>
       <parent>center_link</parent>
       <child>camera_link</child>
       <axis>
@@ -946,7 +946,7 @@
       </sensor>
     </link>
     <joint name='drive_wheel_front_left_joint' type='revolute'>
-      <pose relative_to='base_link'>0.26397 0.258475 0.1016 0 -0 0</pose>
+      <pose relative_to='base_link'>0.20837 0.258475 0.1016 0 -0 0</pose>
       <parent>base_link</parent>
       <child>drive_wheel_front_left_link</child>
       <axis>
@@ -1013,7 +1013,7 @@
       <slip2>0</slip2>
     </link>
     <joint name='drive_wheel_front_right_joint' type='revolute'>
-      <pose relative_to='base_link'>0.26397 -0.258475 0.1016 0 -0 0</pose>
+      <pose relative_to='base_link'>0.20837 -0.258475 0.1016 0 -0 0</pose>
       <parent>base_link</parent>
       <child>drive_wheel_front_right_link</child>
       <axis>
@@ -1080,7 +1080,7 @@
       <slip2>0</slip2>
     </link>
     <joint name='drive_wheel_rear_left_joint' type='revolute'>
-      <pose relative_to='base_link'>-0.26397 0.258475 0.1016 0 -0 0</pose>
+      <pose relative_to='base_link'>-0.20837 0.258475 0.1016 0 -0 0</pose>
       <parent>base_link</parent>
       <child>drive_wheel_rear_left_link</child>
       <axis>
@@ -1147,7 +1147,7 @@
       <slip2>0</slip2>
     </link>
     <joint name='drive_wheel_rear_right_joint' type='revolute'>
-      <pose relative_to='base_link'>-0.26397 -0.258475 0.1016 0 -0 0</pose>
+      <pose relative_to='base_link'>-0.20837 -0.258475 0.1016 0 -0 0</pose>
       <parent>base_link</parent>
       <child>drive_wheel_rear_right_link</child>
       <axis>

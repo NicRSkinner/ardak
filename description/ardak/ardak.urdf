@@ -6,7 +6,8 @@
 
     <!-- Define robot constants -->
     <xacro:property name="base_width" value="0.35"/>
-    <xacro:property name="base_length" value="0.7112"/>
+    <!-- Original: 0.7712 -->
+    <xacro:property name="base_length" value="0.55"/>
     <xacro:property name="base_height" value="0.302244"/>
 
     <xacro:property name="wheel_radius" value="0.1016"/>

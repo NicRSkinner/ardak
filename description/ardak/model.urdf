@@ -7,7 +7,7 @@
   <link name="center_link">
     <visual>
       <geometry>
-        <box size="0.7112 0.35 0.302244"/>
+        <box size="0.6 0.35 0.302244"/>
       </geometry>
       <material name="Cyan">
         <color rgba="0 1.0 1.0 1.0"/>
@@ -16,7 +16,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="0.7112 0.35 0.302244"/>
+        <box size="0.6 0.35 0.302244"/>
       </geometry>
     </collision>
     <!-- Need to check these values -->
@@ -77,9 +77,10 @@
     </inertial>
   </link>
   <joint name="drive_wheel_rear_left_joint" type="continuous">
+    <!-- This should really be based off the center of the robot, but that breaks the Gazebo plugin for some reason. -->
     <parent link="base_link"/>
     <child link="drive_wheel_rear_left_link"/>
-    <origin rpy="0 0 0" xyz="-0.26397000000000004 0.258475 0.1016"/>
+    <origin rpy="0 0 0" xyz="-0.20837 0.258475 0.1016"/>
     <axis xyz="0 1 0"/>
     <!--<dynamics friction="100.0" damping="100.0" />-->
   </joint>
@@ -115,9 +116,10 @@
     </inertial>
   </link>
   <joint name="drive_wheel_rear_right_joint" type="continuous">
+    <!-- This should really be based off the center of the robot, but that breaks the Gazebo plugin for some reason. -->
     <parent link="base_link"/>
     <child link="drive_wheel_rear_right_link"/>
-    <origin rpy="0 0 0" xyz="-0.26397000000000004 -0.258475 0.1016"/>
+    <origin rpy="0 0 0" xyz="-0.20837 -0.258475 0.1016"/>
     <axis xyz="0 1 0"/>
     <!--<dynamics friction="100.0" damping="100.0" />-->
   </joint>
@@ -153,9 +155,10 @@
     </inertial>
   </link>
   <joint name="drive_wheel_front_left_joint" type="continuous">
+    <!-- This should really be based off the center of the robot, but that breaks the Gazebo plugin for some reason. -->
     <parent link="base_link"/>
     <child link="drive_wheel_front_left_link"/>
-    <origin rpy="0 0 0" xyz="0.26397000000000004 0.258475 0.1016"/>
+    <origin rpy="0 0 0" xyz="0.20837 0.258475 0.1016"/>
     <axis xyz="0 1 0"/>
     <!--<dynamics friction="100.0" damping="100.0" />-->
   </joint>
@@ -191,9 +194,10 @@
     </inertial>
   </link>
   <joint name="drive_wheel_front_right_joint" type="continuous">
+    <!-- This should really be based off the center of the robot, but that breaks the Gazebo plugin for some reason. -->
     <parent link="base_link"/>
     <child link="drive_wheel_front_right_link"/>
-    <origin rpy="0 0 0" xyz="0.26397000000000004 -0.258475 0.1016"/>
+    <origin rpy="0 0 0" xyz="0.20837 -0.258475 0.1016"/>
     <axis xyz="0 1 0"/>
     <!--<dynamics friction="100.0" damping="100.0" />-->
   </joint>
@@ -290,7 +294,7 @@
   <joint name="camera_link_joint" type="fixed">
     <parent link="center_link"/>
     <child link="camera_link"/>
-    <origin rpy="0 0 0" xyz="0.3236 0 0.022122000000000003"/>
+    <origin rpy="0 0 0" xyz="0.268 0 0.022122000000000003"/>
   </joint>
   <gazebo reference="camera_link_joint">
     <disableFixedJointLumping>true</disableFixedJointLumping>
@@ -539,7 +543,6 @@
         <xacro:fixedlink joint_name="base_to_center_joint" />
     </xacro:unless>-->
   <gazebo>
-    <!-- For some unknown reason, this joint state publisher (and only this plugin!!!) give a positive Z number when the SDF is acually negative. -->
     <plugin filename="libgazebo_ros_diff_drive.so" name="diff_drive">
       <update_rate>30</update_rate>
       <num_wheel_pairs>2</num_wheel_pairs>
