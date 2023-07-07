@@ -85,6 +85,7 @@ def generate_launch_description():
     spawnY = LaunchConfiguration('SimSpawnY')
     spawnZ = LaunchConfiguration('SimSpawnZ')
     spawnYaw = LaunchConfiguration('SimSpawnYaw')
+    useMappingDriver = LaunchConfiguration('UseMappingDriver')
 
     # -- DIRECTORIES/ARGUMENTS/CONFIGS --
 
@@ -120,6 +121,8 @@ def generate_launch_description():
                               description='Z position to spawn the robot at during simulation.'),
         DeclareLaunchArgument(name='SimSpawnYaw', default_value='0.0',
                               description='Rotational Yaw to spawn the robot at during simulation.'),
+        DeclareLaunchArgument(name="UseMappingDriver",
+                              default_value='True', description="Use an autonomous mapping driver for robot movement"),
     ]
     # -- LAUNCH ARGUMENTS
 
@@ -429,6 +432,17 @@ def generate_launch_description():
         ]
     )
 
+    mappingdriver_node = Node(
+        package="zyg_ai",
+        executable="mappingdriver",
+        parameters=[
+            {
+                'use_sim_time': use_simulator
+            }
+        ],
+        condition=IfCondition(useMappingDriver)
+    )
+
     return LaunchDescription(launch_args + [
         SetParameter(name='use_sim_time', value=use_simulator),
 
@@ -465,4 +479,5 @@ def generate_launch_description():
 
         # AI Algorithms
         beanbagdetector_node,
+        mappingdriver_node
     ])

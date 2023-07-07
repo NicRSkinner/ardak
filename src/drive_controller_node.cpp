@@ -304,7 +304,6 @@ namespace bfr
 
     void DriveControllerNode::twist_callback(const geometry_msgs::msg::Twist::SharedPtr msg)
     {
-        RCLCPP_INFO_STREAM(this->get_logger(), "Received Twist message.");
         geometry_msgs::msg::Twist out;
         out.angular = msg.get()->angular;
         out.linear = msg.get()->linear;
@@ -354,12 +353,13 @@ namespace bfr
         leftMsg.data = (left_rpm / 60. / this->driveGearRatio);
         rightMsg.data = (right_rpm / 60. / this->driveGearRatio);
 
-        RCLCPP_INFO_STREAM(
+        /*RCLCPP_INFO_STREAM(
             this->get_logger(),
             "linear: " << input.linear.x << " angular: " << input.angular.z
                        << "\n leftRPM: " << left_rpm << " rightRPM: " << right_rpm
                        << "\n leftTPS: " << leftMsg.data << " rightTPS: " << rightMsg.data
         );
+        */
 
         this->leftDrivePublisher->publish(leftMsg);
         this->rightDrivePublisher->publish(rightMsg);
