@@ -346,7 +346,12 @@ def generate_launch_description():
 
     geofencer_node = Node(
         package="zyg_ai",
-        executable="geofencer_node"
+        executable="geofencer_node",
+        parameters=[
+            {
+                'use_sim_time': use_simulator
+            }
+        ],
     )
 
     nav2_launch = IncludeLaunchDescription(
