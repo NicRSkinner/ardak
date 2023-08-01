@@ -10,10 +10,10 @@ from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument , OpaqueFunction
 from launch_ros.actions import Node
 from launch_ros.actions import SetParameter
-from launch.substitutions import LaunchConfiguration, PythonExpression
+from launch.substitutions import LaunchConfiguration, PythonExpression, PathJoinSubstitution
 from launch.conditions import IfCondition
 from launch_ros.actions import ComposableNodeContainer
 from launch_ros.descriptions import ComposableNode
@@ -37,6 +37,8 @@ def generate_launch_description():
     )
     robot_name_in_model = 'ardak'
     nav2_dir = get_package_share_directory('nav2_bringup')
+    foxglove_dir = get_package_share_directory('foxglove_bridge')
+
 
     drive_control_config_path = os.path.join(
         get_package_share_directory('ardak'),
@@ -64,6 +66,7 @@ def generate_launch_description():
         'Cameras.yaml'
     )
 
+
     # Set the path to different files and folders.
     pkg_gazebo_ros = FindPackageShare(package='gazebo_ros').find('gazebo_ros')
     gazebo_models_path = os.path.join(pkg_share, 'description')
@@ -86,6 +89,9 @@ def generate_launch_description():
     spawnZ = LaunchConfiguration('SimSpawnZ')
     spawnYaw = LaunchConfiguration('SimSpawnYaw')
     useMappingDriver = LaunchConfiguration('UseMappingDriver')
+    useFoxgloveRosBridge = LaunchConfiguration('UseFoxgloveRosBridge')
+    useRosbridgeServer = LaunchConfiguration('UseRosbridgeServer')
+    rosbridgeCertDir = LaunchConfiguration('RosbridgeCertDirectory')
 
     # -- DIRECTORIES/ARGUMENTS/CONFIGS --
 
@@ -93,7 +99,7 @@ def generate_launch_description():
     launch_args = [
         DeclareLaunchArgument(name="localization", default_value="True",
                               description='Whether to start localization nodes.'),
-        DeclareLaunchArgument(name='rviz', default_value='True',
+        DeclareLaunchArgument(name='rviz', default_value='False',
                               description='flag to use rviz instead of gazebo'),
         DeclareLaunchArgument(name='rvizconfig', default_value=default_rviz_config_path,
                               description='Absolute path to the rviz config file.'),
@@ -123,6 +129,9 @@ def generate_launch_description():
                               description='Rotational Yaw to spawn the robot at during simulation.'),
         DeclareLaunchArgument(name="UseMappingDriver",
                               default_value='True', description="Use an autonomous mapping driver for robot movement"),
+        DeclareLaunchArgument(name="UseFoxgloveRosBridge",default_value='True', description="Open a Websocket for use with foxglove-studio"),
+        DeclareLaunchArgument(name="UseRosbridgeServer", default_value="False", description="Open a Rosbridge server with wss for foxglove-studio"),
+        DeclareLaunchArgument(name="RosbridgeCertDirectory", default_value="/usr/share/rosbridge/certifications/", description="Directory for ssl certifications using rosbridge"),
     ]
     # -- LAUNCH ARGUMENTS
 
@@ -448,6 +457,39 @@ def generate_launch_description():
         condition=IfCondition(useMappingDriver)
     )
 
+    foxglove_server = Node(
+        package="foxglove_bridge",
+        executable="foxglove_bridge",
+        parameters=[
+            {
+                'port': 10621,
+                'address': '0.0.0.0',
+                'tls': True,
+                'certfile': PathJoinSubstitution([rosbridgeCertDir, 'server_cert.pem']),
+                'keyfile': PathJoinSubstitution([rosbridgeCertDir, 'server_key.pem']),
+                'num_threads': 8,
+                'send_buffer_limit': 100000000, #100MB, lower and use whitelist if buffer cannot clear.
+                'use_sim_time': use_simulator
+            }
+        ],
+        condition=IfCondition(useFoxgloveRosBridge)
+    )
+
+    rosbridge_server = Node(
+        package="rosbridge_server",
+        executable="rosbridge_websocket",
+        parameters=[
+            {
+                'port': 10621,
+                'address': '',
+                'ssl': True,
+                'certfile': PathJoinSubstitution([rosbridgeCertDir, 'server_cert.pem']),
+                'keyfile': PathJoinSubstitution([rosbridgeCertDir, 'server_key.pem']),
+                'authenticate': False
+            }
+        ]
+    )
+
     return LaunchDescription(launch_args + [
         SetParameter(name='use_sim_time', value=use_simulator),
 
@@ -481,8 +523,10 @@ def generate_launch_description():
 
         # VISUALIZATION NODES
         rviz_node,
+        foxglove_server,
+        #rosbridge_server,
 
         # AI Algorithms
-        beanbagdetector_node,
+        #beanbagdetector_node,
         mappingdriver_node
     ])
