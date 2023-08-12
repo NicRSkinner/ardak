@@ -159,6 +159,7 @@ def generate_launch_description():
         'wait_imu_to_init': True,
         'wait_for_transform': 2.0,
         'odom_frame_id': "odom",
+        'GridGlobal/MinSize': '40.0', # Make the map a minimum of 40 meters
         #publish_tf: False
     }]
 
