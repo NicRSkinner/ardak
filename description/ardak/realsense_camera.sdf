@@ -3,9 +3,12 @@
   <visual name="realsense_link_visual">
     <pose>0 0 0 -1.57 0 -1.57</pose>
     <geometry>
-      <mesh>
+      <box>
+        <size>0.02505 0.090 0.025</size>
+      </box>
+      <!--<mesh>
         <uri>model://ardak/meshes/d435.dae</uri>
-      </mesh>
+      </mesh>-->
     </geometry>
   </visual>
   <collision name="realsense_link_collision">

@@ -47,7 +47,7 @@
         <link name="${prefix}">
             <visual>
                 <geometry>
-                    <box size="0.0 0.0 0.1"/>
+                    <box size="0.001 0.001 0.001"/>
                 </geometry>
                 <material name="Cyan">
                     <color rgba="0 1.0 1.0 1.0"/>
@@ -56,12 +56,12 @@
             <collision>
                 <origin xyz="0 0 0" rpy="0 0 0"/>
                 <geometry>
-                    <box size="0.0 0.0 0.0"/>
+                    <box size="0.001 0.001 0.001"/>
                 </geometry>
             </collision>
             <inertial>
-                <mass value="0.1" />
-                <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.001" />
+                <mass value="0.12266" />
+                <inertia ixx="0.0177645" ixy="0.0" ixz="0.0" iyy="0.011722917" iyz="0.0" izz="0.022277168" />
             </inertial>
         </link>
     </xacro:macro>
@@ -264,7 +264,7 @@
     </xacro:unless>-->
 
     <!-- Include Gazebo plugins and simulation definitions -->
-    <xacro:if value="$(arg use_simulation)">
+    <!--<xacro:if value="$(arg use_simulation)">
         <xacro:include filename="$(find ardak)/description/ardak/ardak.gazebo" />
-    </xacro:if>
+    </xacro:if>-->
 </robot>

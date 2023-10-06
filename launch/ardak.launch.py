@@ -19,7 +19,6 @@ from launch_ros.actions import ComposableNodeContainer
 from launch_ros.descriptions import ComposableNode
 from ament_index_python.packages import get_package_share_directory
 
-
 def generate_launch_description():
     # -- DIRECTORIES/ARGUMENTS/CONFIGS --
     pkg_share = FindPackageShare(package='ardak').find('ardak')
@@ -66,7 +65,6 @@ def generate_launch_description():
         'Cameras.yaml'
     )
 
-
     # Set the path to different files and folders.
     pkg_gazebo_ros = FindPackageShare(package='gazebo_ros').find('gazebo_ros')
     gazebo_models_path = os.path.join(pkg_share, 'description')
@@ -74,6 +72,7 @@ def generate_launch_description():
 
     # Launch configuration variables specific to simulation
     headless = LaunchConfiguration('headless')
+    gzweb = LaunchConfiguration('use_gzweb')
     namespace = LaunchConfiguration('namespace')
     sdf_model = LaunchConfiguration('sdf_model')
     use_namespace = LaunchConfiguration('use_namespace')
@@ -111,6 +110,8 @@ def generate_launch_description():
                               description='Absolute path to the sdf model.'),
         DeclareLaunchArgument(name='headless', default_value='False',
                               description='Whether to execute gzclient'),
+        DeclareLaunchArgument(name='use_gzweb', default_value='False',
+                              description='Spawn a gzweb server for remote viewing of simulation'),
         DeclareLaunchArgument(name='use_simulator', default_value='True',
                               description='Whether to start the simulator'),
         DeclareLaunchArgument(name='world', default_value=default_world_path,
@@ -491,6 +492,12 @@ def generate_launch_description():
         ]
     )
 
+    gzweb_server = ExecuteProcess(
+        cmd=['npm', 'run', '--prefix', '/root/dd_ws/gzweb/', 'start', '-p', '10622'],
+        output='screen',
+        condition=IfCondition(gzweb)
+    )
+
     return LaunchDescription(launch_args + [
         SetParameter(name='use_sim_time', value=use_simulator),
 
@@ -525,6 +532,7 @@ def generate_launch_description():
         # VISUALIZATION NODES
         rviz_node,
         foxglove_server,
+        gzweb_server,
         #rosbridge_server,
 
         # AI Algorithms
