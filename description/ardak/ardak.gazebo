@@ -1,185 +1,28 @@
 <?xml version="1.0"?>
 <robot>
     <gazebo>
-        <plugin name="diff_drive" filename="libgazebo_ros_diff_drive.so">
-            <update_rate>30</update_rate>
-
-            <num_wheel_pairs>2</num_wheel_pairs>
+        <plugin
+            filename="ignition-gazebo-diff-drive-system"
+            name="ignition::gazebo::systems::DiffDrive">
             <left_joint>drive_wheel_front_left_joint</left_joint>
-            <right_joint>drive_wheel_front_right_joint</right_joint>
             <left_joint>drive_wheel_rear_left_joint</left_joint>
+            <right_joint>drive_wheel_front_right_joint</right_joint>
             <right_joint>drive_wheel_rear_right_joint</right_joint>
-
-            <wheel_separation>${(base_width+wheel_ygap + wheel_width/2)}</wheel_separation>
-            <wheel_separation>${(base_width+wheel_ygap + wheel_width/2)}</wheel_separation>
-            <wheel_diameter>${wheel_radius*2}</wheel_diameter>
-            <wheel_diameter>${wheel_radius*2}</wheel_diameter>
-
-            <publishWheelJointState>1</publishWheelJointState>
-
-            <!-- limits -->
-            <max_wheel_torque>40</max_wheel_torque>
-            <max_wheel_acceleration>1.0</max_wheel_acceleration>
-
-            <publish_odom>true</publish_odom>
-            <publish_odom_tf>false</publish_odom_tf>
-            <publish_wheel_tf>true</publish_wheel_tf>
-
-            <!-- Due to large slip on the model->ground, using encoder is extremely unreliable. Either remove slip enough on the model or keep to world-->
-            <!-- Odometry source, 0 for ENCODER, 1 for WORLD, defaults to WORLD -->
-            <odometry_source>1</odometry_source>
-            <odometry_topic>odom</odometry_topic>
-            <odometry_frame>odom</odometry_frame>
-            <robot_base_frame>center_link</robot_base_frame>
-
-            <torque>40</torque>
-            <ros>
-                <namespace>/</namespace>
-                <remapping>cmd_vel:=wheel_cmd</remapping>
-                <remapping>odom:=wheel/odometry</remapping>
-            </ros>
-
-            <covariance_x>0.001</covariance_x>            <!-- 0.0001 -->
-            <covariance_y>0.001</covariance_y>            <!-- 0.0001 -->
-            <covariance_yaw>0.01</covariance_yaw>            <!-- 0.01 -->
-            <use_sim_time>1</use_sim_time>
-        </plugin>
+            <wheel_separation>1.25</wheel_separation>
+            <wheel_radius>0.3</wheel_radius>
+            <topic>/cmd_vel</topic>
+            <max_linear_acceleration>1</max_linear_acceleration>
+            <min_linear_acceleration>-1</min_linear_acceleration>
+            <max_angular_acceleration>2</max_angular_acceleration>
+            <min_angular_acceleration>-2</min_angular_acceleration>
+            <max_linear_velocity>0.5</max_linear_velocity>
+            <min_linear_velocity>-0.5</min_linear_velocity>
+            <max_angular_velocity>1</max_angular_velocity>
+            <min_angular_velocity>-1</min_angular_velocity>
+      </plugin>
     </gazebo>
 
     <gazebo reference="base_link">
         <material>Gazebo/White</material>
-    </gazebo>
-
-    <gazebo>
-        <plugin name="camera" filename="librealsense_gazebo_plugin.so">
-            <prefix>camera</prefix>
-            <depthUpdateRate>30.0</depthUpdateRate>
-            <colorUpdateRate>30.0</colorUpdateRate>
-            <infraredUpdateRate>1.0</infraredUpdateRate>
-            <depthTopicName>aligned_depth_to_color/image_raw</depthTopicName>
-            <depthCameraInfoTopicName>depth/camera_info</depthCameraInfoTopicName>
-            <colorTopicName>color/image_raw</colorTopicName>
-            <colorCameraInfoTopicName>color/camera_info</colorCameraInfoTopicName>
-            <infrared1TopicName>infra1/image_raw</infrared1TopicName>
-            <infrared1CameraInfoTopicName>infra1/camera_info</infrared1CameraInfoTopicName>
-            <infrared2TopicName>infra2/image_raw</infrared2TopicName>
-            <infrared2CameraInfoTopicName>infra2/camera_info</infrared2CameraInfoTopicName>
-            <colorOpticalframeName>camera_color_optical_frame</colorOpticalframeName>
-            <depthOpticalframeName>camera_depth_optical_frame</depthOpticalframeName>
-            <infrared1OpticalframeName>camera_left_ir_optical_frame</infrared1OpticalframeName>
-            <infrared2OpticalframeName>camera_right_ir_optical_frame</infrared2OpticalframeName>
-            <rangeMinDepth>0.3</rangeMinDepth>
-            <rangeMaxDepth>3.0</rangeMaxDepth>
-            <pointCloud>true</pointCloud>
-            <pointCloudTopicName>depth/color/points</pointCloudTopicName>
-            <pointCloudCutoff>0.3</pointCloudCutoff>
-        </plugin>
-    </gazebo>
-
-    <gazebo reference="imu_sensor_link">
-        <gravity>true</gravity>
-        <sensor name="imu_sensor" type="imu">
-            <always_on>true</always_on>
-            <update_rate>100</update_rate>
-            <visualize>true</visualize>
-            <imu>
-                <orientation>
-                    <x>
-                        <noise type="gaussian">
-                            <mean>0.0</mean>
-                            <stddev>2e-3</stddev>
-                        </noise>
-                    </x>
-                    <y>
-                        <noise type="gaussian">
-                            <mean>0.0</mean>
-                            <stddev>2e-3</stddev>
-                        </noise>
-                    </y>
-                    <z>
-                        <noise type="gaussian">
-                            <mean>0.0</mean>
-                            <stddev>2e-3</stddev>
-                        </noise>
-                    </z>
-                </orientation>
-                <angular_velocity>
-                    <x>
-                        <noise type="gaussian">
-                            <mean>0.0</mean>
-                            <stddev>2e-4</stddev>
-                        </noise>
-                    </x>
-                    <y>
-                        <noise type="gaussian">
-                            <mean>0.0</mean>
-                            <stddev>2e-4</stddev>
-                        </noise>
-                    </y>
-                    <z>
-                        <noise type="gaussian">
-                            <mean>0.0</mean>
-                            <stddev>2e-4</stddev>
-                        </noise>
-                    </z>
-                </angular_velocity>
-                <linear_acceleration>
-                    <x>
-                        <noise type="gaussian">
-                            <mean>0.0</mean>
-                            <stddev>1.7e-2</stddev>
-                        </noise>
-                    </x>
-                    <y>
-                        <noise type="gaussian">
-                            <mean>0.0</mean>
-                            <stddev>1.7e-2</stddev>
-                        </noise>
-                    </y>
-                    <z>
-                        <noise type="gaussian">
-                            <mean>0.0</mean>
-                            <stddev>1.7e-2</stddev>
-                        </noise>
-                    </z>
-                </linear_acceleration>
-            </imu>
-            <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
-                <frameName>imu_sensor_link</frameName>
-                <initialOrientationAsReference>false</initialOrientationAsReference>
-                <ros>
-                    <namespace>/imu</namespace>
-                    <remapping>~/out:=data</remapping>
-                </ros>
-            </plugin>
-        </sensor>
-    </gazebo>
-
-    <gazebo reference="gps_sensor_link">
-        <sensor name="center_gps" type="gps">
-            <always_on>true</always_on>
-            <update_rate>10.0</update_rate>
-            <gps>
-                <position_sensing>
-                    <horizontal>
-                        <noise type="gaussian">
-                            <mean>0.0</mean>
-                            <stddev>1e-2</stddev>
-                        </noise>
-                    </horizontal>
-                    <vertical>
-                        <noise type="gaussian">
-                            <mean>0.0</mean>
-                            <stddev>1</stddev>
-                        </noise>
-                    </vertical>
-                </position_sensing>
-            </gps>
-            <plugin name="gps_plugin" filename="libgazebo_ros_gps_sensor.so">
-                <ros>
-                    <remapping>~/out:=gps/fix</remapping>
-                </ros>
-            </plugin>
-        </sensor>
     </gazebo>
 </robot>

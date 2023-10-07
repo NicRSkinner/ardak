@@ -65,11 +65,9 @@ def generate_launch_description():
     )
 
     # Set the path to different files and folders.
-    #pkg_gazebo_ros = FindPackageShare(package='gazebo_ros').find('gazebo_ros')
-
+    pkg_gazebo_ros = FindPackageShare(package='gazebo_ros').find('gazebo_ros')
     gazebo_models_path = os.path.join(pkg_share, 'description')
     os.environ["GAZEBO_MODEL_PATH"] = gazebo_models_path
-    os.environ["IGN_GAZEBO_MODEL_PATH"] = gazebo_models_path
 
     # Launch configuration variables specific to simulation
     headless = LaunchConfiguration('headless')
@@ -254,7 +252,7 @@ def generate_launch_description():
         launch_arguments={'world': world}.items()
     )
 
-    """simulation_client_launch = IncludeLaunchDescription(
+    simulation_client_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 pkg_gazebo_ros,
@@ -278,9 +276,7 @@ def generate_launch_description():
                    '-Y', spawnYaw
                    ],
         condition=IfCondition(use_simulator),
-        output='screen')"""
-    
-    # ign service -s /world/${worldName}/create --reqtype ignition.msgs.EntityFactory --reptype ignition.msgs.Boolean --timeout 1000 --req 'sdf_filename: "${pkgshare}/description/ardak/model.sdf", name: "ardak", pose: {position: {x: ${simSpawnX}, y: ${simSpawnY}, z: ${simSpawnZ}}}'
+        output='screen')
 
     # All of the Ardak nodes used for simulation only
     ardak_nodes = Node(

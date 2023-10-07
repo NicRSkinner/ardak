@@ -1,131 +1,50 @@
 <sdf version='1.9'>
   <model name='ardak'>
-<link name="realsense_link">
-  <pose relative_to='camera_link'>0 0 0 0 -0 0</pose>
-  <visual name="realsense_link_visual">
-    <pose>0 0 0 -1.57 0 -1.57</pose>
+<link name="depth_camera">
+  <pose>0.275 0.00 0.302244 0 0 0</pose>
+  <inertial>
+    <mass>0.1</mass>
+    <inertia>
+      <ixx>0.000166667</ixx>
+      <iyy>0.000166667</iyy>
+      <izz>0.000166667</izz>
+    </inertia>
+  </inertial>
+  <collision name="collision">
     <geometry>
       <box>
-        <size>0.02505 0.090 0.025</size>
-      </box>
-      <!--<mesh>
-        <uri>model://ardak/meshes/d435.dae</uri>
-      </mesh>-->
-    </geometry>
-  </visual>
-  <collision name="realsense_link_collision">
-    <pose>0 0 0 -1.57 0 -1.57</pose>
-    <geometry>
-      <box>
-        <size>0.02505 0.090 0.025</size>
+        <size>0.05 0.05 0.05</size>
       </box>
     </geometry>
   </collision>
-  <inertial>
-    <pose>0 0 0 0 0 0</pose>
-    <inertia>
-      <ixx>0.001</ixx>
-      <ixy>0.000</ixy>
-      <ixz>0.000</ixz>
-      <iyy>0.001</iyy>
-      <iyz>0.000</iyz>
-      <izz>0.001</izz>
-    </inertia>
-    <mass>0.564</mass>
-  </inertial>
-
-  <sensor name="cameradepth" type="depth">
-    <camera name="camera">
-      <horizontal_fov>1.57</horizontal_fov>
+  <visual name="visual">
+    <geometry>
+      <box>
+        <size>0.05 0.05 0.05</size>
+      </box>
+    </geometry>
+  </visual>
+  <sensor name="depth_camera1" type="depth_camera">
+    <update_rate>10</update_rate>
+    <topic>depth_camera</topic>
+    <camera>
+      <horizontal_fov>1.05</horizontal_fov>
       <image>
-        <width>1280</width>
-        <height>720</height>
+        <width>256</width>
+        <height>256</height>
+        <format>R_FLOAT32</format>
       </image>
       <clip>
         <near>0.1</near>
-        <far>100</far>
+        <far>10.0</far>
       </clip>
-      <noise>
-        <type>gaussian</type>
-        <mean>0.0</mean>
-        <stddev>0.100</stddev>
-      </noise>
     </camera>
-    <always_on>1</always_on>
-    <update_rate>30</update_rate>
-    <visualize>0</visualize>
-  </sensor>
-  <sensor name="cameracolor" type="camera">
-    <camera name="camera">
-      <horizontal_fov>1.57</horizontal_fov>
-      <image>
-        <width>1280</width>
-        <height>720</height>
-        <format>RGB_INT8</format>
-      </image>
-      <clip>
-        <near>0.1</near>
-        <far>100</far>
-      </clip>
-      <noise>
-        <type>gaussian</type>
-        <mean>0.0</mean>
-        <stddev>0.007</stddev>
-      </noise>
-    </camera>
-    <always_on>1</always_on>
-    <update_rate>30</update_rate>
-    <visualize>1</visualize>
-  </sensor>
-  <sensor name="cameraired1" type="camera">
-    <camera name="camera">
-      <horizontal_fov>1.57</horizontal_fov>
-      <image>
-        <width>1280</width>
-        <height>720</height>
-        <format>L_INT8</format>
-      </image>
-      <clip>
-        <near>0.1</near>
-        <far>100</far>
-      </clip>
-      <noise>
-        <type>gaussian</type>
-        <mean>0.0</mean>
-        <stddev>0.05</stddev>
-      </noise>
-    </camera>
-    <always_on>1</always_on>
-    <update_rate>1</update_rate>
-    <visualize>0</visualize>
-  </sensor>
-  <sensor name="cameraired2" type="camera">
-    <camera name="camera">
-      <horizontal_fov>1.57</horizontal_fov>
-      <image>
-        <width>1280</width>
-        <height>720</height>
-        <format>L_INT8</format>
-      </image>
-      <clip>
-        <near>0.1</near>
-        <far>100</far>
-      </clip>
-      <noise>
-        <type>gaussian</type>
-        <mean>0.0</mean>
-        <stddev>0.05</stddev>
-      </noise>
-    </camera>
-    <always_on>1</always_on>
-    <update_rate>1</update_rate>
-    <visualize>0</visualize>
   </sensor>
 </link>
 
 <joint name="realsense_joint" type="fixed">
   <parent>base_link</parent>
-  <child>realsense_link</child>
+  <child>depth_camera</child>
   <pose>0.4 0 0.4 0 0 0</pose>
 </joint>    <link name='base_link'>
       <inertial>
@@ -140,14 +59,6 @@
           <izz>0.022277168</izz>
         </inertia>
       </inertial>
-      <collision name='base_link_collision'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.001 0.001 0.001</size>
-          </box>
-        </geometry>
-      </collision>
       <visual name='base_link_visual'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
@@ -156,6 +67,10 @@
           </box>
         </geometry>
         <material>
+          <script>
+            <name>Gazebo/White</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
           <diffuse>0 1 1 1</diffuse>
           <ambient>0 1 1 1</ambient>
         </material>
@@ -258,14 +173,6 @@
           <izz>0.022277168</izz>
         </inertia>
       </inertial>
-      <collision name='camera_link_collision'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.001 0.001 0.001</size>
-          </box>
-        </geometry>
-      </collision>
       <visual name='camera_link_visual'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
@@ -317,14 +224,6 @@
           <izz>0.022277168</izz>
         </inertia>
       </inertial>
-      <collision name='camera_color_frame_collision'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.001 0.001 0.001</size>
-          </box>
-        </geometry>
-      </collision>
       <visual name='camera_color_frame_visual'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
@@ -376,14 +275,6 @@
           <izz>0.022277168</izz>
         </inertia>
       </inertial>
-      <collision name='camera_color_optical_frame_collision'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.001 0.001 0.001</size>
-          </box>
-        </geometry>
-      </collision>
       <visual name='camera_color_optical_frame_visual'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
@@ -435,14 +326,6 @@
           <izz>0.022277168</izz>
         </inertia>
       </inertial>
-      <collision name='camera_depth_frame_collision'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.001 0.001 0.001</size>
-          </box>
-        </geometry>
-      </collision>
       <visual name='camera_depth_frame_visual'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
@@ -494,14 +377,6 @@
           <izz>0.022277168</izz>
         </inertia>
       </inertial>
-      <collision name='camera_depth_optical_frame_collision'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.001 0.001 0.001</size>
-          </box>
-        </geometry>
-      </collision>
       <visual name='camera_depth_optical_frame_visual'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
@@ -553,14 +428,6 @@
           <izz>0.022277168</izz>
         </inertia>
       </inertial>
-      <collision name='camera_left_ir_frame_collision'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.001 0.001 0.001</size>
-          </box>
-        </geometry>
-      </collision>
       <visual name='camera_left_ir_frame_visual'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
@@ -612,14 +479,6 @@
           <izz>0.022277168</izz>
         </inertia>
       </inertial>
-      <collision name='camera_left_ir_optical_frame_collision'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.001 0.001 0.001</size>
-          </box>
-        </geometry>
-      </collision>
       <visual name='camera_left_ir_optical_frame_visual'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
@@ -671,14 +530,6 @@
           <izz>0.022277168</izz>
         </inertia>
       </inertial>
-      <collision name='camera_right_ir_frame_collision'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.001 0.001 0.001</size>
-          </box>
-        </geometry>
-      </collision>
       <visual name='camera_right_ir_frame_visual'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
@@ -730,14 +581,6 @@
           <izz>0.022277168</izz>
         </inertia>
       </inertial>
-      <collision name='camera_right_ir_optical_frame_collision'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.001 0.001 0.001</size>
-          </box>
-        </geometry>
-      </collision>
       <visual name='camera_right_ir_optical_frame_visual'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
@@ -789,14 +632,6 @@
           <izz>0.022277168</izz>
         </inertia>
       </inertial>
-      <collision name='gps_sensor_link_collision'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.001 0.001 0.001</size>
-          </box>
-        </geometry>
-      </collision>
       <visual name='gps_sensor_link_visual'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
@@ -848,14 +683,6 @@
           <izz>0.022277168</izz>
         </inertia>
       </inertial>
-      <collision name='imu_sensor_link_collision'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.001 0.001 0.001</size>
-          </box>
-        </geometry>
-      </collision>
       <visual name='imu_sensor_link_visual'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
@@ -1153,5 +980,22 @@
       <slip1>0.5</slip1>
       <slip2>0</slip2>
     </link>
+    <plugin name='ignition::gazebo::systems::DiffDrive' filename='ignition-gazebo-diff-drive-system'>
+      <left_joint>drive_wheel_front_left_joint</left_joint>
+      <left_joint>drive_wheel_rear_left_joint</left_joint>
+      <right_joint>drive_wheel_front_right_joint</right_joint>
+      <right_joint>drive_wheel_rear_right_joint</right_joint>
+      <wheel_separation>1.25</wheel_separation>
+      <wheel_radius>0.3</wheel_radius>
+      <topic>/cmd_vel</topic>
+      <max_linear_acceleration>1</max_linear_acceleration>
+      <min_linear_acceleration>-1</min_linear_acceleration>
+      <max_angular_acceleration>2</max_angular_acceleration>
+      <min_angular_acceleration>-2</min_angular_acceleration>
+      <max_linear_velocity>0.5</max_linear_velocity>
+      <min_linear_velocity>-0.5</min_linear_velocity>
+      <max_angular_velocity>1</max_angular_velocity>
+      <min_angular_velocity>-1</min_angular_velocity>
+    </plugin>
   </model>
 </sdf>
