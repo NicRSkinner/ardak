@@ -1,0 +1,44 @@
+#/camera_info
+#/clock
+#/depth_camera
+#/depth_camera/points
+#/gazebo/resource_paths
+#/gui/camera/pose
+#/model/ardak/odometry
+#/model/ardak/tf
+#/sensors/marker
+#/stats
+#/world/basic_world/clock
+#/world/basic_world/dynamic_pose/info
+#/world/basic_world/pose/info
+#/world/basic_world/scene/deletion
+#/world/basic_world/scene/info
+#/world/basic_world/state
+#/world/basic_world/stats
+
+- ros_topic_name: "/model/ardak/odometry"
+  gz_topic_name: "/wheel/odometry"
+  ros_type_name: "nav_msgs/msg/Odometry"
+  gz_type_name: "gz.msgs.Odometry"
+  subscriber_queue: 5
+  publisher_queue: 6
+  lazy: false
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/color/camera_info"
+  gz_topic_name: "/camera_info"
+  ros_type_name: "sensor_msgs/msg/CameraInfo"
+  gz_type_name: "gz.msgs.CameraInfo"
+  subscriber_queue: 5
+  publisher_queue: 6
+  lazy: false
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/depth_camera"
+  gz_topic_name: "/D400/depth/image_rect_raw"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  subscriber_queue: 5
+  publisher_queue: 6
+  lazy: false
+  direction: GZ_TO_ROS

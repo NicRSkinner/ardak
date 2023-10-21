@@ -132,7 +132,6 @@
         </joint>
     </xacro:macro>
 
-
     <xacro:macro name="wheel_gz" params="prefix">
         <xacro:if value="$(arg use_simulation)">
             <gazebo reference="${prefix}_link">
@@ -147,7 +146,6 @@
             </gazebo>
         </xacro:if>
     </xacro:macro>
-
 
     <xacro:wheel prefix="drive_wheel_rear_left" x_reflect="-1" y_reflect="1" />
     <xacro:wheel_gz prefix="drive_wheel_rear_left" />

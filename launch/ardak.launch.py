@@ -32,8 +32,10 @@ def generate_launch_description():
         'description/ardak/ardak.urdf')
     default_world_path = os.path.join(
         pkg_share,
-        'world/smalltown.world'
+        'world/Gazebo_Fortress/basic_world.sdf'
     )
+
+    default_world_name = 'basic_world'
     robot_name_in_model = 'ardak'
     nav2_dir = get_package_share_directory('nav2_bringup')
     foxglove_dir = get_package_share_directory('foxglove_bridge')
@@ -62,6 +64,11 @@ def generate_launch_description():
         get_package_share_directory('ardak'),
         'config',
         'Cameras.yaml'
+    )
+    parambridge_config = os.path.join(
+        get_package_share_directory('ardak'),
+        'config',
+        'Gazebo11ParameterBridge.yaml'
     )
 
     # Set the path to different files and folders.
@@ -92,6 +99,7 @@ def generate_launch_description():
     useFoxgloveRosBridge = LaunchConfiguration('UseFoxgloveRosBridge')
     useRosbridgeServer = LaunchConfiguration('UseRosbridgeServer')
     rosbridgeCertDir = LaunchConfiguration('RosbridgeCertDirectory')
+    worldName = 'basic_world'
 
     # -- DIRECTORIES/ARGUMENTS/CONFIGS --
 
@@ -243,7 +251,7 @@ def generate_launch_description():
         condition=launch.conditions.IfCondition(rviz)
     )
 
-    simulation_launch = IncludeLaunchDescription(
+    """simulation_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 pkg_gazebo_ros,
@@ -254,7 +262,7 @@ def generate_launch_description():
         launch_arguments={'world': world}.items()
     )
 
-    """simulation_client_launch = IncludeLaunchDescription(
+    simulation_client_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 pkg_gazebo_ros,
@@ -263,12 +271,20 @@ def generate_launch_description():
         condition=IfCondition(
             PythonExpression([use_simulator, ' and not ', headless])
         )
-    )
+    )"""
 
     # Launch the robot
-    entity_node = Node(
-        package='gazebo_ros',
-        executable='spawn_entity.py',
+    # Sim Server Creator
+    gazebo_server = ExecuteProcess(
+        cmd=['ign', 'gazebo', '-s', world],
+        output='screen',
+        condition=IfCondition(use_simulator)
+    )
+
+    # Sim Entity Spawner
+    entity_spawner = Node(
+        package='ros_gz_sim',
+        executable='create',
         arguments=[
                    '-entity', robot_name_in_model,
                    '-file', sdf_model,
@@ -278,9 +294,24 @@ def generate_launch_description():
                    '-Y', spawnYaw
                    ],
         condition=IfCondition(use_simulator),
-        output='screen')"""
+        output='screen'
+    )
+
+    gz_bridge = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        arguments=['--ros-args', '--log-level', 'info', '-p', 'config_file:=' + parambridge_config],
+        condition=IfCondition(use_simulator)
+    )
     
-    # ign service -s /world/${worldName}/create --reqtype ignition.msgs.EntityFactory --reptype ignition.msgs.Boolean --timeout 1000 --req 'sdf_filename: "${pkgshare}/description/ardak/model.sdf", name: "ardak", pose: {position: {x: ${simSpawnX}, y: ${simSpawnY}, z: ${simSpawnZ}}}'
+    # Sim Client Creator
+    gazebo_client = ExecuteProcess(
+        cmd=['ign', 'gazebo', '-g'],
+        output='screen',
+        condition=IfCondition(
+            PythonExpression([use_simulator, ' and not ', headless])
+        )
+    )
 
     # All of the Ardak nodes used for simulation only
     ardak_nodes = Node(
@@ -495,11 +526,7 @@ def generate_launch_description():
         ]
     )
 
-    gzweb_server = ExecuteProcess(
-        cmd=['npm', 'run', '--prefix', '/root/dd_ws/gzweb/', 'start', '-p', '10622'],
-        output='screen',
-        condition=IfCondition(gzweb)
-    )
+
 
     return LaunchDescription(launch_args + [
         SetParameter(name='use_sim_time', value=use_simulator),
@@ -528,14 +555,16 @@ def generate_launch_description():
         nav2_launch,
 
         # SIMULATION NODES
-        simulation_launch,
-        simulation_client_launch,
-        entity_node,
+        #simulation_launch,
+        #simulation_client_launch,
+        gazebo_server,
+        entity_spawner,
+        gz_bridge,
 
         # VISUALIZATION NODES
         rviz_node,
         foxglove_server,
-        gzweb_server,
+        gazebo_client,
         #rosbridge_server,
 
         # AI Algorithms
