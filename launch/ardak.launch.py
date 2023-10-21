@@ -139,7 +139,7 @@ def generate_launch_description():
                               description='Rotational Yaw to spawn the robot at during simulation.'),
         DeclareLaunchArgument(name="UseMappingDriver",
                               default_value='True', description="Use an autonomous mapping driver for robot movement"),
-        DeclareLaunchArgument(name="UseFoxgloveRosBridge",default_value='True', description="Open a Websocket for use with foxglove-studio"),
+        DeclareLaunchArgument(name="UseFoxgloveRosBridge",default_value='False', description="Open a Websocket for use with foxglove-studio"),
         DeclareLaunchArgument(name="UseRosbridgeServer", default_value="False", description="Open a Rosbridge server with wss for foxglove-studio"),
         DeclareLaunchArgument(name="RosbridgeCertDirectory", default_value="/usr/share/rosbridge/certifications/", description="Directory for ssl certifications using rosbridge"),
     ]
@@ -525,8 +525,6 @@ def generate_launch_description():
             }
         ]
     )
-
-
 
     return LaunchDescription(launch_args + [
         SetParameter(name='use_sim_time', value=use_simulator),
