@@ -66,7 +66,7 @@ def generate_launch_description():
     )
 
     # Set the path to different files and folders.
-    #pkg_gazebo_ros = FindPackageShare(package='gazebo_ros').find('gazebo_ros')
+    pkg_gazebo_ros = FindPackageShare(package='gazebo_ros').find('gazebo_ros')
 
     gazebo_models_path = os.path.join(pkg_share, 'description')
     os.environ["GAZEBO_MODEL_PATH"] = gazebo_models_path
@@ -109,8 +109,6 @@ def generate_launch_description():
 
     # -- LAUNCH ARGUMENTS
     launch_args = [
-        
-
         DeclareLaunchArgument(name='namespace', default_value='',
                               description='top-level namespace'),
         DeclareLaunchArgument(name='use_namespace', default_value='False',
@@ -181,8 +179,6 @@ def generate_launch_description():
 
     # -- REMAPPINGS/PARAMETERS
     camera_remappings = [
-        ('/T265/odom', '/camera/odometry'),
-        ('/T265/imu', '/camera/imu/data'),
         ('/D400/color/camera_info', '/color/camera_info'),
         ('/D400/color/image_raw', '/color/image_raw'),
     ]
@@ -287,7 +283,7 @@ def generate_launch_description():
         condition=IfCondition(rviz)
     )
 
-    """simulation_launch = IncludeLaunchDescription(
+    simulation_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 pkg_gazebo_ros,
@@ -307,7 +303,22 @@ def generate_launch_description():
         condition=IfCondition(
             PythonExpression([use_simulator, ' and not ', headless])
         )
-    )"""
+    )
+
+    entity_spawner = Node(
+        package='ros_gz_sim',
+        executable='create',
+        arguments=[
+                   '-entity', robot_name_in_model,
+                   '-file', sdf_model,
+                   '-x', spawnX,
+                   '-y', spawnY,
+                   '-z', spawnZ,
+                   '-Y', spawnYaw
+                   ],
+        condition=IfCondition(use_simulator),
+        output='screen'
+    )
 
     # All of the Ardak nodes used for simulation only
     ardak_nodes = Node(
@@ -461,25 +472,6 @@ def generate_launch_description():
         )
     )
 
-    """
-    t265_node = Node(
-        package='bfr_hal',
-        name='T265',
-        executable='t265_node',
-        parameters=[
-            {
-                'base_frame_id': 'base_link',
-                'odom_frame_id': 'odom',
-                'publish_tf': False,
-                'use_sim_time': use_simulator
-            }
-        ],
-        remappings=camera_remappings,
-        condition=IfCondition(
-            PythonExpression(['not ', use_simulator])
-        )
-    )"""
-
     # AI Algorithms
     beanbagdetector_node = Node(
         package="zyg_ai",
@@ -515,8 +507,7 @@ def generate_launch_description():
         # HARDWARE NODES
         gamepad_node,
         
-        # T265 is deprecated (forcefully) from Intel. Older packages either do not work, or not easy to install.
-        #t265_node,
+        # CAMREA NODES AND OUTPUT CONDITIONING
         d400_node,
         rtab_alignment_pointcloud,
         rtab_alignment_aligner,
@@ -531,10 +522,9 @@ def generate_launch_description():
         nav2_launch,
 
         # SIMULATION NODES
-        #simulation_launch,
-        #simulation_client_launch,
-        #gazebo_server,
-        #entity_spawner,
+        simulation_launch,
+        simulation_client_launch,
+        entity_spawner,
 
         # VISUALIZATION NODES
         rviz_node,
