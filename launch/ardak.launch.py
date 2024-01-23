@@ -38,7 +38,6 @@ def generate_launch_description():
     default_world_name = 'basic_world'
     robot_name_in_model = 'ardak'
     nav2_dir = get_package_share_directory('nav2_bringup')
-    foxglove_dir = get_package_share_directory('foxglove_bridge')
 
     drive_control_config_path = os.path.join(
         get_package_share_directory('ardak'),
@@ -78,39 +77,45 @@ def generate_launch_description():
     os.environ["GAZEBO_MODEL_PATH"] = gazebo_models_path
     os.environ["IGN_GAZEBO_MODEL_PATH"] = gazebo_models_path
 
-    # Launch configuration variables specific to simulation
-    headless = LaunchConfiguration('headless')
-    gzweb = LaunchConfiguration('use_gzweb')
+    # NEW LAUNCH FILE ARGUMENTS
+    
+        # Gazebo
     namespace = LaunchConfiguration('namespace')
-    sdf_model = LaunchConfiguration('sdf_model')
-    use_namespace = LaunchConfiguration('use_namespace')
-    use_simulator = LaunchConfiguration('use_simulator')
-    world = LaunchConfiguration('world')
-    use_manual_drive = LaunchConfiguration('use_manual_drive')
     urdf_model = LaunchConfiguration('urdf_model')
-    rviz = LaunchConfiguration('rviz')
-    rvizconfig = LaunchConfiguration('rvizconfig')
-    localization = LaunchConfiguration('localization')
+    sdf_model = LaunchConfiguration('sdf_model')
+    world = LaunchConfiguration('world')
     spawnX = LaunchConfiguration('SimSpawnX')
     spawnY = LaunchConfiguration('SimSpawnY')
     spawnZ = LaunchConfiguration('SimSpawnZ')
     spawnYaw = LaunchConfiguration('SimSpawnYaw')
-    useMappingDriver = LaunchConfiguration('UseMappingDriver')
-    useFoxgloveRosBridge = LaunchConfiguration('UseFoxgloveRosBridge')
-    useRosbridgeServer = LaunchConfiguration('UseRosbridgeServer')
-    rosbridgeCertDir = LaunchConfiguration('RosbridgeCertDirectory')
+
     worldName = 'basic_world'
 
+    use_simulator = LaunchConfiguration('use_simulator')
+    headless = LaunchConfiguration('headless')
+
+        # Ardak/Robot Nodes
+    use_manual_drive = LaunchConfiguration('use_manual_drive')
+    useMappingDriver = LaunchConfiguration('UseMappingDriver')
+    localization = LaunchConfiguration('localization')
+    use_ardak_nodes = LaunchConfiguration('use_ardak_nodes')
+    use_geofencer = LaunchConfiguration('use_geofencer')
+    use_camera_nodes = LaunchConfiguration('use_camera_nodes')
+    use_rtabmap = LaunchConfiguration('use_rtabmap')
+    use_ekf = LaunchConfiguration('use_ekf')
+    use_mapping_node = LaunchConfiguration('use_mapping_node')
+    use_nav2 = LaunchConfiguration('use_nav2')
+
+        # Data Analytics & Visualization
+    rviz = LaunchConfiguration('rviz')
+    rvizconfig = LaunchConfiguration('rvizconfig')
+    
     # -- DIRECTORIES/ARGUMENTS/CONFIGS --
 
     # -- LAUNCH ARGUMENTS
     launch_args = [
-        DeclareLaunchArgument(name="localization", default_value="True",
-                              description='Whether to start localization nodes.'),
-        DeclareLaunchArgument(name='rviz', default_value='False',
-                              description='flag to use rviz instead of gazebo'),
-        DeclareLaunchArgument(name='rvizconfig', default_value=default_rviz_config_path,
-                              description='Absolute path to the rviz config file.'),
+        
+
         DeclareLaunchArgument(name='namespace', default_value='',
                               description='top-level namespace'),
         DeclareLaunchArgument(name='use_namespace', default_value='False',
@@ -133,15 +138,49 @@ def generate_launch_description():
                               description='X position to spawn the robot at during simulation.'),
         DeclareLaunchArgument(name='SimSpawnY', default_value='0.0',
                               description='Y position to spawn the robot at during simulation.'),
-        DeclareLaunchArgument(name='SimSpawnZ', default_value='0.2',
+        DeclareLaunchArgument(name='SimSpawnZ', default_value='0.0',
                               description='Z position to spawn the robot at during simulation.'),
         DeclareLaunchArgument(name='SimSpawnYaw', default_value='0.0',
                               description='Rotational Yaw to spawn the robot at during simulation.'),
+        
+        DeclareLaunchArgument(name="use_ardak_nodes", default_value="True",
+                              description='Launch Node: Ardak Nodes'),
+        DeclareLaunchArgument(name="use_geofencer", default_value="True",
+                              description='Launch Node: Geofencer'),
+        DeclareLaunchArgument(name="use_camera_nodes", default_value="True",
+                              description='Launch Node: Camera Nodes (D435)'),
+        DeclareLaunchArgument(name="use_rtabmap", default_value="True",
+                              description='Launch Node: Ardak Nodes'),
+        DeclareLaunchArgument(name="use_ekf", default_value="True",
+                              description='Launch Node: EKF Nodes'),
+        DeclareLaunchArgument(name="use_mapping_node", default_value="True",
+                              description='Launch Node: Mapping Node'),
+        DeclareLaunchArgument(name="use_nav2", default_value="True",
+                              description='Launch Node: Nav2'),
+
+                              
+        DeclareLaunchArgument(name="localization", default_value="True",
+                              description='Whether to start localization nodes.'),
+        DeclareLaunchArgument(name="launch_primary_ardak_nodes", default_value="True",
+                              description="Launches the primary ardak nodes for driving and autonomous modes."),
+
+        DeclareLaunchArgument(name="use_state_publishers", default_value="True",
+                              description="Automatically publish robot and joint states."),
+        DeclareLaunchArgument(name="launch_beanbag_detector", default_value="False",
+                              description="Launches the beanbag detector to provide TF to detected beanbags."),
+        DeclareLaunchArgument(name="autonomous_driver_algorithm", default_value="mapping",
+                              description="Choice: mapping; Launches an autonomous driver algorithm.",
+                              choices=["mapping"]),
+
+
+        DeclareLaunchArgument(name='rviz', default_value='False',
+                              description='flag to use rviz instead of gazebo'),
+        DeclareLaunchArgument(name='rvizconfig', default_value=default_rviz_config_path,
+                              description='Absolute path to the rviz config file.'),
+
+
         DeclareLaunchArgument(name="UseMappingDriver",
-                              default_value='True', description="Use an autonomous mapping driver for robot movement"),
-        DeclareLaunchArgument(name="UseFoxgloveRosBridge",default_value='False', description="Open a Websocket for use with foxglove-studio"),
-        DeclareLaunchArgument(name="UseRosbridgeServer", default_value="False", description="Open a Rosbridge server with wss for foxglove-studio"),
-        DeclareLaunchArgument(name="RosbridgeCertDirectory", default_value="/usr/share/rosbridge/certifications/", description="Directory for ssl certifications using rosbridge"),
+                        default_value='True', description="Use an autonomous mapping driver for robot movement"),
     ]
     # -- LAUNCH ARGUMENTS
 
@@ -236,7 +275,9 @@ def generate_launch_description():
         parameters=mapping_parameters,
         remappings=mapping_remappings,
         arguments=['-d'],
-        condition=IfCondition(localization)
+        condition=IfCondition(
+            PythonExpression([localization, 'and', use_mapping_node])
+        )
     )
 
     rviz_node = Node(
@@ -248,7 +289,7 @@ def generate_launch_description():
         parameters=[
                     {'use_sim_time': use_simulator}
                     ],
-        condition=launch.conditions.IfCondition(rviz)
+        condition=IfCondition(rviz)
     )
 
     """simulation_launch = IncludeLaunchDescription(
@@ -322,7 +363,10 @@ def generate_launch_description():
                     ("appout/drive/left_drive_command", "odrive0/motor0/input_vel"),
                     ("appout/drive/right_drive_command", "odrive0/motor1/input_vel"),
                     ("appout/drive/wheel_cmd", "wheel_cmd")
-        ]
+        ],
+        condition=IfCondition(
+            PythonExpression([use_ardak_nodes])
+        )
     )
 
     gamepad_node = Node(
@@ -351,7 +395,9 @@ def generate_launch_description():
                     ('odometry/filtered', 'odometry/local'),
                     ('/set_pose', '/initialpose')
                     ],
-        condition=IfCondition(localization)
+        condition=IfCondition(
+            PythonExpression([localization, 'and ', use_ekf])
+        )
     )
 
 
@@ -367,7 +413,9 @@ def generate_launch_description():
                     ('odometry/filtered', 'odometry/global'),
                      ('/set_pose', '/initialpose')
                      ],
-        condition=IfCondition(localization)
+        condition=IfCondition(
+            PythonExpression([localization, 'and ', use_ekf])
+        )
     )
 
     navsat_transform_node = Node(
@@ -386,7 +434,9 @@ def generate_launch_description():
                     ('odometry/gps', 'odometry/gps'),
                     ('odometry/filtered', 'odometry/global')
                     ],
-        condition=IfCondition(localization)
+        condition=IfCondition(
+            PythonExpression([localization, 'and ', use_ekf])
+        )
     )
 
     geofencer_node = Node(
@@ -397,6 +447,9 @@ def generate_launch_description():
                 'use_sim_time': use_simulator
             }
         ],
+        condition=IfCondition(
+            PythonExpression([use_geofencer])
+        )
     )
 
     nav2_launch = IncludeLaunchDescription(
@@ -407,7 +460,7 @@ def generate_launch_description():
             'params_file': nav_control_config_path
         }.items(),
         condition=IfCondition(
-            PythonExpression(['not ', use_manual_drive])
+            PythonExpression([use_nav2, 'and', 'not ', use_manual_drive])
         )
     )
 
@@ -428,20 +481,20 @@ def generate_launch_description():
         emulate_tty=True,
         remappings=camera_remappings,
         condition=IfCondition(
-            PythonExpression(['not ', use_simulator])
+            PythonExpression([use_camera_nodes, 'and', 'not ', use_simulator])
         )
     )
 
     rtab_alignment_pointcloud = Node(
-            package='rtabmap_util',
-            executable='point_cloud_xyz',
-            parameters=pointcloud_parameters,
-            remappings=pointcloud_remappings,
-            output='screen',
-            condition=IfCondition(
-                PythonExpression(['not ', use_simulator])
-            )
+        package='rtabmap_util',
+        executable='point_cloud_xyz',
+        parameters=pointcloud_parameters,
+        remappings=pointcloud_remappings,
+        output='screen',
+        condition=IfCondition(
+            PythonExpression([use_rtabmap, 'and', 'not ', use_simulator])
         )
+    )
 
     rtab_alignment_aligner = Node(
         package='rtabmap_util',
@@ -449,10 +502,11 @@ def generate_launch_description():
         parameters=alignment_parameters,
         remappings=alignment_remappings,
         condition=IfCondition(
-            PythonExpression(['not ', use_simulator])
+                PythonExpression([use_rtabmap, 'and', 'not ', use_simulator])
         )
     )
 
+    """
     t265_node = Node(
         package='bfr_hal',
         name='T265',
@@ -469,7 +523,7 @@ def generate_launch_description():
         condition=IfCondition(
             PythonExpression(['not ', use_simulator])
         )
-    )
+    )"""
 
     # AI Algorithms
     beanbagdetector_node = Node(
@@ -493,39 +547,6 @@ def generate_launch_description():
         condition=IfCondition(useMappingDriver)
     )
 
-    foxglove_server = Node(
-        package="foxglove_bridge",
-        executable="foxglove_bridge",
-        parameters=[
-            {
-                'port': 10621,
-                'address': '0.0.0.0',
-                'tls': True,
-                'certfile': PathJoinSubstitution([rosbridgeCertDir, 'server_cert.pem']),
-                'keyfile': PathJoinSubstitution([rosbridgeCertDir, 'server_key.pem']),
-                'num_threads': 8,
-                'send_buffer_limit': 100000000, #100MB, lower and use whitelist if buffer cannot clear.
-                'use_sim_time': use_simulator
-            }
-        ],
-        condition=IfCondition(useFoxgloveRosBridge)
-    )
-
-    rosbridge_server = Node(
-        package="rosbridge_server",
-        executable="rosbridge_websocket",
-        parameters=[
-            {
-                'port': 10621,
-                'address': '',
-                'ssl': True,
-                'certfile': PathJoinSubstitution([rosbridgeCertDir, 'server_cert.pem']),
-                'keyfile': PathJoinSubstitution([rosbridgeCertDir, 'server_key.pem']),
-                'authenticate': False
-            }
-        ]
-    )
-
     return LaunchDescription(launch_args + [
         SetParameter(name='use_sim_time', value=use_simulator),
 
@@ -538,7 +559,9 @@ def generate_launch_description():
 
         # HARDWARE NODES
         gamepad_node,
-        t265_node,
+        
+        # T265 is deprecated (forcefully) from Intel. Older packages either do not work, or not easy to install.
+        #t265_node,
         d400_node,
         rtab_alignment_pointcloud,
         rtab_alignment_aligner,
@@ -555,15 +578,11 @@ def generate_launch_description():
         # SIMULATION NODES
         #simulation_launch,
         #simulation_client_launch,
-        gazebo_server,
-        entity_spawner,
-        gz_bridge,
+        #gazebo_server,
+        #entity_spawner,
 
         # VISUALIZATION NODES
         rviz_node,
-        foxglove_server,
-        gazebo_client,
-        #rosbridge_server,
 
         # AI Algorithms
         #beanbagdetector_node,

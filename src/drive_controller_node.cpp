@@ -175,7 +175,7 @@ namespace bfr
 
                     this->gamepadSubscription = this->create_subscription<bfr_msgs::msg::Gamepad>(
                         "hal/inputs/gamepad",
-                        this->base_qos,
+                        10,
                         std::bind(&DriveControllerNode::gamepad_callback, this, _1),
                         sub_options
                     );
@@ -232,6 +232,8 @@ namespace bfr
                 std::string("DriveController: Manual control enabled.").c_str()
             );
         }
+
+        this->running = true;
 
         if (this->inputAlive && this->running)
         {
