@@ -64,11 +64,6 @@ def generate_launch_description():
         'config',
         'Cameras.yaml'
     )
-    parambridge_config = os.path.join(
-        get_package_share_directory('ardak'),
-        'config',
-        'Gazebo11ParameterBridge.yaml'
-    )
 
     # Set the path to different files and folders.
     #pkg_gazebo_ros = FindPackageShare(package='gazebo_ros').find('gazebo_ros')
@@ -313,46 +308,6 @@ def generate_launch_description():
             PythonExpression([use_simulator, ' and not ', headless])
         )
     )"""
-
-    # Launch the robot
-    # Sim Server Creator
-    gazebo_server = ExecuteProcess(
-        cmd=['ign', 'gazebo', '-s', world],
-        output='screen',
-        condition=IfCondition(use_simulator)
-    )
-
-    # Sim Entity Spawner
-    entity_spawner = Node(
-        package='ros_gz_sim',
-        executable='create',
-        arguments=[
-                   '-entity', robot_name_in_model,
-                   '-file', sdf_model,
-                   '-x', spawnX,
-                   '-y', spawnY,
-                   '-z', spawnZ,
-                   '-Y', spawnYaw
-                   ],
-        condition=IfCondition(use_simulator),
-        output='screen'
-    )
-
-    gz_bridge = Node(
-        package="ros_gz_bridge",
-        executable="parameter_bridge",
-        arguments=['--ros-args', '--log-level', 'info', '-p', 'config_file:=' + parambridge_config],
-        condition=IfCondition(use_simulator)
-    )
-    
-    # Sim Client Creator
-    gazebo_client = ExecuteProcess(
-        cmd=['ign', 'gazebo', '-g'],
-        output='screen',
-        condition=IfCondition(
-            PythonExpression([use_simulator, ' and not ', headless])
-        )
-    )
 
     # All of the Ardak nodes used for simulation only
     ardak_nodes = Node(
