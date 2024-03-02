@@ -64,9 +64,14 @@ def generate_launch_description():
         'config',
         'Cameras.yaml'
     )
+    parambridge_config = os.path.join(
+        get_package_share_directory('ardak'),
+        'config',
+        'Gazebo11ParameterBridge.yaml'
+    )
 
     # Set the path to different files and folders.
-    pkg_gazebo_ros = FindPackageShare(package='gazebo_ros').find('gazebo_ros')
+    #pkg_gazebo_ros = FindPackageShare(package='gazebo_ros').find('gazebo_ros')
 
     gazebo_models_path = os.path.join(pkg_share, 'description')
     os.environ["GAZEBO_MODEL_PATH"] = gazebo_models_path
@@ -109,6 +114,8 @@ def generate_launch_description():
 
     # -- LAUNCH ARGUMENTS
     launch_args = [
+        
+
         DeclareLaunchArgument(name='namespace', default_value='',
                               description='top-level namespace'),
         DeclareLaunchArgument(name='use_namespace', default_value='False',
@@ -179,6 +186,8 @@ def generate_launch_description():
 
     # -- REMAPPINGS/PARAMETERS
     camera_remappings = [
+        ('/T265/odom', '/camera/odometry'),
+        ('/T265/imu', '/camera/imu/data'),
         ('/D400/color/camera_info', '/color/camera_info'),
         ('/D400/color/image_raw', '/color/image_raw'),
     ]
@@ -283,7 +292,7 @@ def generate_launch_description():
         condition=IfCondition(rviz)
     )
 
-    simulation_launch = IncludeLaunchDescription(
+    """simulation_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 pkg_gazebo_ros,
@@ -303,8 +312,17 @@ def generate_launch_description():
         condition=IfCondition(
             PythonExpression([use_simulator, ' and not ', headless])
         )
+    )"""
+
+    # Launch the robot
+    # Sim Server Creator
+    gazebo_server = ExecuteProcess(
+        cmd=['gz', 'sim', '-s', world],
+        output='screen',
+        condition=IfCondition(use_simulator)
     )
 
+    # Sim Entity Spawner
     entity_spawner = Node(
         package='ros_gz_sim',
         executable='create',
@@ -318,6 +336,22 @@ def generate_launch_description():
                    ],
         condition=IfCondition(use_simulator),
         output='screen'
+    )
+
+    gz_bridge = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        arguments=['--ros-args', '--log-level', 'info', '-p', 'config_file:=' + parambridge_config],
+        condition=IfCondition(use_simulator)
+    )
+    
+    # Sim Client Creator
+    gazebo_client = ExecuteProcess(
+        cmd=['gz', 'sim', '-g'],
+        output='screen',
+        condition=IfCondition(
+            PythonExpression([use_simulator, ' and not ', headless])
+        )
     )
 
     # All of the Ardak nodes used for simulation only
@@ -472,6 +506,25 @@ def generate_launch_description():
         )
     )
 
+    """
+    t265_node = Node(
+        package='bfr_hal',
+        name='T265',
+        executable='t265_node',
+        parameters=[
+            {
+                'base_frame_id': 'base_link',
+                'odom_frame_id': 'odom',
+                'publish_tf': False,
+                'use_sim_time': use_simulator
+            }
+        ],
+        remappings=camera_remappings,
+        condition=IfCondition(
+            PythonExpression(['not ', use_simulator])
+        )
+    )"""
+
     # AI Algorithms
     beanbagdetector_node = Node(
         package="zyg_ai",
@@ -498,38 +551,40 @@ def generate_launch_description():
         SetParameter(name='use_sim_time', value=use_simulator),
 
         # ROBOT NODES
-        ardak_nodes,
-        geofencer_node,
+        #ardak_nodes,
+        #geofencer_node,
         robot_state_publisher_node,
         joint_state_publisher_node,
-        odrive_node,
+        #odrive_node,
 
         # HARDWARE NODES
-        gamepad_node,
+        #gamepad_node,
         
-        # CAMREA NODES AND OUTPUT CONDITIONING
-        d400_node,
-        rtab_alignment_pointcloud,
-        rtab_alignment_aligner,
+        # T265 is deprecated (forcefully) from Intel. Older packages either do not work, or not easy to install.
+        #t265_node,
+        #d400_node,
+        #rtab_alignment_pointcloud,
+        #rtab_alignment_aligner,
 
         # LOCALIZATION NODES
-        ekf_node_odom,
-        ekf_node_map,
-        navsat_transform_node,
-        mapping_node,
+        #ekf_node_odom,
+        #ekf_node_map,
+        #navsat_transform_node,
+        #mapping_node,
 
         # NAVIGATION NODES
-        nav2_launch,
+        #nav2_launch,
 
         # SIMULATION NODES
-        simulation_launch,
-        simulation_client_launch,
+        gazebo_server,
         entity_spawner,
+        #gz_bridge,
 
         # VISUALIZATION NODES
-        rviz_node,
+        #rviz_node,
+        gazebo_client,
 
         # AI Algorithms
         #beanbagdetector_node,
-        mappingdriver_node
+        #mappingdriver_node
     ])
