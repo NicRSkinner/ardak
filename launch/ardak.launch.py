@@ -67,7 +67,7 @@ def generate_launch_description():
     parambridge_config = os.path.join(
         get_package_share_directory('ardak'),
         'config',
-        'Gazebo11ParameterBridge.yaml'
+        'SimParamBridge.yaml'
     )
 
     # Set the path to different files and folders.
@@ -332,7 +332,8 @@ def generate_launch_description():
                    '-x', spawnX,
                    '-y', spawnY,
                    '-z', spawnZ,
-                   '-Y', spawnYaw
+                   '-Y', spawnYaw,
+                   '-world', 'basic_world'
                    ],
         condition=IfCondition(use_simulator),
         output='screen'
@@ -578,7 +579,7 @@ def generate_launch_description():
         # SIMULATION NODES
         gazebo_server,
         entity_spawner,
-        #gz_bridge,
+        gz_bridge,
 
         # VISUALIZATION NODES
         #rviz_node,
