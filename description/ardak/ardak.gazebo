@@ -2,8 +2,8 @@
 <robot>
     <gazebo>
         <plugin
-            filename="ignition-gazebo-diff-drive-system"
-            name="ignition::gazebo::systems::DiffDrive">
+            filename="gz-sim-diff-drive-system"
+            name="gz::sim::systems::DiffDrive">
             <left_joint>drive_wheel_front_left_joint</left_joint>
             <left_joint>drive_wheel_rear_left_joint</left_joint>
             <right_joint>drive_wheel_front_right_joint</right_joint>

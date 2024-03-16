@@ -1027,7 +1027,7 @@
       <slip1>0.5</slip1>
       <slip2>0</slip2>
     </link>
-    <plugin name='ignition::gazebo::systems::DiffDrive' filename='ignition-gazebo-diff-drive-system'>
+    <plugin name='gz::sim::systems::DiffDrive' filename='gz-sim-diff-drive-system'>
       <left_joint>drive_wheel_front_left_joint</left_joint>
       <left_joint>drive_wheel_rear_left_joint</left_joint>
       <right_joint>drive_wheel_front_right_joint</right_joint>
