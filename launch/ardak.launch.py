@@ -78,7 +78,7 @@ def generate_launch_description():
     os.environ["IGN_GAZEBO_MODEL_PATH"] = gazebo_models_path
 
     # NEW LAUNCH FILE ARGUMENTS
-    
+
         # Gazebo
     namespace = LaunchConfiguration('namespace')
     urdf_model = LaunchConfiguration('urdf_model')
@@ -109,12 +109,12 @@ def generate_launch_description():
         # Data Analytics & Visualization
     rviz = LaunchConfiguration('rviz')
     rvizconfig = LaunchConfiguration('rvizconfig')
-    
+
     # -- DIRECTORIES/ARGUMENTS/CONFIGS --
 
     # -- LAUNCH ARGUMENTS
     launch_args = [
-        
+
 
         DeclareLaunchArgument(name='namespace', default_value='',
                               description='top-level namespace'),
@@ -142,7 +142,7 @@ def generate_launch_description():
                               description='Z position to spawn the robot at during simulation.'),
         DeclareLaunchArgument(name='SimSpawnYaw', default_value='0.0',
                               description='Rotational Yaw to spawn the robot at during simulation.'),
-        
+
         DeclareLaunchArgument(name="use_ardak_nodes", default_value="True",
                               description='Launch Node: Ardak Nodes'),
         DeclareLaunchArgument(name="use_geofencer", default_value="True",
@@ -158,7 +158,7 @@ def generate_launch_description():
         DeclareLaunchArgument(name="use_nav2", default_value="True",
                               description='Launch Node: Nav2'),
 
-                              
+
         DeclareLaunchArgument(name="localization", default_value="True",
                               description='Whether to start localization nodes.'),
         DeclareLaunchArgument(name="launch_primary_ardak_nodes", default_value="True",
@@ -345,7 +345,7 @@ def generate_launch_description():
         arguments=['--ros-args', '--log-level', 'info', '-p', 'config_file:=' + parambridge_config],
         condition=IfCondition(use_simulator)
     )
-    
+
     # Sim Client Creator
     gazebo_client = ExecuteProcess(
         cmd=['gz', 'sim', '-g'],
@@ -552,15 +552,15 @@ def generate_launch_description():
         SetParameter(name='use_sim_time', value=use_simulator),
 
         # ROBOT NODES
-        #ardak_nodes,
+        ardak_nodes,
         #geofencer_node,
         robot_state_publisher_node,
         joint_state_publisher_node,
-        #odrive_node,
+        odrive_node,
 
         # HARDWARE NODES
-        #gamepad_node,
-        
+        gamepad_node,
+
         # T265 is deprecated (forcefully) from Intel. Older packages either do not work, or not easy to install.
         #t265_node,
         #d400_node,
