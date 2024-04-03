@@ -42,7 +42,7 @@
  */
 #include "gamepad_definitions.hpp"
 #include "scale.hpp"
-#include "unittypes.h"
+#include "unittypes.hpp"
 
 using namespace bfr_base::literals;
 
