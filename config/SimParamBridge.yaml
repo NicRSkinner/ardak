@@ -52,7 +52,7 @@
   lazy: false
   direction: GZ_TO_ROS
 
-- ros_topic_name: "/wheel/cmd"
+- ros_topic_name: "/wheel_cmd"
   gz_topic_name: "/cmd_vel"
   ros_type_name: "geometry_msgs/msg/Twist"
   gz_type_name: "gz.msgs.Twist"

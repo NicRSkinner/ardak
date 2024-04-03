@@ -145,17 +145,17 @@ def generate_launch_description():
 
         DeclareLaunchArgument(name="use_ardak_nodes", default_value="True",
                               description='Launch Node: Ardak Nodes'),
-        DeclareLaunchArgument(name="use_geofencer", default_value="True",
+        DeclareLaunchArgument(name="use_geofencer", default_value="False",
                               description='Launch Node: Geofencer'),
-        DeclareLaunchArgument(name="use_camera_nodes", default_value="True",
+        DeclareLaunchArgument(name="use_camera_nodes", default_value="False",
                               description='Launch Node: Camera Nodes (D435)'),
         DeclareLaunchArgument(name="use_rtabmap", default_value="True",
                               description='Launch Node: Ardak Nodes'),
         DeclareLaunchArgument(name="use_ekf", default_value="True",
                               description='Launch Node: EKF Nodes'),
-        DeclareLaunchArgument(name="use_mapping_node", default_value="True",
+        DeclareLaunchArgument(name="use_mapping_node", default_value="False",
                               description='Launch Node: Mapping Node'),
-        DeclareLaunchArgument(name="use_nav2", default_value="True",
+        DeclareLaunchArgument(name="use_nav2", default_value="False",
                               description='Launch Node: Nav2'),
 
 

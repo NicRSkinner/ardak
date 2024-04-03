@@ -235,7 +235,7 @@ namespace bfr
 
         this->running = true;
 
-        if (this->inputAlive && this->running)
+        if (this->running)
         {
             if (msg->action == GamepadAction::RIGHT_STICK_UP_DOWN)
             {
