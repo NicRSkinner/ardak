@@ -1,13 +1,13 @@
 /**
  * @file drive_controller_node.cpp
- * @author Nick Skinner (nskinner@zygenrobotics.com)
+ * @author Nick Skinner (nicholas.skinner95@gmail.com)
  * @brief Drive controller for Ardak project. Commands the steering and drive
  * system as specificied by incoming signals from either a manual control or the
  *          onboard intelligence system.
- * @version 0.1
- * @date 2023-03-09
+ * @version 0.2
+ * @date 2024-04-10
  *
- * @copyright Copyright (c) 2021-2023
+ * @copyright Copyright (c) 2021-2024
  *
  */
 
@@ -33,11 +33,11 @@ namespace bfr
 
         try
         {
-            this->base_qos.liveliness(RMW_QOS_POLICY_LIVELINESS_AUTOMATIC);
-            this->base_qos.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
+            //this->base_qos.liveliness(RMW_QOS_POLICY_LIVELINESS_AUTOMATIC);
+            //this->base_qos.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
             this->base_qos.liveliness_lease_duration(2s);
             this->base_qos.deadline(500ms);
-            this->base_qos.history(RMW_QOS_POLICY_HISTORY_KEEP_LAST);
+            //this->base_qos.history(RMW_QOS_POLICY_HISTORY_KEEP_LAST);
 
             this->callbackHandle = this->add_on_set_parameters_callback(
                 std::bind(&DriveControllerNode::parametersCallback, this, std::placeholders::_1)
@@ -175,10 +175,10 @@ namespace bfr
 
                     this->gamepadSubscription = this->create_subscription<bfr_msgs::msg::Gamepad>(
                         "hal/inputs/gamepad",
-                        10,
-                        std::bind(&DriveControllerNode::gamepad_callback, this, _1),
-                        sub_options
+                        rclcpp::SensorDataQoS(rclcpp::KeepLast(1)),
+                        std::bind(&DriveControllerNode::gamepad_callback, this, _1)
                     );
+                        //sub_options
                 }
 
                 result.successful = true;

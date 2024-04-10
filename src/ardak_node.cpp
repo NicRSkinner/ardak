@@ -1,6 +1,6 @@
 /**
  * @file ardak_node.cpp
- * @author Nick Skinner (nskinner@zygenrobotics.com)
+ * @author Nick Skinner (nicholas.skinner95@gmail.com)
  * @brief Primary application control for the ardak system. Dictates incoming
  * signals to determine functional state of the machine and signal downstream
  * packages to start/stop operations. Handles switching from autonomous modes to
@@ -8,7 +8,7 @@
  * downstream packages.
  * @version 0.1
  *
- * @copyright Copyright (c) 2021
+ * @copyright Copyright (c) 2021-2024
  *
  */
 #include "ardak_node.hpp"
