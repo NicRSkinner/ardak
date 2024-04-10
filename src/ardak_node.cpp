@@ -37,17 +37,12 @@ namespace bfr
         RCLCPP_INFO_STREAM(this->get_logger(), "Starting ardak controller.");
         try
         {
-            this->base_qos.liveliness(RMW_QOS_POLICY_LIVELINESS_AUTOMATIC);
-            this->base_qos.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
-            this->base_qos.liveliness_lease_duration(2s);
-            this->base_qos.history(RMW_QOS_POLICY_HISTORY_KEEP_LAST);
-
             RCLCPP_INFO_STREAM(this->get_logger(), "Creating ROS objects.");
             this->runPublisher =
                 this->create_publisher<std_msgs::msg::Bool>("safety/run", this->base_qos);
             this->gamepadSubscription = this->create_subscription<bfr_msgs::msg::Gamepad>(
                 "hal/inputs/gamepad",
-                this->base_qos,
+                rclcpp::SensorDataQoS(rclcpp::KeepLast(1)),
                 std::bind(&ArdakNode::gamepad_callback, this, _1)
             );
 

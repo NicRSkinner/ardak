@@ -363,18 +363,35 @@ def generate_launch_description():
         remappings=[
                     ("appout/drive/left_drive_command", "odrive0/motor0/input_vel"),
                     ("appout/drive/right_drive_command", "odrive0/motor1/input_vel"),
-                    ("appout/drive/wheel_cmd", "wheel_cmd")
+                    ("appout/drive/wheel_cmd", "wheel_cmd"),
         ],
         condition=IfCondition(
             PythonExpression([use_ardak_nodes])
         )
     )
 
-    gamepad_node = Node(
-        package="bfr_hal",
-        executable="gamepad.py",
-        condition=IfCondition(use_manual_drive)
-    )
+    gamepad_nodes = [
+        ComposableNodeContainer(
+            name='joy_container',
+            namespace='p9n',
+            package='rclcpp_components',
+            executable='component_container',
+            composable_node_descriptions=[
+                ComposableNode(
+                    package='joy',
+                    plugin='joy::Joy',
+                    name='joy',
+                ),
+                ComposableNode(
+                    package='bfr_hal',
+                    plugin='zyg::PS5Controller',
+                    name='gamepad_node',
+                    parameters=[{
+                        'hw_type': 'DualSense'
+                    }]
+                )
+            ]),
+    ]
 
     odrive_node = Node(
         package="odrive_ros2",
@@ -548,7 +565,7 @@ def generate_launch_description():
         condition=IfCondition(useMappingDriver)
     )
 
-    return LaunchDescription(launch_args + [
+    return LaunchDescription(launch_args + gamepad_nodes + [
         SetParameter(name='use_sim_time', value=use_simulator),
 
         # ROBOT NODES
@@ -559,7 +576,7 @@ def generate_launch_description():
         odrive_node,
 
         # HARDWARE NODES
-        gamepad_node,
+        #gamepad_nodes,
 
         # T265 is deprecated (forcefully) from Intel. Older packages either do not work, or not easy to install.
         #t265_node,
