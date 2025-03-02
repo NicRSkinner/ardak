@@ -175,7 +175,7 @@ namespace bfr
 
                     this->gamepadSubscription = this->create_subscription<bfr_msgs::msg::Gamepad>(
                         "hal/inputs/gamepad",
-                        rclcpp::SensorDataQoS(rclcpp::KeepLast(1)),
+                        rclcpp::SensorDataQoS(rclcpp::KeepLast(3)),
                         std::bind(&DriveControllerNode::gamepad_callback, this, _1)
                     );
                         //sub_options
